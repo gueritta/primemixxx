@@ -1,0 +1,22 @@
+[Unit]
+Description=MIXXX DJ Software (SD Card)
+After=sound.target multi-user.target
+Conflicts=engine.service
+Before=engine.service
+
+[Service]
+Type=simple
+ExecStart=/media/az01-internal/mixxx/mixxx_launcher.sh
+Restart=on-failure
+RestartSec=2
+Environment=HOME=/root
+Environment=QT_QPA_PLATFORM=eglfs
+Environment=QT_QPA_EGLFS_INTEGRATION=eglfs_emu
+Environment=QT_QPA_EGLFS_KMS_ATOMIC=1
+
+# Real-time audio
+LimitRTPRIO=99
+LimitMEMLOCK=infinity
+
+[Install]
+WantedBy=multi-user.target

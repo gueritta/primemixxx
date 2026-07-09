@@ -59,6 +59,8 @@ buildroot_path="buildroot/$(get_buildroot_version)"
 make_flags=(
   -C "${buildroot_path}"
   BR2_EXTERNAL=../../buildroot-customizations
+  FORCE_UNSAFE_CONFIGURE=1
+  HOST_TAR_CONF_ENV="ac_cv_header_sys_acl_h=no gl_cv_func_working_acl_get_file=no"
 )
 
 if [ -n "${BR2_JLEVEL:-}" ]; then
@@ -74,6 +76,19 @@ if command -v gcc 2>/dev/null >/dev/null; then
   # read gcc version
   gcc_version=$(gcc --version | grep -Eo 'gcc.+[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+' | cut -d' ' -f 3)
   if [ "$( (echo "$gcc_version" && echo "14.0.0") | sort -V | head -n1 )" = "14.0.0" ]; then
+    # host-gcc-initial 12.3.0: libcody uses u8"" strings incompatible with C++20/23
+    # Force C++11 where u8"" → const char[N] instead of const char8_t[N]
+    # libcody configure also requires exactly C++11 (__cplusplus == 201103)
+    gcc_cxx_override="CXXFLAGS=\"-O2 -I${buildroot_path}/output/host/include -std=c++11\""
+    make_flags+=(HOST_GCC_INITIAL_CONF_ENV="${gcc_cxx_override} CFLAGS_FOR_BUILD=-std=gnu17")
+    make_flags+=(HOST_GCC_FINAL_CONF_ENV="${gcc_cxx_override} CFLAGS_FOR_BUILD=-std=gnu17")
+    echo "WARNING: Forcing CXXFLAGS=-std=c++11 for host-gcc-initial/final due to GCC $gcc_version"
+
+    # host-systemd: newer kernel headers have errno aliases (EFSBADCRC=EBADMSG, EFSCORRUPTED=EUCLEAN)
+    # causing duplicate array initializers in generated errno-to-name.h
+    make_flags+=(HOST_SYSTEMD_CONF_ENV="CFLAGS=\"-O2 -I${buildroot_path}/output/host/include -Wno-error=override-init\"")
+    echo "WARNING: Adding -Wno-error=override-init for host-systemd due to GCC $gcc_version"
+
     # m4 1.4.19 and older
     #
     # ref #69
@@ -110,8 +125,12 @@ if command -v gcc 2>/dev/null >/dev/null; then
         make_flags+=(HOST_GMP_CONF_ENV=CFLAGS=-std=gnu17)
       fi
     fi
+
   fi
 fi
+
+# CMake 4.x dropped compatibility with cmake_minimum_required < 3.5
+export CMAKE_POLICY_VERSION_MINIMUM=3.5
 
 make "${make_flags[@]}" "${device_id_lowercase}_defconfig"
 make "${make_flags[@]}"
@@ -129,3 +148,5 @@ fi
 do_mount --write sed -i 's,#PermitRootLogin .\+,PermitRootLogin yes,g' /etc/ssh/sshd_config
 (echo denonprime4 && echo denonprime4) | do_mount --write passwd root
 do_mount --write mkdir -p /var/empty
+echo "==> Pre-generating SSH host keys (so sshd doesn't need writable /etc at boot)..."
+do_mount --write ssh-keygen -A
