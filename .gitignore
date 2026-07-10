@@ -8,12 +8,20 @@
 *.run
 /go/updater
 /go/find_update
+/go/*_linux_amd64
+/go/fltk_build/
 /buildroot/
 /engineos/*
 !/engineos/.gitkeep
 /media/
 /unpacked-img/
+/unpacked-ssh-img/
 /updater/
+/updater-run/
+/mixxx-bundle/bin/
+/mixxx-bundle/lib/
+/session-backup-*/
+/*Update_linux/
 
 /*_mali_*
 /mali*
