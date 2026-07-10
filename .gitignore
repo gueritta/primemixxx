@@ -27,3 +27,6 @@
 /mali*
 /libmali*
 backups/
+artifacts/*.tar.gz
+artifacts/*.tar.xz
+artifacts/*.img
