@@ -30,3 +30,4 @@ backups/
 artifacts/*.tar.gz
 artifacts/*.tar.xz
 artifacts/*.img
+/device-libs/
