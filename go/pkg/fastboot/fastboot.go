@@ -213,6 +213,8 @@ func (fb *FastBootChannel) Command(ctx context.Context, cmd string, param ...any
 		return data, nil
 	case err := <-fb.errorC:
 		return nil, err
+	case <-ctx.Done():
+		return nil, ctx.Err()
 	}
 }
 
@@ -234,6 +236,8 @@ func (fb *FastBootChannel) dataCommand(
 		return data, ErrUnexpectedResponse
 	case err := <-fb.errorC: // error/fail
 		return nil, err
+	case <-ctx.Done():
+		return nil, ctx.Err()
 	case returnedSize := <-fb.readyForDataC: // data
 		if returnedSize != size {
 			return nil, &UnexpectedDataSizeError{
@@ -267,6 +271,8 @@ func (fb *FastBootChannel) dataCommand(
 		return result, nil
 	case err := <-fb.errorC:
 		return nil, err
+	case <-ctx.Done():
+		return nil, ctx.Err()
 	}
 }
 

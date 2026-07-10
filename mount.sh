@@ -59,7 +59,7 @@ mount -t tmpfs run engineos/run
 mount -t sysfs sys engineos/sys
 mount -t tmpfs sys_firmware engineos/sys/firmware
 mkdir engineos/sys/firmware/devicetree
-mount --bind -o ro devicetrees/JC11 engineos/sys/firmware/devicetree
+mount --bind -o ro "devicetrees/${device_id}" engineos/sys/firmware/devicetree
 mount -t tmpfs tmp engineos/tmp
 
 if [ "$listonly" -ne 0 ]; then
