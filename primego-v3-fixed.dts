@@ -1,0 +1,48 @@
+/dts-v1/;
+
+/ {
+	timestamp = <0x690ae308>;
+	description = "Stripped stock with SSH key + USB ethernet";
+	compatible = "inmusic,jp11";
+	inmusic,devices = <0x15e4d00c>;
+	inmusic,version = "4.3.4";
+
+	images {
+
+		splash {
+			description = "Stripped stock with SSH key + USB ethernet";
+			partition = "splash";
+			data = /incbin/("unpacked-ssh-img/stock-tkgl.img.xz");
+			compression = "xz";
+
+			hash {
+				algo = "sha1";
+				value = [4d5a231a7cc1a1adf9d88e03690b8235d4e18f07];
+			};
+		};
+
+		recoverysplash {
+			description = "Stripped stock with SSH key + USB ethernet";
+			partition = "recoverysplash";
+			data = /incbin/("unpacked-ssh-img/stock-tkgl.img.xz");
+			compression = "xz";
+
+			hash {
+				algo = "sha1";
+				value = [4d5a231a7cc1a1adf9d88e03690b8235d4e18f07];
+			};
+		};
+
+		rootfs {
+			description = "Stripped stock with SSH key + USB ethernet";
+			partition = "rootfs";
+			data = /incbin/("unpacked-ssh-img/stock-tkgl.img.xz");
+			compression = "xz";
+
+			hash {
+				algo = "sha1";
+				value = [4d5a231a7cc1a1adf9d88e03690b8235d4e18f07];
+			};
+		};
+	};
+};

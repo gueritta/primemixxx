@@ -1,0 +1,31 @@
+/dts-v1/;
+/ {
+	timestamp = <0x690ae308>;
+	description = "JP11 MIXXX + SSH upgrade image";
+	compatible = "inmusic,jp11";
+	inmusic,devices = <0x15e4d00c>;
+	inmusic,version = "4.3.4";
+	images {
+		splash {
+			description = "Splash screen";
+			partition = "splash";
+			data = /incbin/("unpacked-ssh-img/splash.img.xz");
+			compression = "xz";
+			hash { algo = "sha1"; value = <0xc2739a42 0x0158d655 0x5c5449e0 0x52fdb8bd 0x6292229f>; };
+		};
+		recoverysplash {
+			description = "Update mode splash screen";
+			partition = "recoverysplash";
+			data = /incbin/("unpacked-ssh-img/recoverysplash.img.xz");
+			compression = "xz";
+			hash { algo = "sha1"; value = <0x9dd3a6bc 0x88920a69 0x485e1f55 0x46795e60 0xdda0ae27>; };
+		};
+		rootfs {
+			description = "Root filesystem";
+			partition = "rootfs";
+			data = /incbin/("unpacked-ssh-img/rootfs-mixxx-ssh-v8.img.xz");
+			compression = "xz";
+			hash { algo = "sha1"; value = <0x4fc89c37 0x3f156c13 0xc44fc1f2 0xca15b79b 0xd51aaa30>; };
+		};
+	};
+};
