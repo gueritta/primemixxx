@@ -31,3 +31,4 @@ artifacts/*.tar.gz
 artifacts/*.tar.xz
 artifacts/*.img
 /device-libs/
+extracted_run/
