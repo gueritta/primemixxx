@@ -41,16 +41,15 @@ ln -sf /usr/lib/libmali.so.14.0 libGLESv1_CM.so
 
 ```bash
 # Use SD card's bundled Qt 5.15.8 — NOT device's Qt 5.15.2
-export LD_LIBRARY_PATH="/media/az01-internal/mixxx/lib:/usr/lib:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="/media/az01-internal/mixxx/lib:/usr/qt/lib:/usr/lib"
 export QT_PLUGIN_PATH="/media/az01-internal/mixxx/qt-plugins"
 export QT_QPA_PLATFORM=eglfs
 export QT_QPA_EGLFS_INTEGRATION=eglfs_mali          # Custom Mali integration (not emu)
-export QT_QPA_EGLFS_KMS_ATOMIC=1
 export QT_QPA_EGLFS_ROTATION=90
 export QT_QPA_FONTDIR=/usr/share/fonts
-export QT_QPA_GENERIC_PLUGINS=evdevtouch:evdevmouse:evdevkeyboard
-export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS="/dev/input/event0:rotate=90"
-export HOME=/root
+export QT_QPA_GENERIC_PLUGINS=evdevtouch:/dev/input/event0,evdevkeyboard:/dev/input/event1
+export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=/dev/input/event0:rotate=0
+export HOME=/tmp
 ```
 
 ### Key Points
@@ -60,7 +59,7 @@ export HOME=/root
 - **Custom Mali integration plugin:** `/media/az01-internal/mixxx/qt-plugins/egldeviceintegrations/libqeglfs-mali-integration.so` — built from the same Qt 5.15.8 source as the bundled Qt libs. This is the critical component that enables display output.
 - **KMS/DRM**: The GPU drives the built-in 7-inch display via `/dev/dri/card0` (DRM connector status: "connected"). fbcon may still hold DRM plane-4 but Mali GPU outputs via hardware overlay.
 - **Touchscreen**: ILI2117 detected on `/dev/input/event0`, works with evdev input plugin with `QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS="/dev/input/event0:rotate=90"`.
-- **Dialog suppression:** The SD card's MIXXX binary (built Jul 13 2025) has `"skipping dialog on EGLFS"` built in — no LD_PRELOAD/nodialog shim needed for this build. The nodialog.cpp in the overlay is kept as a fallback for other Qt builds.
+- **Dialog suppression:** The SD card's MIXXX binary (10 MB at `lib/bin/mixxx`) handles EGLFS gracefully. The `mixxx.real` binary (17 MB) is a different build that crashes with `EGLFS: OpenGL windows cannot be mixed with others`. Only `lib/bin/mixxx` should be used. `nodialog.so` exists at `lib/nodialog.so` as a fallback for other Qt builds but is NOT used in the default launcher.
 
 ### GPU Performance
 

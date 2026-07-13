@@ -10,14 +10,31 @@
 
 The `mixxx-bundle/` directory in this repo is the **local mirror** of what was SCP'd to the device. It was created by `scripts/collect-mixxx-bundle.sh` from Buildroot output, then deployed via `scripts/deploy-to-device.sh` using SCP.
 
-## Contents
+## Directory Structure (Binary Layout)
+
+**Important:** The MIXXX binary lives in `lib/bin/mixxx` (~10 MB stripped). The `bin/` directory contains symlinks pointing into `lib/bin/`:
 
 ```
 /media/az01-internal/mixxx/
+├── mixxx.real                             # 17 MB binary — DO NOT USE (causes EGLFS crash)
 ├── bin/
-│   ├── mixxx                              # MIXXX 2.5.6 ARMv7 binary (~325MB unstripped)
-│   └── mixxx.debug                        # Debug symbols
-├── lib/                                   # 66 shared libraries
+│   ├── mixxx -> ../lib/bin/mixxx          # Symlink to working 10 MB binary
+│   ├── controllers -> ../lib/bin/controllers
+│   ├── effects -> ../lib/bin/effects
+│   ├── keyboard -> ../lib/bin/keyboard
+│   ├── skins -> ../lib/bin/skins
+│   └── translations -> ../lib/bin/translations
+├── lib/
+│   ├── bin/
+│   │   ├── mixxx                          # MIXXX 2.5.6 ARMv7 binary (~10 MB, working)
+│   │   ├── mixxx.bak                      # Backup copy
+│   │   ├── controllers -> ../controllers  # Symlink to parent dir
+│   │   ├── effects -> ../effects
+│   │   ├── keyboard -> ../keyboard
+│   │   ├── skins -> ../skins
+│   │   └── translations -> ../translations
+│   ├── nodialog.so                        # LD_PRELOAD dialog blocker (unused by default)
+│   ├── ...                                # 66 shared libraries
 │   ├── libQt5*.so.5                       # Qt 5.15.8 (bundled, not device's 5.15.2)
 │   ├── libEGL.so, libGLESv2.so, libGLESv1_CM.so  # Mali r1p0 shims → /usr/lib/libmali.so
 │   ├── libasound.so.2                     # ALSA
@@ -82,69 +99,47 @@ The `mixxx-bundle/` directory in this repo is the **local mirror** of what was S
     └── mixxx.bak                          # MD5: a0365bdce2162c1a09d0ba77ab4af227
 ```
 
-## Launcher Script (Working Version on Device: `/data/mixxx/mixxx`)
+## Launcher Script (Working Version on Device)
 
-The firmware overlay at `buildroot-customizations/board/inmusic/jp11/rootfs_overlay/usr/bin/mixxx_launcher.sh`
-matches this script. The entry point called by TKGL bootstrap.
+The actual working launcher on the device is minimal — the TKGL bootstrap framework
+handles USB mounts, seed DB, and GPU governor. This script only sets environment
+variables and launches MIXXX. **Located on SD card at `mixxx_launcher.sh`.**
+
+The entry point on internal storage (`/data/mixxx/mixxx`) is a thin delegation:
+```sh
+#!/bin/sh
+# TKGL entry point - delegates to SD card launcher
+exec /media/az01-internal/mixxx/mixxx_launcher.sh "$@"
+```
 
 ```sh
 #!/bin/sh
-# MIXXX Launcher — Denon Prime Go (SD card binary + USB bind-mount)
-MIXDIR="/media/az01-internal/mixxx"
-BUNDLE="$MIXDIR"
-SETTINGS="$MIXDIR/settings"
-
-# Wait for USB (up to 15s)
-for i in $(seq 0 15); do
-    if [ -b /dev/sda1 ]; then break; fi
-    sleep 1
-done
-
-# Mount USB if plugged, bind-mount to trusted ext4 path
-if [ -b /dev/sda1 ]; then
-    mkdir -p /media/AE1F-B2D6
-    mount /dev/sda1 /media/AE1F-B2D6 -o ro,fmask=0022,dmask=0022 2>/dev/null || true
-    if [ -d /media/AE1F-B2D6/tuv ]; then
-        mkdir -p "$MIXDIR/music"
-        mount --bind /media/AE1F-B2D6/tuv "$MIXDIR/music" 2>/dev/null || true
-    fi
-fi
-
-# Restore seed DB if current DB is missing/corrupted
-# MIXXX loads library dirs from SQLite 'directories' table, not mixxx.cfg
-if [ ! -f "$SETTINGS/mixxxdb.sqlite" ] || [ $(stat -c%s "$SETTINGS/mixxxdb.sqlite" 2>/dev/null || echo 0) -lt 5000 ]; then
-    if [ -f "$SETTINGS/mixxxdb.seed" ]; then
-        cp "$SETTINGS/mixxxdb.seed" "$SETTINGS/mixxxdb.sqlite"
-    fi
-fi
-
-# SD card's bundled Qt 5.15.8 + custom Mali integration (eglfs_mali)
-export LD_LIBRARY_PATH="$BUNDLE/lib:/usr/lib:$LD_LIBRARY_PATH"
+# MIXXX Launcher — Denon Prime Go (SD card)
+# Minimal: env only. USB mount, seed DB, GPU governor handled by TKGL bootstrap.
+BUNDLE=/media/az01-internal/mixxx
 export QT_PLUGIN_PATH="$BUNDLE/qt-plugins"
-export QT_QPA_FONTDIR=/usr/share/fonts
-export QT_QPA_GENERIC_PLUGINS=evdevtouch:evdevmouse:evdevkeyboard
+export LD_LIBRARY_PATH="$BUNDLE/lib:/usr/qt/lib:/usr/lib"
 export QT_QPA_PLATFORM=eglfs
 export QT_QPA_EGLFS_INTEGRATION=eglfs_mali
-export QT_QPA_EGLFS_KMS_ATOMIC=1
 export QT_QPA_EGLFS_ROTATION=90
-export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS="/dev/input/event0:rotate=90"
-export QT_LOGGING_RULES="qt.qpa.evdevtouch=true;qt.qpa.input=true"
-
-for g in /sys/class/devfreq/*mali*/governor /sys/class/devfreq/*gpu*/governor; do
-    [ -f "$g" ] && echo performance > "$g" 2>/dev/null
-done
-
-export HOME=/root
+export QT_QPA_FONTDIR=/usr/share/fonts
+export QT_QPA_GENERIC_PLUGINS=evdevtouch:/dev/input/event0,evdevkeyboard:/dev/input/event1
+export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=/dev/input/event0:rotate=0
+export HOME=/tmp
 export XDG_RUNTIME_DIR=/tmp
-
-systemctl stop engine 2>/dev/null || true
-sleep 0.5
-
-exec taskset -c 2,3 chrt -f 99 "$BUNDLE/bin/mixxx" -platform eglfs \
-  --settingsPath "$SETTINGS" \
-  --resourcePath "$BUNDLE/bin" \
-  "$@"
+exec taskset -c 2,3 chrt -f 99 $BUNDLE/bin/mixxx -platform eglfs --settingsPath $BUNDLE/settings --resourcePath $BUNDLE
 ```
+
+### Key differences from the repo's old template:
+| Setting | Old (wrong) | Actual (working) |
+|---------|-------------|------------------|
+| `--resourcePath` | `$BUNDLE/bin` | `$BUNDLE` (root) |
+| `HOME` | `/root` | `/tmp` |
+| `LD_LIBRARY_PATH` | `$BUNDLE/lib:/usr/lib` | `$BUNDLE/lib:/usr/qt/lib:/usr/lib` |
+| `QT_QPA_EGLFS_KMS_ATOMIC` | `1` | not set |
+| `QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS` | `rotate=90` | `rotate=0` |
+| `QT_QPA_GENERIC_PLUGINS` | `evdevtouch:evdevmouse:evdevkeyboard` | `evdevtouch:/dev/input/event0,evdevkeyboard:/dev/input/event1` |
+| USB mount / seed DB / GPU governor / `systemctl stop engine` | In launcher | Handled by TKGL bootstrap |
 
 ## Systemd Service
 
@@ -221,11 +216,12 @@ These MUST come from device's `/lib` — bundled versions cause segfaults from k
 
 ## Known Issues (Current State)
 
-1. **Screen rotation:** `QT_QPA_EGLFS_ROTATION=90` — Mali renders portrait (800×1280), display controller rotates to landscape (1280×800).
-2. **Mali DDK mismatch:** Bundled `libEGL.so`/`libGLESv2.so` from Buildroot target r0p0; device has r1p0. **FIXED:** Symlinks on SD card point all EGL/GLES libs to `/usr/lib/libmali.so.14.0`. The deployment script handles this automatically.
-3. **Qt version:** Buildroot cross-compiles MIXXX against Qt 5.15.8. The SD card bundles this exact Qt version (under `lib/`). Device's native Qt 5.15.2 is **NOT used** — it causes a black screen with `eglfs_emu`. **CRITICAL:** The launcher MUST use `$BUNDLE/lib` (SD card's Qt 5.15.8) in `LD_LIBRARY_PATH`, NOT `/usr/qt/lib`.
-4. **WiFi power save:** Must run `iw dev wlan0 set power_save off` — not persistent across reboots.
-5. **USB UUID:** The USB mount path `/media/AE1F-B2D6` assumes a specific vfat UUID. If the USB key is reformatted, update the launcher accordingly.
+1. **Two binaries exist:** `mixxx.real` (17 MB) at the root is a DIFFERENT build that crashes with `EGLFS: OpenGL windows cannot be mixed with others`. The working binary is `lib/bin/mixxx` (~10 MB). `bin/mixxx` is a symlink pointing to `lib/bin/mixxx` — do NOT change it to point to `mixxx.real`.
+2. **Screen rotation:** `QT_QPA_EGLFS_ROTATION=90` — Mali renders portrait (800×1280), display controller rotates to landscape (1280×800). Touchscreen uses `rotate=0` because the touch coordinates match the physical orientation.
+3. **Mali DDK mismatch:** Bundled `libEGL.so`/`libGLESv2.so` from Buildroot target r0p0; device has r1p0. **FIXED:** Symlinks on SD card point all EGL/GLES libs to `/usr/lib/libmali.so.14.0`.
+4. **Qt version:** SD card bundles Qt 5.15.8. Device's native Qt 5.15.2 is **NOT used**. Launcher includes `/usr/qt/lib` in `LD_LIBRARY_PATH` (between bundle and system paths) as fallback.
+5. **WiFi power save:** Must run `iw dev wlan0 set power_save off` — not persistent across reboots.
+6. **nodialog.so:** Present at `lib/nodialog.so` but NOT used in the default launcher. The `mixxx-svc` fallback launcher uses it. The TKGL bootstrap path does not.
 
 ## Deployment Scripts
 

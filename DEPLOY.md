@@ -33,12 +33,14 @@ ssh root@primego.local switch-to-engine
 
 | Path on device | Contents |
 |---|---|
-| `/media/az01-internal/mixxx/bin/mixxx` | MIXXX binary (ARMv7, 11.4MB) |
+| `/media/az01-internal/mixxx/lib/bin/mixxx` | MIXXX binary (ARMv7, ~10 MB, working) |
+| `/media/az01-internal/mixxx/bin/mixxx` | Symlink → `../lib/bin/mixxx` |
+| `/media/az01-internal/mixxx/mixxx.real` | 17 MB binary — DO NOT USE (EGLFS crash) |
 | `/media/az01-internal/mixxx/lib/` | All shared libraries MIXXX needs |
 | `/media/az01-internal/mixxx/qt-plugins/` | Qt5 EGLFS platform, image, SQL plugins |
 | `/media/az01-internal/mixxx/mixxx-mapping/` | MIDI controller mappings |
-| `/media/az01-internal/mixxx/mixxx_launcher.sh` | Wrapper with LD_LIBRARY_PATH |
-| `/etc/systemd/system/mixxx.service` | systemd unit (disabled by default) |
+| `/media/az01-internal/mixxx/mixxx_launcher.sh` | Minimal wrapper with env vars only |
+| `/data/mixxx/mixxx` | Entry point — delegates to SD launcher |
 | `/usr/bin/switch-to-mixxx` | Switcher: Engine → MIXXX |
 | `/usr/bin/switch-to-engine` | Switcher: MIXXX → Engine |
 
@@ -112,10 +114,10 @@ cd go && go run ./cmd/updater/ --firmware ../PRIMEGO-4.3.4-STOCK-SSH-Update.img
 - Fallback: flash stock firmware, use `mount.sh --write` to manually add WiFi config
 
 **MIXXX segfaults (exit code 139)**:
-- **System libs conflict**: The bundle must NOT contain `libc.so.6`, `libm.so.6`, `libpthread.so.0`, `libdl.so.2`, `librt.so.1`, `libstdc++.so.6`, `libgcc_s.so.1`, `ld-linux-armhf.so.3`, or `libatomic.so.1`. These MUST come from the device's `/lib`. Run `scripts/fix-device-libs.sh` on the device to remove them.
+- **System libs conflict**: The bundle must NOT contain `libc.so.6`, `libm.so.6`, `libpthread.so.0`, `libdl.so.2`, `librt.so.1`, `libstdc++.so.6`, `libgcc_s.so.1`, `ld-linux-armhf.so.3`, or `libatomic.so.1`. These MUST come from the device's `/lib`.
 - **Mali DDK mismatch**: Error "DDK is not compatible... r1p0 vs r0p0" means the bundled `libEGL.so`/`libGLESv2.so` target the wrong Mali driver version. Fix: `cd /media/az01-internal/mixxx/lib && rm -f libEGL.so libGLESv2.so libGLESv1_CM.so && ln -sf /usr/lib/libmali.so.14.0 libEGL.so && ln -sf /usr/lib/libmali.so.14.0 libGLESv2.so && ln -sf /usr/lib/libmali.so.14.0 libGLESv1_CM.so`
-- **Qt 5.15.8 bundled on SD card**: MIXXX is compiled against Qt 5.15.8 and the SD card bundles this exact version. The device's native Qt 5.15.2 at `/usr/qt/lib` is NOT used — it causes a black screen with `eglfs_emu`. The bundled Qt 5.15.8 + custom `libqeglfs-mali-integration.so` works reliably.
-- **Mali DDK r1p0**: SD card EGL/GLES libs must be symlinked to device's `/usr/lib/libmali.so.14.0` to avoid r0p0/r1p0 mismatch.
+- **EGLFS crash "OpenGL windows cannot be mixed with others"**: This happens when using the wrong binary (`mixxx.real` 17 MB). Use `lib/bin/mixxx` 10 MB instead. Check: `ls -la bin/mixxx` should point to `../lib/bin/mixxx`, NOT `../mixxx.real`.
+- **Qt 5.15.8 bundled on SD card**: MIXXX is compiled against Qt 5.15.8 and the SD card bundles this exact version. The device's native Qt 5.15.2 at `/usr/qt/lib` is used as fallback only.
 
 **MIXXX fails to start**:
 - Check `journalctl -u mixxx.service` or `journalctl -u mixxx-app.service` on device
