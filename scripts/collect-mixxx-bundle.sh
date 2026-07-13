@@ -176,14 +176,24 @@ fi
 # mappings must live alongside the default bundled mappings (copied in Step 4b).
 # The .midi.xml files reference lodash.mixxx.js and midi-components-0.0.js
 # which are already in controllers/ from Buildroot's MIXXX resources.
+#
+# IMPORTANT: .midi.xml and .js files must be FLAT in controllers/, NOT in a
+# subfolder. Mixxx resolves mapping file names (e.g. "Denon-Prime-Go.midi.xml")
+# by scanning controllers/ directly — subfolders are not searched recursively.
 echo ""
 echo "--- Copying Denon MIDI mappings into controllers/ ---"
 MAPPINGS_SRC="$REPO_ROOT/buildroot-customizations/board/inmusic/jp11/mixxx-mapping"
 if [ -d "$MAPPINGS_SRC" ]; then
   # Ensure controllers/ exists (should have been created in Step 4b)
   mkdir -p "$BUNDLE_DIR/controllers"
-  # Copy Denon mappings alongside built-in mappings so Mixxx discovers them
-  cp -rv "$MAPPINGS_SRC/"* "$BUNDLE_DIR/controllers/"
+  # Copy Denon mappings flat into controllers/ (no subfolders — Mixxx requires flat layout)
+  for item in "$MAPPINGS_SRC/"*.midi.xml "$MAPPINGS_SRC/"*-scripts.js "$MAPPINGS_SRC/"*.hid.xml; do
+    [ -f "$item" ] && cp -v "$item" "$BUNDLE_DIR/controllers/"
+  done
+  # Copy any Prime Go mapping files from the prime-go/ subfolder into controllers/ flat
+  for item in "$MAPPINGS_SRC"/prime-go/*.midi.xml "$MAPPINGS_SRC"/prime-go/*-scripts.js; do
+    [ -f "$item" ] && cp -v "$item" "$BUNDLE_DIR/controllers/"
+  done
   # Also keep a source copy in mixxx-mapping/ for repo reference
   mkdir -p "$BUNDLE_DIR/mixxx-mapping"
   cp -rv "$MAPPINGS_SRC/"* "$BUNDLE_DIR/mixxx-mapping/"
