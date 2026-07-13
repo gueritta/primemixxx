@@ -1,0 +1,48 @@
+#!/bin/sh
+# Runs as Engine's ExecStartPre and delegates Mixxx to a transient service.
+
+BOOT_LOG=/data/tkgl-boot-debug.log
+BOOTSTRAP_MOUNT=/media/TKGL_BOOTSTRAP
+TKGL_ROOT=$BOOTSTRAP_MOUNT/tkgl_bootstrap_DenonPrimeGO
+
+echo "$(date): TKGL launcher started" >> "$BOOT_LOG"
+
+if systemctl is-active --quiet mixxx-app.service; then
+    echo "$(date): mixxx-app.service already active" >> "$BOOT_LOG"
+    exit 0
+fi
+
+[ -c /dev/mali0 ] && chmod 666 /dev/mali0 2>/dev/null
+for governor in /sys/class/devfreq/*mali*/governor /sys/class/devfreq/*gpu*/governor; do
+    [ -f "$governor" ] && echo performance > "$governor" 2>/dev/null
+done
+
+elapsed=0
+while [ ! -d "$TKGL_ROOT" ] && [ "$elapsed" -lt 60 ]; do
+    mkdir -p "$BOOTSTRAP_MOUNT"
+    mountpoint -q "$BOOTSTRAP_MOUNT" || mount -L TKGL_BOOTSTRAP "$BOOTSTRAP_MOUNT" 2>/dev/null || true
+    [ -d "$TKGL_ROOT" ] && break
+    sleep 2
+    elapsed=$((elapsed + 2))
+done
+
+if [ ! -d "$TKGL_ROOT" ]; then
+    echo "TKGL: bootstrap not found after ${elapsed}s" >> "$BOOT_LOG"
+    exit 0
+fi
+
+cat > "$TKGL_ROOT/scripts/tkgl_path" <<EOF
+MOUNT_POINT="$BOOTSTRAP_MOUNT"
+TKGL_ROOT="$TKGL_ROOT"
+TKGL_BIN="\$TKGL_ROOT/bin"
+TKGL_LIB="\$TKGL_ROOT/lib"
+TKGL_CONF="\$TKGL_ROOT/conf"
+TKGL_LOG="\$TKGL_ROOT/logs"
+TKGL_SCRIPTS="\$TKGL_ROOT/scripts"
+TKGL_MODULES="\$TKGL_ROOT/modules"
+TKGL_LOG_FILE="\$TKGL_LOG/bootstrap_\$(date +%Y%m%d_%H%M%S).log"
+EOF
+
+echo "TKGL: running bootstrap" >> "$BOOT_LOG"
+"$TKGL_ROOT/scripts/tkgl_bootstrap" 2>&1 | tee -a "$BOOT_LOG"
+exit 0
