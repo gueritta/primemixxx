@@ -1,0 +1,48 @@
+#!/bin/sh
+# TKGL Bootstrap - Main script
+# Reads doer_list and executes modules in order
+# Source: adapted from MPC-LiveXplore-bootstrap
+
+# Source tkgl_path first (needed when run as child process)
+TKGL_ROOT_DIR="$(dirname "$(readlink -f "$0")")/.."
+. "$TKGL_ROOT_DIR/scripts/tkgl_path"
+
+BOOTSTRAP_LOG="$TKGL_LOG_FILE"
+
+log() {
+    echo "[$(date +%H:%M:%S)] $*" | tee -a "$BOOTSTRAP_LOG"
+}
+
+log "=========================================="
+log "TKGL Bootstrap starting for Denon Prime GO"
+log "Device: $(cat /sys/firmware/devicetree/model 2>/dev/null || echo 'unknown')"
+log "=========================================="
+
+# Update PATH
+export PATH="$TKGL_BIN:$TKGL_LIB:$PATH"
+export LD_LIBRARY_PATH="$TKGL_LIB:$LD_LIBRARY_PATH"
+
+# Source doer_list to get TKGL_DOER
+if [ -f "$TKGL_ROOT/doer_list" ]; then
+    . "$TKGL_ROOT/doer_list"
+    log "doer_list loaded: TKGL_DOER='$TKGL_DOER'"
+else
+    log "ERROR: doer_list not found at $TKGL_ROOT/doer_list"
+    exit 1
+fi
+
+# Execute each module in order
+for module in $TKGL_DOER; do
+    MOD_SCRIPT="$TKGL_MODULES/mod_$module/tkgl_mod_$module.sh"
+    log "--- Executing module: $module ---"
+    if [ -f "$MOD_SCRIPT" ]; then
+        . "$MOD_SCRIPT"
+    else
+        log "ERROR: Module script not found: $MOD_SCRIPT"
+    fi
+    log "--- Module $module completed ---"
+done
+
+log "=========================================="
+log "TKGL Bootstrap completed"
+log "=========================================="
