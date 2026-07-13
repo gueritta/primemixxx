@@ -59,3 +59,47 @@ speaker-test -D hw:JP11 -c 2 -t sine -f 440
 amixer -c JP11 contents
 amixer -c JP11 controls
 ```
+
+## PortAudio — Assertion Fix (NDEBUG)
+
+The Buildroot portaudio package builds a debug version (`V19.7.0-devel`) with all
+C `assert()` calls active. During ALSA device enumeration, PortAudio's `GropeDevice()`
+probes plugin PCMs that return 0 channels on the JP11 hardware, triggering
+`assert(maxChans > 0)` → SIGABRT → crash.
+
+**Fix**: Add `-DNDEBUG` to PortAudio's CFLAGS in `package/portaudio/portaudio.mk`
+via a post-configure hook. This disables all assertions in `pa_linux_alsa.c`.
+See `patches/portaudio-ndebug.mk` for the full modified file.
+
+**Verification**: A standalone test (`minipa_arm`, built from `test/minipa.c`)
+calls `Pa_Initialize()` + `Pa_GetDeviceCount()` and confirms:
+- 4 devices found
+- JP11: PCM inmusic,jp11-audio-codec-0 (hw:1,0) — 2 in, 4 out
+
+### Known Issue — Mixxx Startup Crash Regression
+
+After the PortAudio NDEBUG fix, Mixxx crashes during Qt initialization (before
+`main()` — during dynamic linker constructor phase). The crash is NOT caused by
+PortAudio (standalone test works, removing PortAudio just changes the error).
+Mixxx previously launched successfully with GUI (see `mixxx-now.log` at 21:37).
+
+Suspected trigger: A change in the SD card bundle (Qt plugin, library version
+mismatch, or Mali integration) deployed alongside the PortAudio rebuild.
+
+### soundconfig.xml — Bypassing Enumeration
+
+If PortAudio enumeration remains problematic, Mixxx can skip it entirely by
+providing a pre-configured `soundconfig.xml`:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<SoundManagerConfig>
+  <SoundDevice name="JP11: PCM inmusic,jp11-audio-codec-0 (hw:1,0)" api="ALSA">
+    <output_channels>4</output_channels>
+    <sample_rate>44100</sample_rate>
+  </SoundDevice>
+</SoundManagerConfig>
+```
+
+Place at `/media/az01-internal/mixxx/settings/soundconfig.xml` — Mixxx will
+use this device directly without scanning ALSA hardware.

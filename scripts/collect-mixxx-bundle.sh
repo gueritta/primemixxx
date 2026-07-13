@@ -171,11 +171,21 @@ if [ -d "$MIX_RESOURCES_SRC" ]; then
   done
 fi
 
-# ── Step 5: Copy MIDI controller mappings ────────────────────────────────────
+# ── Step 5: Copy Denon MIDI controller mappings into controllers/ ────────────
+# Mixxx discovers mappings from <resourcePath>/controllers/. The Denon custom
+# mappings must live alongside the default bundled mappings (copied in Step 4b).
+# The .midi.xml files reference lodash.mixxx.js and midi-components-0.0.js
+# which are already in controllers/ from Buildroot's MIXXX resources.
 echo ""
-echo "--- Copying MIDI mappings ---"
+echo "--- Copying Denon MIDI mappings into controllers/ ---"
 MAPPINGS_SRC="$REPO_ROOT/buildroot-customizations/board/inmusic/jp11/mixxx-mapping"
 if [ -d "$MAPPINGS_SRC" ]; then
+  # Ensure controllers/ exists (should have been created in Step 4b)
+  mkdir -p "$BUNDLE_DIR/controllers"
+  # Copy Denon mappings alongside built-in mappings so Mixxx discovers them
+  cp -rv "$MAPPINGS_SRC/"* "$BUNDLE_DIR/controllers/"
+  # Also keep a source copy in mixxx-mapping/ for repo reference
+  mkdir -p "$BUNDLE_DIR/mixxx-mapping"
   cp -rv "$MAPPINGS_SRC/"* "$BUNDLE_DIR/mixxx-mapping/"
 fi
 
