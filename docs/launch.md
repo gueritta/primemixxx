@@ -197,6 +197,30 @@ WantedBy=multi-user.target
 
 Enable with caution — disables Engine DJ at boot.
 
+## Verified Boot Chain (Tested 2026-07-13)
+
+The full chain was verified across a device reboot:
+
+```
+tkgl-mixxx.service (enabled)
+  → /data/tkgl-bootstrap-launcher
+    → tkgl_mod_mixxx.sh
+      → systemd-run --unit=mixxx-app
+        → /data/mixxx/mixxx (116 bytes delegation)
+          → /media/az01-internal/mixxx/mixxx_launcher.sh (SD card)
+            → USB bind-mount + seed DB restore
+              → exec /media/az01-internal/mixxx/bin/mixxx
+```
+
+**Verified results after fresh boot (43s uptime):**
+- ✅ `mixxx-app.service` transient created and active
+- ✅ MIXXX PID 388 running from SD card binary
+- ✅ USB bind-mount: `/dev/sda1` → `/media/az01-internal/mixxx/music`
+- ✅ DB present: 307KB `mixxxdb.sqlite`
+- ✅ Tracks visible in library
+
+**Critical prerequisite:** `mixxx-app.service` must NOT be masked (`/dev/null`). If masked, `systemd-run` fails silently. Fix: `systemctl unmask mixxx-app.service`
+
 ## Switcher Scripts
 
 ### switch-to-mixxx

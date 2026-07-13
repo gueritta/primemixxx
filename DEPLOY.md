@@ -44,12 +44,41 @@ ssh root@primego.local switch-to-engine
 
 ## How It Works
 
-1. The stock firmware boots **Engine DJ normally** — nothing changed.
-2. When you run `switch-to-mixxx`, it:
-   - Stops `engine.service`
-   - Starts `mixxx.service` which runs from the SD card
-3. MIXXX uses `LD_LIBRARY_PATH` to load **its own** bundled Qt5 and other libraries from the SD card, avoiding conflicts with the stock `/usr/qt/lib/`.
-4. `switch-to-engine` reverses the process.
+There are **two launch paths**:
+
+### Path 1: TKGL Bootstrap at Boot (Autostart)
+The working autostart chain used on device:
+
+```
+tkgl-mixxx.service → /data/tkgl-bootstrap-launcher
+  → tkgl_mod_mixxx.sh → systemd-run --unit=mixxx-app
+    → /data/mixxx/mixxx → SD card launcher → MIXXX
+```
+
+- **`/data/mixxx/mixxx`**: A thin delegation script (116 bytes) that calls the SD card launcher:
+  `#!/bin/sh\nexec /media/az01-internal/mixxx/mixxx_launcher.sh "$@"\n`
+- **`mixxx-app.service` must NOT be masked**: The TKGL module uses `systemd-run --unit=mixxx-app` to create a transient unit. If masked (`/dev/null`), it fails silently and MIXXX won't start. Unmask with `systemctl unmask mixxx-app.service`
+- MIXXX uses **SD card's bundled Qt 5.15.8** + custom `libqeglfs-mali-integration.so` (not device Qt 5.15.2 + eglfs_emu)
+
+### Path 2: Manual Switch (SSH)
+When you run `switch-to-mixxx`:
+1. Stops `engine.service`
+2. Starts `mixxx.service` which runs the SD card launcher
+3. `switch-to-engine` reverses the process
+
+### Boot Verification
+```bash
+# After reboot, verify MIXXX is running
+ssh root@primego.local 'ps | grep mixxx'
+# Should show: /media/az01-internal/mixxx/bin/mixxx -platform eglfs ...
+
+# Check transient service was created
+ssh root@primego.local 'systemctl status mixxx-app.service'
+# Should show: Active: active (running)
+
+# Check USB bind-mount
+ssh root@primego.local 'mount | grep "az01-internal/mixxx/music"'
+```
 
 ## SD Card Backup
 
@@ -89,7 +118,9 @@ cd go && go run ./cmd/updater/ --firmware ../PRIMEGO-4.3.4-STOCK-SSH-Update.img
 - **Mali DDK r1p0**: SD card EGL/GLES libs must be symlinked to device's `/usr/lib/libmali.so.14.0` to avoid r0p0/r1p0 mismatch.
 
 **MIXXX fails to start**:
-- Check `journalctl -u mixxx.service` on device
+- Check `journalctl -u mixxx.service` or `journalctl -u mixxx-app.service` on device
+- Check TKGL boot log: `ls /var/log/tkgl/mixxx*.log`
+- **mixxx-app.service is masked**: Run `systemctl unmask mixxx-app.service` — the TKGL module needs this unit name for `systemd-run`
 - Common issue: EGLFS can't open display — ensure engine.service is fully stopped first
 - Verify `/media/az01-internal/mixxx/lib/` contains all needed .so files
 
