@@ -199,12 +199,26 @@ if [ -d "$MAPPINGS_SRC" ]; then
   cp -rv "$MAPPINGS_SRC/"* "$BUNDLE_DIR/mixxx-mapping/"
 fi
 
-# ── Step 6: Ensure launcher is executable (hand-crafted, not generated) ──────
+# ── Step 6: Copy LD_PRELOAD workaround library ────────────────────────────────
+# Kernel 5.10.109-inmusic-rt64 never sends NLMSG_DONE for hidraw netlink dumps.
+# This .so skips hidraw udev scans and caps infinite poll() timeouts.
+echo ""
+echo "--- Copying no_hid_poll.so workaround ---"
+if [ -f "$REPO_ROOT/mixxx-bundle/helpers/no_hid_poll.so" ]; then
+  mkdir -p "$BUNDLE_DIR/lib"
+  cp -v "$REPO_ROOT/mixxx-bundle/helpers/no_hid_poll.so" "$BUNDLE_DIR/lib/no_hid_poll.so"
+else
+  echo "WARNING: no_hid_poll.so not found — compile it first with:"
+  echo "  CC=\$BUILDROOT/output/host/bin/arm-buildroot-linux-gnueabihf-gcc"
+  echo "  \$CC -shared -fPIC -o helpers/no_hid_poll.so helpers/no_hid_poll.c -ldl"
+fi
+
+# ── Step 7: Ensure launcher is executable (hand-crafted, not generated) ──────
 echo ""
 echo "--- Ensuring launcher is executable ---"
 chmod +x "$BUNDLE_DIR/mixxx_launcher.sh"
 
-# ── Step 7: Summary ──────────────────────────────────────────────────────────
+# ── Step 8: Summary ──────────────────────────────────────────────────────────
 echo ""
 echo "=== Bundle collected successfully ==="
 echo "Bundle size: $(du -sh "$BUNDLE_DIR" | cut -f1)"
