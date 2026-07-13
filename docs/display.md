@@ -37,23 +37,30 @@ ln -sf /usr/lib/libmali.so.14.0 libGLESv2.so
 ln -sf /usr/lib/libmali.so.14.0 libGLESv1_CM.so
 ```
 
-### Required Environment Variables
+### Required Environment Variables (Working Configuration)
 
 ```bash
-export LD_LIBRARY_PATH="/media/az01-internal/mixxx/lib:/usr/qt/lib:/usr/lib:/lib"
-export QT_PLUGIN_PATH="/media/az01-internal/mixxx/qt-plugins:/usr/qt/plugins"
+# Use SD card's bundled Qt 5.15.8 — NOT device's Qt 5.15.2
+export LD_LIBRARY_PATH="/media/az01-internal/mixxx/lib:/usr/lib:$LD_LIBRARY_PATH"
+export QT_PLUGIN_PATH="/media/az01-internal/mixxx/qt-plugins"
 export QT_QPA_PLATFORM=eglfs
-export QT_QPA_EGLFS_INTEGRATION=eglfs_emu
+export QT_QPA_EGLFS_INTEGRATION=eglfs_mali          # Custom Mali integration (not emu)
 export QT_QPA_EGLFS_KMS_ATOMIC=1
+export QT_QPA_EGLFS_ROTATION=90
+export QT_QPA_FONTDIR=/usr/share/fonts
+export QT_QPA_GENERIC_PLUGINS=evdevtouch:evdevmouse:evdevkeyboard
+export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS="/dev/input/event0:rotate=90"
 export HOME=/root
 ```
 
 ### Key Points
 
-- **`eglfs_emu`** integration works best — `eglfs_mali` from stock Qt plugins also works but no advantage observed
-- **System Mali libs must be used** — Buildroot's bundled `libEGL.so`/`libGLESv2.so` target Mali DDK `r0p0` which is incompatible with the device's `r1p0`
-- **KMS/DRM**: The GPU drives the built-in 7-inch display via `/dev/dri/card0` (DRM connector status: "connected")
-- **Touchscreen**: ILI2117 detected on `/dev/input/event0`, works with evdev input plugin
+- **SD card's bundled Qt 5.15.8 + `eglfs_mali` is the working combination.** Device-native Qt 5.15.2 with `eglfs_emu` causes a black screen — the Mali EGLFS integration can't take over the display from fbcon. The SD card's custom-built `libqeglfs-mali-integration.so` (14KB, built with the MIXXX buildroot) handles display takeover correctly.
+- **System Mali libs must be used** — Buildroot's bundled `libEGL.so`/`libGLESv2.so` target Mali DDK `r0p0` which is incompatible with the device's `r1p0`. All EGL/GLES symlinks in the SD card's `lib/` point to `/usr/lib/libmali.so.14.0`.
+- **Custom Mali integration plugin:** `/media/az01-internal/mixxx/qt-plugins/egldeviceintegrations/libqeglfs-mali-integration.so` — built from the same Qt 5.15.8 source as the bundled Qt libs. This is the critical component that enables display output.
+- **KMS/DRM**: The GPU drives the built-in 7-inch display via `/dev/dri/card0` (DRM connector status: "connected"). fbcon may still hold DRM plane-4 but Mali GPU outputs via hardware overlay.
+- **Touchscreen**: ILI2117 detected on `/dev/input/event0`, works with evdev input plugin with `QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS="/dev/input/event0:rotate=90"`.
+- **Dialog suppression:** The SD card's MIXXX binary (built Jul 13 2025) has `"skipping dialog on EGLFS"` built in — no LD_PRELOAD/nodialog shim needed for this build. The nodialog.cpp in the overlay is kept as a fallback for other Qt builds.
 
 ### GPU Performance
 

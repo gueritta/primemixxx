@@ -10,9 +10,9 @@ ExecStart=/media/az01-internal/mixxx/mixxx_launcher.sh
 Restart=on-failure
 RestartSec=2
 Environment=HOME=/root
-Environment=QT_QPA_PLATFORM=eglfs
-Environment=QT_QPA_EGLFS_INTEGRATION=eglfs_emu
-Environment=QT_QPA_EGLFS_KMS_ATOMIC=1
+
+# Environment is set by mixxx_launcher.sh, not duplicated here.
+# Key env: LD_LIBRARY_PATH (SD card Qt 5.15.8), QT_QPA_EGLFS_INTEGRATION=eglfs_mali
 
 # Real-time audio
 LimitRTPRIO=99

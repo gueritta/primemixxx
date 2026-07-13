@@ -85,7 +85,8 @@ cd go && go run ./cmd/updater/ --firmware ../PRIMEGO-4.3.4-STOCK-SSH-Update.img
 **MIXXX segfaults (exit code 139)**:
 - **System libs conflict**: The bundle must NOT contain `libc.so.6`, `libm.so.6`, `libpthread.so.0`, `libdl.so.2`, `librt.so.1`, `libstdc++.so.6`, `libgcc_s.so.1`, `ld-linux-armhf.so.3`, or `libatomic.so.1`. These MUST come from the device's `/lib`. Run `scripts/fix-device-libs.sh` on the device to remove them.
 - **Mali DDK mismatch**: Error "DDK is not compatible... r1p0 vs r0p0" means the bundled `libEGL.so`/`libGLESv2.so` target the wrong Mali driver version. Fix: `cd /media/az01-internal/mixxx/lib && rm -f libEGL.so libGLESv2.so libGLESv1_CM.so && ln -sf /usr/lib/libmali.so.14.0 libEGL.so && ln -sf /usr/lib/libmali.so.14.0 libGLESv2.so && ln -sf /usr/lib/libmali.so.14.0 libGLESv1_CM.so`
-- **Qt5 version mismatch**: MIXXX compiled against Qt5.15.8 but device has Qt5.15.2. The device lacks `libQt5PrintSupport` and `libqt5keychain`. Our bundled Qt5.15.8 must be used, but may have ABI issues with device's glibc. The permanent fix is to recompile MIXXX against the device's native Qt5.15.2 libraries.
+- **Qt 5.15.8 bundled on SD card**: MIXXX is compiled against Qt 5.15.8 and the SD card bundles this exact version. The device's native Qt 5.15.2 at `/usr/qt/lib` is NOT used — it causes a black screen with `eglfs_emu`. The bundled Qt 5.15.8 + custom `libqeglfs-mali-integration.so` works reliably.
+- **Mali DDK r1p0**: SD card EGL/GLES libs must be symlinked to device's `/usr/lib/libmali.so.14.0` to avoid r0p0/r1p0 mismatch.
 
 **MIXXX fails to start**:
 - Check `journalctl -u mixxx.service` on device

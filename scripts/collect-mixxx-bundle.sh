@@ -4,10 +4,12 @@
 #
 # Output: ./mixxx-bundle/ containing:
 #   bin/mixxx              — MIXXX binary
-#   lib/                   — MIXXX-specific shared libraries (Qt5 libs NOT bundled — device provides 5.15.2)
+#   lib/                   — MIXXX-specific shared libraries (includes Qt 5.15.8 — CRITICAL for display)
 #   mixxx-mapping/         — MIDI controller mapping XML/JS files
 #   mixxx_launcher.sh      — wrapper that sets LD_LIBRARY_PATH and launches MIXXX
-# Qt5 libs and plugins are NOT bundled — the device provides Qt 5.15.2 at /usr/qt/{lib,plugins}
+# Qt 5.15.8 libs and plugins ARE bundled — the device's Qt 5.15.2 + eglfs_emu
+# causes a black screen. SD card's bundled Qt 5.15.8 + custom Mali integration
+# (eglfs_mali) is required for working display output.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
@@ -62,11 +64,6 @@ SYSTEM_ONLY_LIBS=(
 
 is_system_lib() {
   local name="$1"
-  # Qt5 libraries — device has Qt 5.15.2 at /usr/qt/lib, don't bundle Buildroot's 5.15.8
-  # (both are 5.15.x LTS, patch-level ABI compatible)
-  case "$name" in
-    libQt5*) return 0 ;;
-  esac
   for syslib in "${SYSTEM_ONLY_LIBS[@]}"; do
     [ "$name" = "$syslib" ] && return 0
   done
@@ -134,9 +131,33 @@ for malilib in libEGL.so libGLESv2.so; do
 done
 
 # ── Step 4: Qt plugins ──────────────────────────────────────────────────────
-# Device provides Qt plugins at /usr/qt/plugins (5.15.2, Mali-optimized).
-# No need to bundle Buildroot's Qt 5.15.8 plugins — use device's instead.
-echo "--- Qt plugins: using device /usr/qt/plugins (not bundled) ---"
+# Bundle Qt 5.15.8 plugins from Buildroot output — CRITICAL for display.
+# The Mali integration plugin (libqeglfs-mali-integration.so) is REQUIRED
+# for working display output with eglfs_mali. Device's Qt 5.15.2 plugins
+# use eglfs_emu which causes a black screen.
+echo "--- Bundling Qt 5.15.8 plugins from Buildroot ---"
+mkdir -p "$BUNDLE_DIR/qt-plugins"
+if [ -d "$BUILDROOT_TARGET/usr/lib/qt/plugins" ]; then
+  # Copy ALL Qt plugins from Buildroot
+  cp -rv "$BUILDROOT_TARGET/usr/lib/qt/plugins/"* "$BUNDLE_DIR/qt-plugins/"
+  echo "Qt plugins bundled from Buildroot"
+elif [ -d "$BUILDROOT_TARGET/usr/qt/plugins" ]; then
+  cp -rv "$BUILDROOT_TARGET/usr/qt/plugins/"* "$BUNDLE_DIR/qt-plugins/"
+  echo "Qt plugins bundled from Buildroot"
+else
+  echo "WARNING: No Qt plugins found in Buildroot target. Searching..."
+  QT_PLUGIN_DIRS=$(find "$BUILDROOT_TARGET" -type d -name plugins -path "*/qt/*" 2>/dev/null)
+  if [ -n "$QT_PLUGIN_DIRS" ]; then
+    for dir in $QT_PLUGIN_DIRS; do
+      cp -rv "$dir/"* "$BUNDLE_DIR/qt-plugins/"
+    done
+    echo "Qt plugins bundled from: $QT_PLUGIN_DIRS"
+  else
+    echo "ERROR: Could not find Qt plugins in Buildroot output!" >&2
+    echo "The bundle will NOT work without Qt 5.15.8 plugins." >&2
+    exit 1
+  fi
+fi
 
 # ── Step 4b: Copy MIXXX resources (skins, keyboard, controllers, etc.) ──────
 echo ""

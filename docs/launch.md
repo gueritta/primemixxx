@@ -1,5 +1,34 @@
 # Launch & CPU Shielding — Denon Prime Go + MIXXX
 
+## Boot Chain (Working Configuration)
+
+At boot, `tkgl-mixxx.service` fires, which starts the TKGL bootstrap framework:
+
+```
+tkgl-mixxx.service → /data/tkgl-bootstrap-launcher
+  → sources mod_mixxx/tkgl_mod_mixxx.sh
+    → systemd-run --unit=mixxx-app -- /data/mixxx/mixxx
+      → /media/az01-internal/mixxx/mixxx_launcher.sh  (SD card)
+        → SD Qt 5.15.8 + eglfs_mali + USB bind-mount + seed DB
+          → exec taskset chrt /media/az01-internal/mixxx/bin/mixxx
+```
+
+**Critical: `mixxx-app.service` must NOT be masked.** The TKGL module uses `systemd-run --unit=mixxx-app` to create a transient unit. If the name is masked (`/etc/systemd/system/mixxx-app.service → /dev/null`), systemd-run fails and MIXXX never starts.
+
+### Entry Point: `/data/mixxx/mixxx`
+
+A thin delegation script (116 bytes) that calls the SD card launcher:
+```sh
+#!/bin/sh
+exec /media/az01-internal/mixxx/mixxx_launcher.sh "$@"
+```
+
+The SD card launcher stays on the SD card where it can be updated independently. The entry point on internal storage only needs to exist at boot time.
+
+### TKGL Module: `tkgl_mod_mixxx.sh`
+
+Minimal — delegates all env/mount/display config to the SD launcher. Sets only `HOME` and `XDG_RUNTIME_DIR`. Does NOT set `LD_LIBRARY_PATH`, `QT_PLUGIN_PATH`, `QT_QPA_*`, `--settingsPath`, or `-platform` — these would override the SD launcher's configuration.
+
 ## TKGL Bootstrap Framework
 
 To implement the **`tkgl_bootstrap`** framework, you are setting up a modular, "tethered" exploitation environment that allows you to run custom scripts without permanently altering or risking your core operating system. 
@@ -42,34 +71,107 @@ Voici comment il fonctionne et pourquoi il est indispensable :
 
 En pratique, l'opération se déroule en deux temps : vous devez d'abord "tuer" l'interface native d'Engine OS avec la commande `systemctl stop engine` pour libérer les ressources, puis exécuter votre script wrapper qui va activer ce CPU shielding juste avant de lancer le binaire de votre application.
 
-### Wrapper Script
+### Wrapper Script (Working Configuration)
+
+The working setup uses the **SD card's bundled Qt 5.15.8** (not the device's Qt 5.15.2) with a custom-built `libqeglfs-mali-integration.so` for display. It also handles USB bind-mounting and seed DB restoration.
 
 ```bash
 #!/bin/sh
-# mixxx_launcher.sh — deployed to /media/az01-internal/mixxx/
-
+# MIXXX Launcher — Denon Prime Go (SD card binary + USB bind-mount)
 MIXDIR="/media/az01-internal/mixxx"
+BUNDLE="$MIXDIR"
+SETTINGS="$MIXDIR/settings"
 
-# System libs FIRST, bundled libs for MIXXX-specific deps
-# /usr/qt/lib provides Denon's optimized Qt5.15.2 binaries
-export LD_LIBRARY_PATH="$MIXDIR/lib:/usr/qt/lib:/usr/lib:/lib"
-export QT_PLUGIN_PATH="$MIXDIR/qt-plugins:/usr/qt/plugins"
+# Wait for USB (up to 15s)
+for i in $(seq 0 15); do
+    if [ -b /dev/sda1 ]; then break; fi
+    sleep 1
+done
+
+# Mount USB if plugged, bind-mount to trusted ext4 path
+if [ -b /dev/sda1 ]; then
+    mkdir -p /media/AE1F-B2D6
+    mount /dev/sda1 /media/AE1F-B2D6 -o ro,fmask=0022,dmask=0022 2>/dev/null || true
+    if [ -d /media/AE1F-B2D6/tuv ]; then
+        mkdir -p "$MIXDIR/music"
+        mount --bind /media/AE1F-B2D6/tuv "$MIXDIR/music" 2>/dev/null || true
+    fi
+fi
+
+# Restore seed DB if current DB is missing/corrupted
+# MIXXX loads library dirs from SQLite 'directories' table, not mixxx.cfg
+if [ ! -f "$SETTINGS/mixxxdb.sqlite" ] || [ $(stat -c%s "$SETTINGS/mixxxdb.sqlite" 2>/dev/null || echo 0) -lt 5000 ]; then
+    if [ -f "$SETTINGS/mixxxdb.seed" ]; then
+        cp "$SETTINGS/mixxxdb.seed" "$SETTINGS/mixxxdb.sqlite"
+    fi
+fi
+
+# SD card's bundled Qt 5.15.8 + custom Mali integration (eglfs_mali)
+export LD_LIBRARY_PATH="$BUNDLE/lib:/usr/lib:$LD_LIBRARY_PATH"
+export QT_PLUGIN_PATH="$BUNDLE/qt-plugins"
+export QT_QPA_FONTDIR=/usr/share/fonts
+export QT_QPA_GENERIC_PLUGINS=evdevtouch:evdevmouse:evdevkeyboard
 export QT_QPA_PLATFORM=eglfs
-export QT_QPA_EGLFS_INTEGRATION=eglfs_emu
+export QT_QPA_EGLFS_INTEGRATION=eglfs_mali
 export QT_QPA_EGLFS_KMS_ATOMIC=1
+export QT_QPA_EGLFS_ROTATION=90
+export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS="/dev/input/event0:rotate=90"
+
+for g in /sys/class/devfreq/*mali*/governor /sys/class/devfreq/*gpu*/governor; do
+    [ -f "$g" ] && echo performance > "$g" 2>/dev/null
+done
+
 export HOME=/root
+export XDG_RUNTIME_DIR=/tmp
 
-# Stop Engine DJ to release ALSA hardware locks
 systemctl stop engine 2>/dev/null || true
+sleep 0.5
 
-# GPU performance governor (matches Engine's setup)
-echo performance > /sys/devices/platform/ffa30000.gpu/devfreq/ffa30000.gpu/governor 2>/dev/null || true
-
-# Launch MIXXX pinned to CPU 2-3 with real-time FIFO priority 99
-exec taskset -c 2,3 chrt -f 99 "$MIXDIR/bin/mixxx" -platform eglfs \
-  --settingsPath "$MIXDIR/settings" \
-  --resourcePath "$MIXDIR/share/mixxx"
+exec taskset -c 2,3 chrt -f 99 "$BUNDLE/bin/mixxx" -platform eglfs \
+  --settingsPath "$SETTINGS" \
+  --resourcePath "$BUNDLE/bin" \
+  "$@"
 ```
+
+### USB MP3 Library: Sandbox Bypass
+
+MIXXX's sandbox blocks access to vfat filesystems. The working solution:
+
+1. **Bind-mount**: `mount --bind /media/AE1F-B2D6/tuv /media/az01-internal/mixxx/music`
+   - The sandbox trusts the mount **path** (ext4), not the underlying filesystem (vfat)
+   - Config: `Directory[0]=/media/az01-internal/mixxx/music` in `[Library]` section
+
+2. **Seed DB**: MIXXX loads library directories from the `directories` SQLite table, NOT from `mixxx.cfg`
+   - A fresh DB has an empty table → scanner does nothing
+   - The first-run wizard imports config → DB, but is skipped by EGLFS dialog suppression
+   - Solution: `mixxxdb.seed` pre-populated with the directories entry
+   - Wrapper restores seed DB if mixxxdb.sqlite is missing or < 5KB
+
+3. **sandbox.cfg**: Contains paths to whitelist (one per line). Placed at `settings/sandbox.cfg`.
+   - Note: the bind-mount approach works without sandbox.cfg, but having both provides defense in depth.
+
+### Config Reference (mixxx.cfg)
+
+```ini
+[Config]
+FirstRun=1
+HasScreenedForLibraryDir=1
+
+[Library]
+Directory[0]=/media/az01-internal/mixxx/music
+RescanOnStartup 1
+```
+
+### Key Differences from Earlier Setup
+
+| Component | Old (broken) | New (working) |
+|-----------|-------------|---------------|
+| Qt libs | Device Qt 5.15.2 (`/usr/qt/lib`) | SD card Qt 5.15.8 (`$BUNDLE/lib`) |
+| EGLFS integration | `eglfs_emu` | `eglfs_mali` (custom built) |
+| Mali plugin | Stock `libqeglfs-emu-integration.so` | Custom `libqeglfs-mali-integration.so` |
+| USB access | Direct vfat mount (sandbox denied) | Bind-mount to ext4 path (sandbox granted) |
+| Library dirs | From config (not imported to DB) | Seed DB with pre-populated `directories` table |
+| Dialog suppression | LD_PRELOAD nodialog shim | Built-in (SD binary has "skipping dialog on EGLFS") |
 
 ## Systemd Service (Optional)
 

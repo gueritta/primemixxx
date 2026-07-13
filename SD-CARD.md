@@ -55,7 +55,7 @@ The `mixxx-bundle/` directory in this repo is the **local mirror** of what was S
 │   │   ├── libqminimal.so
 │   │   └── libqoffscreen.so
 │   ├── egldeviceintegrations/
-│   │   └── libqeglfs-emu-integration.so   # EGLFS emu backend
+│   │   └── libqeglfs-mali-integration.so   # Custom Mali integration (CRITICAL for display)
 │   ├── generic/
 │   │   ├── libqevdevkeyboardplugin.so
 │   │   ├── libqevdevmouseplugin.so
@@ -82,61 +82,117 @@ The `mixxx-bundle/` directory in this repo is the **local mirror** of what was S
     └── mixxx.bak                          # MD5: a0365bdce2162c1a09d0ba77ab4af227
 ```
 
-## Launcher Script (mixxx_launcher.sh)
+## Launcher Script (Working Version on Device: `/data/mixxx/mixxx`)
+
+The firmware overlay at `buildroot-customizations/board/inmusic/jp11/rootfs_overlay/usr/bin/mixxx_launcher.sh`
+matches this script. The entry point called by TKGL bootstrap.
 
 ```sh
 #!/bin/sh
-MIXDIR="$(cd "$(dirname "$0")" && pwd)"
+# MIXXX Launcher — Denon Prime Go (SD card binary + USB bind-mount)
+MIXDIR="/media/az01-internal/mixxx"
 BUNDLE="$MIXDIR"
+SETTINGS="$MIXDIR/settings"
 
-# Device-native Qt5.15.2 first, bundled libs for MIXXX-specific deps
-export LD_LIBRARY_PATH="/usr/qt/lib:/usr/lib:$BUNDLE/lib:$LD_LIBRARY_PATH"
-export QT_PLUGIN_PATH="/usr/qt/plugins"          # Device Qt plugins
+# Wait for USB (up to 15s)
+for i in $(seq 0 15); do
+    if [ -b /dev/sda1 ]; then break; fi
+    sleep 1
+done
+
+# Mount USB if plugged, bind-mount to trusted ext4 path
+if [ -b /dev/sda1 ]; then
+    mkdir -p /media/AE1F-B2D6
+    mount /dev/sda1 /media/AE1F-B2D6 -o ro,fmask=0022,dmask=0022 2>/dev/null || true
+    if [ -d /media/AE1F-B2D6/tuv ]; then
+        mkdir -p "$MIXDIR/music"
+        mount --bind /media/AE1F-B2D6/tuv "$MIXDIR/music" 2>/dev/null || true
+    fi
+fi
+
+# Restore seed DB if current DB is missing/corrupted
+# MIXXX loads library dirs from SQLite 'directories' table, not mixxx.cfg
+if [ ! -f "$SETTINGS/mixxxdb.sqlite" ] || [ $(stat -c%s "$SETTINGS/mixxxdb.sqlite" 2>/dev/null || echo 0) -lt 5000 ]; then
+    if [ -f "$SETTINGS/mixxxdb.seed" ]; then
+        cp "$SETTINGS/mixxxdb.seed" "$SETTINGS/mixxxdb.sqlite"
+    fi
+fi
+
+# SD card's bundled Qt 5.15.8 + custom Mali integration (eglfs_mali)
+export LD_LIBRARY_PATH="$BUNDLE/lib:/usr/lib:$LD_LIBRARY_PATH"
+export QT_PLUGIN_PATH="$BUNDLE/qt-plugins"
+export QT_QPA_FONTDIR=/usr/share/fonts
+export QT_QPA_GENERIC_PLUGINS=evdevtouch:evdevmouse:evdevkeyboard
 export QT_QPA_PLATFORM=eglfs
-export QT_QPA_EGLFS_INTEGRATION=eglfs_emu
+export QT_QPA_EGLFS_INTEGRATION=eglfs_mali
 export QT_QPA_EGLFS_KMS_ATOMIC=1
 export QT_QPA_EGLFS_ROTATION=90
-export HOME=/root
-export XDG_RUNTIME_DIR=/tmp
+export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS="/dev/input/event0:rotate=90"
+export QT_LOGGING_RULES="qt.qpa.evdevtouch=true;qt.qpa.input=true"
 
-# GPU performance governor
-for g in /sys/class/devfreq/*mali*/governor; do
+for g in /sys/class/devfreq/*mali*/governor /sys/class/devfreq/*gpu*/governor; do
     [ -f "$g" ] && echo performance > "$g" 2>/dev/null
 done
 
-# USB mount trigger
-udevadm trigger --subsystem-match=block --action=add 2>/dev/null || true
+export HOME=/root
+export XDG_RUNTIME_DIR=/tmp
 
-# Stop Engine DJ → release ALSA & GPU
 systemctl stop engine 2>/dev/null || true
 sleep 0.5
 
-# CPU shielding: cores 2-3, real-time FIFO priority 99
 exec taskset -c 2,3 chrt -f 99 "$BUNDLE/bin/mixxx" -platform eglfs \
-  --settingsPath "$BUNDLE/settings" \
-  --resourcePath "$BUNDLE/bin"
+  --settingsPath "$SETTINGS" \
+  --resourcePath "$BUNDLE/bin" \
+  "$@"
 ```
 
-## Systemd Service (on device)
+## Systemd Service
 
+There are two service paths:
+
+### 1. Firmware overlay: `/usr/lib/systemd/system/mixxx.service`
+The canonical service definition in the Buildroot overlay. Sources `mixxx_launcher.sh`.
+
+### 2. TKGL Bootstrap: `/etc/systemd/system/tkgl-mixxx.service`
+The actual service used at boot (TKGL framework). Can be masked with
+`systemctl mask tkgl-mixxx` or overridden by the `mixxx` service.
+
+### Boot chain:
+```
+tkgl-mixxx.service → /data/tkgl-bootstrap-launcher → tkgl_mod_mixxx.sh
+  → systemd-run --unit=mixxx-app → /data/mixxx/mixxx → SD card launcher → MIXXX
+```
+
+### Important: `mixxx-app.service` must NOT be masked
+The TKGL module uses `systemd-run --unit=mixxx-app` to create a transient unit.
+If the name is masked (`/dev/null`), `systemd-run` fails silently and MIXXX
+won't start at boot. If masked, unmask with:
+```bash
+systemctl unmask mixxx-app.service 2>/dev/null || true
+```
+
+### To re-enable the simple service:
+
+## USB MP3 Library: Sandbox Bypass & Seed DB
+
+### Problem
+1. MIXXX sandbox silently blocks vfat filesystems → USB library won't scan
+2. MIXXX loads library directories from SQLite `directories` table, NOT from `mixxx.cfg` → fresh DB = empty `directories` table = scanner idle
+3. First-run wizard (which imports config→DB) is skipped by EGLFS dialog suppression
+
+### Solution
+1. **Bind-mount USB to ext4 path** bypasses sandbox: `mount --bind /media/AE1F-B2D6/tuv /media/az01-internal/mixxx/music`
+2. **Seed DB** (`mixxxdb.seed`) pre-populated with `directories` table entry pointing to the bind-mount path
+3. **Wrapper** restores seed DB if current DB is missing or < 5KB
+
+### Config (mixxx.cfg)
 ```ini
-# /etc/systemd/system/mixxx.service
-[Unit]
-Description=MIXXX DJ Software
-Conflicts=engine.service
-After=local-fs.target
-
-[Service]
-Type=simple
-ExecStart=/media/az01-internal/mixxx/mixxx_launcher.sh
-Restart=no
-TTYPath=/dev/tty1
-StandardInput=tty
-StandardOutput=tty
-Environment=HOME=/root
-
-[Install]
-WantedBy=multi-user.target
+[Config]
+FirstRun=1
+HasScreenedForLibraryDir=1
+[Library]
+Directory[0]=/media/az01-internal/mixxx/music
+RescanOnStartup=1
 ```
 
 ## Switcher Scripts (on device)
@@ -163,12 +219,13 @@ These MUST come from device's `/lib` — bundled versions cause segfaults from k
 - `librt.so.1`, `libstdc++.so.6`, `libgcc_s.so.1`
 - `ld-linux-armhf.so.3`, `libatomic.so.1`
 
-## Known Issues at Time of Deployment
+## Known Issues (Current State)
 
-1. **Screen rotation:** `QT_QPA_EGLFS_ROTATION=90` — Mali renders portrait (800×1280), display controller rotates to landscape (1280×800). Rotation value uncertain.
-2. **Mali DDK mismatch:** Bundled `libEGL.so`/`libGLESv2.so` may target wrong r0p0; device has r1p0. Fix: symlink to `/usr/lib/libmali.so.14.0`.
-3. **Qt version mismatch:** Buildroot compiled against Qt 5.15.8, device has Qt 5.15.2. Launcher uses device Qt at runtime via `LD_LIBRARY_PATH`.
+1. **Screen rotation:** `QT_QPA_EGLFS_ROTATION=90` — Mali renders portrait (800×1280), display controller rotates to landscape (1280×800).
+2. **Mali DDK mismatch:** Bundled `libEGL.so`/`libGLESv2.so` from Buildroot target r0p0; device has r1p0. **FIXED:** Symlinks on SD card point all EGL/GLES libs to `/usr/lib/libmali.so.14.0`. The deployment script handles this automatically.
+3. **Qt version:** Buildroot cross-compiles MIXXX against Qt 5.15.8. The SD card bundles this exact Qt version (under `lib/`). Device's native Qt 5.15.2 is **NOT used** — it causes a black screen with `eglfs_emu`. **CRITICAL:** The launcher MUST use `$BUNDLE/lib` (SD card's Qt 5.15.8) in `LD_LIBRARY_PATH`, NOT `/usr/qt/lib`.
 4. **WiFi power save:** Must run `iw dev wlan0 set power_save off` — not persistent across reboots.
+5. **USB UUID:** The USB mount path `/media/AE1F-B2D6` assumes a specific vfat UUID. If the USB key is reformatted, update the launcher accordingly.
 
 ## Deployment Scripts
 
