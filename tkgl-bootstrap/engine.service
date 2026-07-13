@@ -6,7 +6,8 @@ After=touch-fw-update.service xmos-update.service
 Type=oneshot
 RemainAfterExit=yes
 ExecStartPre=/data/tkgl-bootstrap-launcher
-ExecStart=/bin/true
+# If Mixxx was launched by the launcher, skip Engine. Otherwise start real Engine OS.
+ExecStart=-/bin/sh -c 'systemctl is-active --quiet mixxx-app.service || exec /usr/Engine/Scripts/runengine'
 TimeoutStopSec=30
 LimitCORE=infinity
 

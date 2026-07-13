@@ -1,5 +1,6 @@
 #!/bin/sh
-# Runs as Engine's ExecStartPre and delegates Mixxx to a transient service.
+# Runs as Engine's ExecStartPre. If TKGL SD card is present, bootstraps Mixxx
+# via systemd-run. Otherwise exits quickly so the real Engine OS can start.
 
 BOOT_LOG=/data/tkgl-boot-debug.log
 BOOTSTRAP_MOUNT=/media/TKGL_BOOTSTRAP
@@ -12,18 +13,25 @@ if systemctl is-active --quiet mixxx-app.service; then
     exit 0
 fi
 
+# Fail fast: if no SD card reader device exists, skip immediately
+if [ ! -e /dev/mmcblk1 ] && [ ! -e /dev/mmcblk1p1 ]; then
+    echo "$(date): no SD card device, skipping TKGL" >> "$BOOT_LOG"
+    exit 0
+fi
+
 [ -c /dev/mali0 ] && chmod 666 /dev/mali0 2>/dev/null
 for governor in /sys/class/devfreq/*mali*/governor /sys/class/devfreq/*gpu*/governor; do
     [ -f "$governor" ] && echo performance > "$governor" 2>/dev/null
 done
 
+# Wait for SD card partition to appear (kernel may still be probing)
 elapsed=0
-while [ ! -d "$TKGL_ROOT" ] && [ "$elapsed" -lt 60 ]; do
+while [ ! -d "$TKGL_ROOT" ] && [ "$elapsed" -lt 15 ]; do
     mkdir -p "$BOOTSTRAP_MOUNT"
     mountpoint -q "$BOOTSTRAP_MOUNT" || mount -L TKGL_BOOTSTRAP "$BOOTSTRAP_MOUNT" 2>/dev/null || true
     [ -d "$TKGL_ROOT" ] && break
-    sleep 2
-    elapsed=$((elapsed + 2))
+    sleep 1
+    elapsed=$((elapsed + 1))
 done
 
 if [ ! -d "$TKGL_ROOT" ]; then
