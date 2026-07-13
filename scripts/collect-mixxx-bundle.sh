@@ -171,21 +171,12 @@ if [ -d "$MIX_RESOURCES_SRC" ]; then
   done
 fi
 
-# ── Step 5: Copy Denon MIDI controller mappings into controllers/ ────────────
-# Mixxx discovers mappings from <resourcePath>/controllers/, NOT from
-# a separate mixxx-mapping/ directory. The symlink bin/controllers -> ../controllers
-# is created below. Denon custom mappings must be copied into controllers/
-# alongside the default bundled mappings.
+# ── Step 5: Copy MIDI controller mappings ────────────────────────────────────
 echo ""
-echo "--- Copying Denon MIDI mappings into controllers/ ---"
+echo "--- Copying MIDI mappings ---"
 MAPPINGS_SRC="$REPO_ROOT/buildroot-customizations/board/inmusic/jp11/mixxx-mapping"
 if [ -d "$MAPPINGS_SRC" ]; then
-  # Also keep a copy in mixxx-mapping/ as source of truth
-  mkdir -p "$BUNDLE_DIR/mixxx-mapping"
   cp -rv "$MAPPINGS_SRC/"* "$BUNDLE_DIR/mixxx-mapping/"
-  # Copy into controllers/ so Mixxx discovers them at runtime
-  mkdir -p "$BUNDLE_DIR/controllers"
-  cp -rv "$MAPPINGS_SRC/"* "$BUNDLE_DIR/controllers/"
 fi
 
 # ── Step 6: Ensure launcher is executable (hand-crafted, not generated) ──────

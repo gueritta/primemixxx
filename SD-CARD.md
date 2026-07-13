@@ -70,10 +70,9 @@ The `mixxx-bundle/` directory in this repo is the **local mirror** of what was S
 │   │   └── libqsqlite.so
 │   └── platformthemes/
 │       └── libqxdgdesktopportal.so
-├── controllers/                           # Controller mappings (loaded by Mixxx via bin/controllers symlink)
+├── mixxx-mapping/                         # Controller mappings
 │   ├── Denon-Prime-4*.xml, *-scripts.js   # Prime 4 mapping
 │   └── prime-go/Denon-Prime-Go*.xml, *-scripts.js  # Prime GO mapping
-├── mixxx-mapping/                         # Source copy (hand-crafted, preserved across collect runs)
 ├── mixxx_launcher.sh                      # Wrapper: stops engine, sets env, CPU shielding
 ├── settings/                              # MIXXX runtime settings (created at launch)
 │   └── mixxx.cfg
