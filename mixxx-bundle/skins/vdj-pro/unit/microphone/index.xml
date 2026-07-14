@@ -10,9 +10,8 @@
         <ObjectName>Row</ObjectName>
         <Layout>horizontal</Layout>
         <SizePolicy>me,max</SizePolicy>
-        <!-- Fixed height to prevent layout shift when microphone is hidden.
-             Reserving 100px keeps touch coordinates aligned. -->
-        <MinimumSize>-1,100</MinimumSize>
+        <!-- Do not reserve phantom height when the microphone rack is hidden. -->
+        <MinimumSize>-1,0</MinimumSize>
         <Children>
 
             <SizeAwareStack>

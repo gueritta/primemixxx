@@ -8,7 +8,7 @@
     -->
     <WidgetGroup>
         <Layout>stacked</Layout>
-        <Size>-1,40</Size>
+        <Size>-1,44</Size>
         <SizePolicy>e,f</SizePolicy>
         <Children>
 

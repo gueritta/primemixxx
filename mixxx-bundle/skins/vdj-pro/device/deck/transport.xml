@@ -10,14 +10,14 @@
         <ObjectName>TransportRow</ObjectName>
         <Layout>vertical</Layout>
         <SizePolicy>me,f</SizePolicy>
-        <MinimumSize>-1,55</MinimumSize>
-        <MaximumSize>-1,55</MaximumSize>
+        <MinimumSize>-1,45</MinimumSize>
+        <MaximumSize>-1,45</MaximumSize>
         <Children>
 
             <WidgetGroup><!-- margin-top -->
                 <SizePolicy>me,f</SizePolicy>
-                <MinimumSize>-1,10</MinimumSize>
-                <MaximumSize>-1,10</MaximumSize>
+                <MinimumSize>-1,0</MinimumSize>
+                <MaximumSize>-1,0</MaximumSize>
             </WidgetGroup>
 
             <WidgetGroup>
@@ -51,7 +51,7 @@
                                 <MaximumSize>600,45</MaximumSize>
                                 <Children>
 
-                                    <Template src="skin:device/deck/transport_controls_md.xml"/>
+                                    <Template src="skin:device/deck/transport_controls_sm.xml"/>
 
                                 </Children>
                            </WidgetGroup>

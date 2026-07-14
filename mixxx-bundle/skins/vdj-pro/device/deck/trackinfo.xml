@@ -9,7 +9,7 @@
     <WidgetGroup>
         <Layout>horizontal</Layout>
         <SizePolicy>i,max</SizePolicy>
-        <Size>-1,36</Size>
+        <Size>-1,44</Size>
         <Children>
 
             <WidgetGroup><!-- margin-left -->
@@ -19,11 +19,11 @@
 
             <WidgetGroup>
                 <Layout>vertical</Layout>
-                <Size>30f,36f</Size>
+                <Size>30f,44f</Size>
                 <Children>
 
                     <Label>
-                        <Size>30f,23f</Size>
+                        <Size>30f,31f</Size>
                         <ObjectName>DeckLabel</ObjectName>
                         <Alignment>center</Alignment>
                         <Text><Variable name="Number"/></Text>
@@ -38,17 +38,17 @@
 
             <WidgetGroup><!-- spacer -->
                 <Layout>horizontal</Layout>
-                <Size>10f,36f</Size>
+                <Size>10f,44f</Size>
             </WidgetGroup>
 
             <WidgetGroup>
                 <Layout>vertical</Layout>
-                <Size>40f,36f</Size>
+                <Size>44f,44f</Size>
                 <Children>
 
                     <PushButton>
                         <ObjectName>Btn-br</ObjectName>
-                        <Size>40f,23</Size>
+                        <Size>44f,44f</Size>
                         <NumberStates>2</NumberStates>
                         <State>
                             <Number>0</Number>
@@ -64,7 +64,7 @@
                     </PushButton>
 
                     <WidgetGroup>
-                        <Size>80f,13f</Size>
+                        <Size>80f,0f</Size>
                     </WidgetGroup>
 
                 </Children>
@@ -72,14 +72,14 @@
 
             <WidgetGroup><!-- spacer -->
                 <Layout>horizontal</Layout>
-                <Size>10f,36f</Size>
+                <Size>10f,44f</Size>
             </WidgetGroup>
 
             <WidgetGroup>
                 <Layout>vertical</Layout>
                 <SizePolicy>me,max</SizePolicy>
-                <MinimumSize>-1,36</MinimumSize>
-                <MaximumSize>-1,36</MaximumSize>
+                <MinimumSize>-1,44</MinimumSize>
+                <MaximumSize>-1,44</MaximumSize>
                 <Children>
 
                     <TrackProperty>
@@ -105,14 +105,14 @@
 
             <WidgetGroup><!-- spacer -->
                 <Layout>horizontal</Layout>
-                <Size>10f,36f</Size>
+                <Size>10f,44f</Size>
             </WidgetGroup>
 
             <WidgetGroup>
                 <Layout>vertical</Layout>
                 <SizePolicy>me,f</SizePolicy>
-                <MinimumSize>80,36</MinimumSize>
-                <MaximumSize>110,36</MaximumSize>
+                <MinimumSize>80,44</MinimumSize>
+                <MaximumSize>110,44</MaximumSize>
                 <Children>
 
                     <WidgetGroup>

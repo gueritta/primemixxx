@@ -94,7 +94,7 @@ QToolTip {
    ========================================================================== */
 
 WSearchLineEdit {
-    min-height: 40px;
+    min-height: 44px;
     padding: 9px 6px 6px 16px;
     border: 0;
     border-radius: 8px;
@@ -105,7 +105,7 @@ WSearchLineEdit {
 }
 
 WSearchLineEdit:focus {
-    min-height: 40px;
+    min-height: 44px;
     padding: 9px 6px 6px 16px;
     border: 0;
     border-radius: 8px;
@@ -147,7 +147,7 @@ QTreeView {
 QTreeView::item {
     border: 0;
     width: 400px;
-    height: 28px;
+    height: 44px;
     padding-left: 18px;
 }
 
@@ -257,7 +257,7 @@ QHeaderView {
 }
 
 QHeaderView::section {
-    height: 32px;
+    height: 44px;
     font-size: 20px;
     font-weight: bold;
     margin: 0;
@@ -307,6 +307,11 @@ QTableView::item:selected:!active {
     background-color: #39ff14;
     color: #000000;
     outline: none;
+}
+
+QTableView::item {
+    height: 44px;
+    padding: 8px 0;
 }
 
 QTableView::item:!selected {
@@ -907,8 +912,8 @@ QScrollBar::sub-page:vertical {
     background-color: #777777;
     color: #000000;
     margin: 0 0 1px 0;
-    font-size: 12px;
-    line-height: 13px;
+    font-size: 14px;
+    line-height: 16px;
 }
 
 
@@ -935,7 +940,7 @@ QScrollBar::sub-page:vertical {
 }
 
 #Version {
-    font-size: 12px;
+    font-size: 14px;
     background: transparent;
     color: #777777;
 }

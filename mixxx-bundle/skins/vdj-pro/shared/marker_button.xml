@@ -10,7 +10,7 @@
         <ObjectName>Btn-nbr-bisected</ObjectName>
         <TooltipId>hotcue</TooltipId>
         <NumberStates>2</NumberStates>
-        <Size>15me,23f</Size>
+        <Size>15me,45f</Size>
         <LeftClickIsPushButton>true</LeftClickIsPushButton>
         <RightClickIsPushButton>true</RightClickIsPushButton>
         <State>

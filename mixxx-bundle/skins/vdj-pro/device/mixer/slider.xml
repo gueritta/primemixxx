@@ -36,17 +36,17 @@
             <WidgetGroup>
                 <Layout>horizontal</Layout>
                 <MinimumSize>68,0</MinimumSize>
-                <MaximumSize>68,45</MaximumSize>
+                <MaximumSize>68,51</MaximumSize>
                 <Children>
 
                     <WidgetGroup><!-- margin-left -->
-                        <MinimumSize>15,-1</MinimumSize>
-                        <MaximumSize>15,-1</MaximumSize>
+                        <MinimumSize>12,-1</MinimumSize>
+                        <MaximumSize>12,-1</MaximumSize>
                     </WidgetGroup>
 
                     <KnobComposed>
                         <TooltipId>channel_volume</TooltipId>
-                        <Size>38f,38f</Size>
+                        <Size>44f,44f</Size>
                         <Knob>knob/knob_deck<Variable name="Number"/>_1.svg</Knob>
                         <MinAngle>-135</MinAngle>
                         <MaxAngle>135</MaxAngle>
@@ -56,8 +56,8 @@
                     </KnobComposed>
                                 
                     <WidgetGroup><!-- margin-right -->
-                        <MinimumSize>15,-1</MinimumSize>
-                        <MaximumSize>15,-1</MaximumSize>
+                        <MinimumSize>12,-1</MinimumSize>
+                        <MaximumSize>12,-1</MaximumSize>
                     </WidgetGroup>
 
                 </Children>
@@ -65,7 +65,7 @@
 
             <WidgetGroup>
                 <Layout>vertical</Layout>
-                <MinimumSize>68,46</MinimumSize>
+                <MinimumSize>68,52</MinimumSize>
                 <MaximumSize>68,-1</MaximumSize>
                 <Children>
 

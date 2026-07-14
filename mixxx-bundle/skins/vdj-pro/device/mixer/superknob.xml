@@ -12,23 +12,23 @@
     -->
     <WidgetGroup>
         <Layout>vertical</Layout>
-        <Size>68f,55f</Size>
+        <Size>68f,61f</Size>
         <Children>
 
             <WidgetGroup>
                 <Layout>horizontal</Layout>
-                <Size>68f,38f</Size>
+                <Size>68f,44f</Size>
                 <Children>
 
                     <WidgetGroup><!-- margin-left -->
-                        <MinimumSize>15,-1</MinimumSize>
-                        <MaximumSize>15,-1</MaximumSize>
+                        <MinimumSize>12,-1</MinimumSize>
+                        <MaximumSize>12,-1</MaximumSize>
                     </WidgetGroup>
 
                     <KnobComposed>
                         <TooltipId><Variable name="TooltipId1"/></TooltipId>
                         <ObjectName><Variable name="ObjectName1"/></ObjectName>
-                        <Size>38f,38f</Size>
+                        <Size>44f,44f</Size>
                         <Knob>knob/knob_deck<Variable name="Number"/>_1.svg</Knob>
                         <MinAngle>-135</MinAngle>
                         <MaxAngle>135</MaxAngle>
@@ -38,7 +38,7 @@
                     </KnobComposed>
 
                     <WidgetGroup>
-                        <Size>10f,38f</Size>
+                        <Size>10f,44f</Size>
                         <Children>
 
                             <EffectPushButton>
@@ -68,20 +68,20 @@
                     </WidgetGroup>
 
                     <WidgetGroup><!-- margin-right -->
-                        <MinimumSize>5,-1</MinimumSize>
-                        <MaximumSize>5,-1</MaximumSize>
+                        <MinimumSize>2,-1</MinimumSize>
+                        <MaximumSize>2,-1</MaximumSize>
                     </WidgetGroup>
 
                 </Children>
             </WidgetGroup>
 
             <WidgetGroup>
-                <MinimumSize>-1,3</MinimumSize>
-                <MaximumSize>-1,3</MaximumSize>
+                <MinimumSize>-1,4</MinimumSize>
+                <MaximumSize>-1,4</MaximumSize>
             </WidgetGroup>
 
             <EffectName>
-                <Size>68f,12f</Size>
+                <Size>68f,13f</Size>
                 <ObjectName>EffectKnobLabel</ObjectName>
                 <EffectRackGroup><Variable name="QuickEffectRackGroup"/></EffectRackGroup>
                 <EffectUnitGroup><Variable name="QuickEffectUnitGroup"/></EffectUnitGroup>

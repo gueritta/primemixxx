@@ -536,10 +536,15 @@ PrimeGo.init = function(_id, _debug) {
         outConnect: true,
         input: function(channel, control, value, status, _group) {
             if (!this.isPress(channel, control, value, status)) return;
-            // QML: shiftAction: Action.SwitchMainViewLayout
-            // Both normal and shift toggle maximize_library (layout switch)
-            engine.setValue("[Master]", "maximize_library",
-                engine.getValue("[Master]", "maximize_library") > 0 ? 0 : 1);
+            if (PrimeGo.shift) {
+                // Shift+VIEW: toggle skin menubar visibility
+                engine.setValue("[Skin]", "show_menubar",
+                    engine.getValue("[Skin]", "show_menubar") > 0 ? 0 : 1);
+            } else {
+                // VIEW: toggle maximize library
+                engine.setValue("[Master]", "maximize_library",
+                    engine.getValue("[Master]", "maximize_library") > 0 ? 0 : 1);
+            }
         },
         output: function() {
             this.send(engine.getValue("[Master]", "maximize_library") > 0 ? 0x02 : 0x01);
