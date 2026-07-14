@@ -567,9 +567,9 @@ PrimeGo.init = function(_id, _debug) {
     PrimeGo.leftDeck.reconnectComponents();
     PrimeGo.rightDeck.reconnectComponents();
 
-    // LED Initialization
-    midi.sendShortMsg(0x94, 0x1C, 1); // Left Shift Button
-    midi.sendShortMsg(0x95, 0x1C, 1); // Right Shift Button
+    // LED Initialization — QML Shift is global ch15 note 8
+    midi.sendShortMsg(0x9F, 0x08, 0x01); // Shift button dim
+
 };
 
 PrimeGo.shutdown = function() {
@@ -793,9 +793,12 @@ PrimeGo.Deck = function(deckNumbers, midiChannel) {
         midi: [0x90 + midiChannel, 0x08],
     });
 
-    // Cue Button
+    // Cue Button (QML: cueShiftAction = SetCuePoint)
     this.cueButton = new components.CueButton({
         midi: [0x90 + midiChannel, 0x09],
+        shift: function() {
+            this.inKey = "cue_set";
+        },
     });
 
     // Play Button
@@ -950,7 +953,7 @@ PrimeGo.Deck = function(deckNumbers, midiChannel) {
         type: components.Button.prototype.types.toggle,
     });
 
-    // Vinyl Mode Button
+    // Vinyl Mode Button (QML: holdAction=GridCueEdit, shiftAction=SlipMode)
     this.vinylButton = new components.Button({
         midi: [0x90 + midiChannel, 0x23],
         type: components.Button.prototype.types.toggle,
@@ -959,14 +962,22 @@ PrimeGo.Deck = function(deckNumbers, midiChannel) {
             if (!this.isPress(channel, control, value, status)) {
                 return;
             }
-            theDeck.jogWheel.vinylMode = !theDeck.jogWheel.vinylMode;
+            if (PrimeGo.shift) {
+                // Shift+Vinyl = toggle Slip Mode
+                engine.setValue(theDeck.currentDeck, "slip_enabled",
+                    engine.getValue(theDeck.currentDeck, "slip_enabled") > 0 ? 0 : 1);
+            } else {
+                theDeck.jogWheel.vinylMode = !theDeck.jogWheel.vinylMode;
+            }
             this.trigger();
         },
         output: function(value) {
-            if (value > 0) {
+            if (PrimeGo.shift) {
+                sendSysexRGB(midiChannel, 0x23, 0x7f, 0x7f, 0x00); // yellow = slip active
+            } else if (value > 0) {
                 sendSysexRGB(midiChannel, 0x23, 0x7f, 0x00, 0x00); // red = vinyl on
             } else {
-                sendSysexRGB(midiChannel, 0x23, 0x1f, 0x1f, 0x1f); // dim white = vinyl off
+                sendSysexRGB(midiChannel, 0x23, 0x1f, 0x1f, 0x1f); // dim white = off
             }
         },
         trigger: function() {
