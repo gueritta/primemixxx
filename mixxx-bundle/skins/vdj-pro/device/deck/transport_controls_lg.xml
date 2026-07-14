@@ -230,11 +230,11 @@
                         <NumberStates>2</NumberStates>
                         <State>
                             <Number>0</Number>
-                            <Text>MASTER</Text>
+                            <Text>M</Text>
                         </State>
                         <State>
                             <Number>1</Number>
-                            <Text>MASTER</Text>
+                            <Text>M</Text>
                         </State>
                         <Connection>
                             <ConfigKey><Variable name="Group"/>,sync_master</ConfigKey>

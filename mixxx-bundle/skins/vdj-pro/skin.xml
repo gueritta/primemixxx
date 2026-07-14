@@ -72,7 +72,7 @@
             <attribute persist="true" config_key="[VinylControl],show_vinylcontrol">0</attribute>
             <!-- Microphone/Aux-->
             <attribute persist="true" config_key="[Master],num_microphones">2</attribute>
-            <attribute persist="true" config_key="[Master],num_auxiliaries">2</attribute>
+            <attribute persist="true" config_key="[Master],num_auxiliaries">0</attribute>
             <attribute persist="true" config_key="[Microphone],show_microphone">0</attribute>
             <!-- Samplers -->
             <attribute persist="true" config_key="[Master],num_samplers">4</attribute>

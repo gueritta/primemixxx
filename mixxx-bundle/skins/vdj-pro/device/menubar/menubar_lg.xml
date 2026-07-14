@@ -238,21 +238,6 @@
                 <MaximumSize>-1,45</MaximumSize>
                 <Children>
 
-                    <Template src="skin:device/menubar/button.xml">
-                        <SetVariable name="ObjectName">Btn-btrr</SetVariable>
-                        <SetVariable name="Size">180me,23f</SetVariable>
-                        <SetVariable name="icon">Vinylcontrols</SetVariable>
-                        <SetVariable name="control">[VinylControl],show_vinylcontrol</SetVariable>
-                        <SetVariable name="text">VINYL CONTROLS</SetVariable>
-                    </Template>
-
-                    <Template src="skin:device/menubar/button.xml">
-                        <SetVariable name="ObjectName">Btn-bbrr</SetVariable>
-                        <SetVariable name="Size">180me,23f</SetVariable>
-                        <SetVariable name="icon">Microphones</SetVariable>
-                        <SetVariable name="control">[Microphone],show_microphone</SetVariable>
-                        <SetVariable name="text">MICROPHONES</SetVariable>
-                    </Template>
 
                 </Children>
             </WidgetGroup>

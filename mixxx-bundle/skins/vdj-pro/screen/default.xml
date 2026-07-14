@@ -104,9 +104,7 @@
         <SetVariable name="Widget4">[DeckRow2]</SetVariable>
     </Template>
 
-    <Template src="skin:unit/vinylcontrol/index.xml"/>
 
-    <Template src="skin:unit/microphone/index.xml"/>
 
     <Template src="skin:unit/sampler/index.xml">
         <SetVariable name="Number1">1</SetVariable>

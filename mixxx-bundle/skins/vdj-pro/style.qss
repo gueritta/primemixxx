@@ -786,14 +786,14 @@ QScrollBar::sub-page:vertical {
 #Deck2 #Time,
 #Deck2 #Duration,
 #Deck2 #SyncMode {
-    color: #5599ff;
+    color: #77ff88;
     font-size: 20px;
 }
 
 #Deck2 #Title,
 #Deck2 #VisualKey,
 #Deck2 #RateDisplay {
-    color: #5599ff;
+    color: #77ff88;
     font-size: 18px;
 }
 
@@ -1004,7 +1004,7 @@ QScrollBar::sub-page:vertical {
  * Deck2
  */
 #Deck2 #DeckLabel {
-    background-color: #3366ee;
+    background-color: #5cff2e;
 }
 
 /**
@@ -1481,7 +1481,7 @@ QScrollBar::sub-page:vertical {
 #Deck2 #Btn-bbrr[value="1"],
 #Deck2 #Btn-nbr[value="1"],
 #Deck2 #Btn-nbr-bisected[value="1"] {
-    background-color: #3366ee;
+    background-color: #5cff2e;
 }
 
 #Deck2 #Btn-br[value="1"]:hover,
@@ -1495,7 +1495,7 @@ QScrollBar::sub-page:vertical {
 #Deck2 #Btn-bbrr[value="1"]:hover,
 #Deck2 #Btn-nbr[value="1"]:hover,
 #Deck2 #Btn-nbr-bisected[value="1"]:hover {
-    background-color: #2255dd;
+    background-color: #44dd55;
 }
 
 /**
@@ -2245,3 +2245,5 @@ QScrollBar::sub-page:vertical {
     margin: 0;
     padding: 0;
 }
+
+/* AGGRESSIVE DECK2 BLUE OVERRIDE */

@@ -221,7 +221,7 @@
                 </State>
                 <State>
                     <Number>2</Number>
-                    <Text>MASTER</Text>
+                    <Text>M</Text>
                 </State>
                 <Connection>
                     <ConfigKey><Variable name="Group"/>,sync_mode</ConfigKey>
