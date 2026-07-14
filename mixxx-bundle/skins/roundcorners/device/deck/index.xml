@@ -21,7 +21,7 @@
             <WidgetGroup>
                 <ObjectName>Deck<Variable name="Number"/></ObjectName>
                 <Layout>vertical</Layout>
-                <SizePolicy>me,me</SizePolicy>
+                <SizePolicy>me,max</SizePolicy>
                 <Children>
 
                     <Template src="skin:device/deck/border_top.xml"/>
@@ -29,7 +29,7 @@
                     <WidgetGroup>
                         <ObjectName>Rectangle</ObjectName>
                         <Layout>vertical</Layout>
-                        <SizePolicy>me,me</SizePolicy>
+                        <SizePolicy>me,max</SizePolicy>
                         <Children>
 
                             <Template src="skin:device/deck/trackinfo.xml"/>
