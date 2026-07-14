@@ -367,7 +367,29 @@ PrimeGo.EffectUnitEncoderInput = function(_channel, _control, value, _status, _g
 };
 
 // SysEx message for returning position of all components
-const initialPrimeGoSysex = [0xf0, 0x00, 0x02, 0x0b, 0x7f, 0x08, 0x60, 0x00, 0x04, 0x04, 0x01, 0x02, 0x00, 0xf7];
+// SysEx sequences from JP11_Controller_Device.qml (authoritative reference)
+// Subsystem ID: 0x0C (NOT 0x08 — 0x08 was wrong in the original JS)
+const PrimeGo_sysex = {
+    // Universal Device Identity Request (MMC)
+    deviceQuery:       [0xF0, 0x7E, 0x00, 0x06, 0x01, 0xF7],
+    // Send initialization to controller (configures LEDs, modes, etc.)
+    init:              [0xF0, 0x00, 0x02, 0x0B, 0x7F, 0x0C, 0x60, 0x00, 0x04, 0x04, 0x01, 0x01, 0x04, 0xF7],
+    // Request all absolute control positions (faders, knobs report current state)
+    queryControls:     [0xF0, 0x00, 0x02, 0x0B, 0x7F, 0x0C, 0x04, 0x00, 0x00, 0xF7],
+    // Check if power-on button held (for test mode entry)
+    powerOnState:      [0xF0, 0x00, 0x02, 0x0B, 0x7F, 0x0C, 0x42, 0x00, 0x00, 0xF7],
+};
+
+// Send RGB color to a pad LED (channel=deck, index=0-7 pad, color component 0-1)
+// Format: F0 00 02 0B 7F 0C 03 00 05 <ch> <idx> <R> <G> <B> F7
+PrimeGo.sendPadColor = function(channel, index, r, g, b) {
+    var msg = [0xF0, 0x00, 0x02, 0x0B, 0x7F, 0x0C, 0x03, 0x00, 0x05,
+               channel & 0x7F, index & 0x7F,
+               Math.min(127, Math.max(0, r)) & 0x7F,
+               Math.min(127, Math.max(0, g)) & 0x7F,
+               Math.min(127, Math.max(0, b)) & 0x7F, 0xF7];
+    midi.sendSysexMsg(msg, msg.length);
+};
 
 // Meters on OLED screens to visualize effects
 const fxScreen = function(offset, bank) {
@@ -395,6 +417,9 @@ const fxScreen = function(offset, bank) {
 fxScreen.prototype = new components.Deck();
 
 PrimeGo.init = function(_id, _debug) {
+    // Universal Device Identity Request (helps PortMidi enumeration)
+    midi.sendSysexMsg(PrimeGo_sysex.deviceQuery, PrimeGo_sysex.deviceQuery.length);
+
     // Turn off all LEDs
     midi.sendShortMsg(0x90, 0x75, 0x00);
 
@@ -403,8 +428,14 @@ PrimeGo.init = function(_id, _debug) {
         fxSendMsg(fxClear(i));
     }
 
-    // Return position of all components
-    midi.sendSysexMsg(initialPrimeGoSysex, initialPrimeGoSysex.length);
+    // Send controller initialization (from JP11_Controller_Device.qml)
+    midi.sendSysexMsg(PrimeGo_sysex.init, PrimeGo_sysex.init.length);
+
+    // After init, request all absolute control positions
+    // (so MIXXX syncs with hardware fader/knob positions)
+    engine.beginTimer(1000, function() {
+        midi.sendSysexMsg(PrimeGo_sysex.queryControls, PrimeGo_sysex.queryControls.length);
+    }, true);
 
     const decks = [
         new PrimeGo.Deck(1, 2),
@@ -542,11 +573,15 @@ PrimeGo.init = function(_id, _debug) {
 };
 
 PrimeGo.shutdown = function() {
-    // Return all LEDs to initial dim state
+    // From JP11_Controller_Device.qml: Component.onDestruction
+    // Sends Note Off on channel 0, note 118 (0x76) to cleanly disconnect
+    midi.sendShortMsg(0x80, 0x76, 0x00);
+
+    // Dim all LEDs to initial state
     midi.sendShortMsg(0x90, 0x75, 0x01);
 
     // Clear OLED screens
-    for (let i = 0; i < 8; i++) {
+    for (var i = 0; i < 8; i++) {
         fxSendMsg(fxClear(i));
     }
 };
@@ -853,7 +888,7 @@ PrimeGo.Deck = function(deckNumbers, midiChannel) {
     // Tempo Fader (14-bit via XML Script-Bindings — no JS midi: to avoid conflict)
     this.tempoFader = new components.Pot({
         inKey: "rate",
-        invert: true,
+        invert: false,
         inSetParameter: function(value) {
             print("DBG_PITCH: deck=" + deckNumbers + " key=" + this.inKey + " val=" + value.toFixed(4));
             sliderPosAccessors.setter(value);
