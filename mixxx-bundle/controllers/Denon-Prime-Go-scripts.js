@@ -547,10 +547,6 @@ PrimeGo.init = function(_id, _debug) {
         connect: function() {
             components.Button.prototype.connect.call(this);
             this.output();  // no outKey — manually init LED
-            var self = this;
-            engine.makeConnection("[Master]", "maximize_library", function() {
-                self.output();
-            });
         },
     });
 
@@ -662,13 +658,6 @@ PrimeGo.init = function(_id, _debug) {
         connect: function() {
             components.Button.prototype.connect.call(this);
             this.output();  // no outKey — manually init LED
-            // Track when tracks are loaded/ejected
-            var self = this;
-            for (var d = 1; d <= 2; d++) {
-                engine.makeConnection("[Channel" + d + "]", "track_loaded", function() {
-                    self.output();
-                });
-            }
         },
     });
 
@@ -962,10 +951,6 @@ PrimeGo.Deck = function(deckNumbers, midiChannel) {
                 this.send(0x01);  // dim
             }
         },
-        connect: function() {
-            components.SyncButton.prototype.connect.call(this);
-            this.output(engine.getValue(this.group, "sync_enabled"));
-        },
     });
 
     // Cue Button (QML: cueNote=9, cueShiftAction=SetCuePoint)
@@ -1163,16 +1148,11 @@ PrimeGo.Deck = function(deckNumbers, midiChannel) {
         outTrigger: false,
         input: function(channel, control, value, status, _group) {
             print("DBG_VINYL_IN: ch=0x"+channel.toString(16)+" ctrl=0x"+control.toString(16)+" val="+value+" shift="+PrimeGo.shift);
+            // QML actions: normal=GridCueEdit (hold), shift=SlipMode (toggle)
             if (PrimeGo.shift) {
                 if (this.isPress(channel, control, value, status)) {
                     engine.setValue(theDeck.currentDeck, "slip_enabled",
                         engine.getValue(theDeck.currentDeck, "slip_enabled") > 0 ? 0 : 1);
-                }
-            } else {
-                // Normal press: toggle scratch/vinyl mode
-                if (this.isPress(channel, control, value, status)) {
-                    var current = engine.getValue(theDeck.currentDeck, "scratch2_enable");
-                    engine.setValue(theDeck.currentDeck, "scratch2_enable", current > 0 ? 0 : 1);
                 }
             }
         },
@@ -1181,20 +1161,15 @@ PrimeGo.Deck = function(deckNumbers, midiChannel) {
             if (PrimeGo.shift) {
                 this.send(0x09);  // yellow = slip mode via shift
             } else {
-                var vinylOn = engine.getValue(theDeck.currentDeck, "scratch2_enable");
-                this.send(vinylOn > 0 ? 0x40 : 0x01);  // bright red = on, dim = off
+                this.send(0x40);  // bright red = vinyl mode always on
             }
         },
         connect: function() {
             components.Button.prototype.connect.call(this);
             // outKey is undefined, so parent connect makes no connection.
-            // Explicitly light the LED on connect, and track scratch state.
+            // Explicitly light the LED on connect.
             print("DBG_VINYL_CONNECT: midi=0x"+this.midi[0].toString(16)+" n=0x"+this.midi[1].toString(16));
-            var self = this;
-            this.scratchConnection = engine.makeConnection(theDeck.currentDeck, "scratch2_enable", function(value) {
-                self.output();
-            });
-            this.output();
+            this.send(0x03);
         },
     });
 
@@ -1555,7 +1530,7 @@ PrimeGo.hotcueMode = function(deck, offset) {
     components.ComponentContainer.call(this);
     this.ledControl = PrimeGo.padMode.HOTCUE;
     this.colourOn = PrimeGo.rgbCode.green; // mode select button color
-    this.colourOff = PrimeGo.rgbCode.greenDim;
+    this.colourOff = PrimeGo.rgbCode.greenDark;
     const padColoursOn = [
         PrimeGo.rgbCodeSysex.red,
         PrimeGo.rgbCodeSysex.orange,
@@ -1609,7 +1584,7 @@ PrimeGo.hotcueMode = function(deck, offset) {
     for (let j = 1; j <= 8; j++) {
         (function(btn) {
             engine.makeConnection(btn.group, btn.colorKey, function() {
-                if (engine.getValue(btn.group, btn.outKey) > 0) btn.output(1.0);
+                if (btn.inGetValue() > 0) btn.output(1.0);
             });
         })(this.pads[j]);
     }
@@ -1621,7 +1596,7 @@ PrimeGo.savedLoopMode = function(deck, offset) {
     components.ComponentContainer.call(this);
     this.ledControl = PrimeGo.padMode.LOOP;
     this.colourOn = PrimeGo.rgbCode.green;
-    this.colourOff = PrimeGo.rgbCode.greenDim;
+    this.colourOff = PrimeGo.rgbCode.greenDark;
     const padColoursOn = [
         PrimeGo.rgbCodeSysex.red,
         PrimeGo.rgbCodeSysex.orange,
@@ -1675,7 +1650,7 @@ PrimeGo.savedLoopMode = function(deck, offset) {
     for (let j = 1; j <= 8; j++) {
         (function(btn) {
             engine.makeConnection(btn.group, btn.colorKey, function() {
-                if (engine.getValue(btn.group, btn.outKey) > 0) btn.output(1.0);
+                if (btn.inGetValue() > 0) btn.output(1.0);
             });
         })(this.pads[j]);
     }
@@ -1687,7 +1662,7 @@ PrimeGo.autoloopMode = function(deck, offset) {
     components.ComponentContainer.call(this);
     this.ledControl = PrimeGo.padMode.LOOP;
     this.colourOn = PrimeGo.rgbCode.green;
-    this.colourOff = PrimeGo.rgbCode.greenDim;
+    this.colourOff = PrimeGo.rgbCode.greenDark;
     this.pads = new components.ComponentContainer();
     this.loopSize = [0.0625, 0.125, 0.25, 0.5, 1, 2, 4, 8];
     for (let i = 1; i <= 8; i++) {
@@ -1699,7 +1674,7 @@ PrimeGo.autoloopMode = function(deck, offset) {
             outKey: "beatloop_" + loopSize + "_enabled",
             inKey: "beatloop_" + loopSize + "_toggle",
             on: PrimeGo.rgbCode.white,
-            off: PrimeGo.rgbCode.greenDim,
+            off: PrimeGo.rgbCode.greenDark,
             outConnect: true,
             sendRGB: function(color_obj) {
                 const msg = [0xf0, 0x00, 0x02, 0x0b, 0x7f, 0x0C, 0x03, 0x00, 0x05,
@@ -1721,7 +1696,7 @@ PrimeGo.rollMode = function(deck, offset) {
     components.ComponentContainer.call(this);
     this.ledControl = PrimeGo.padMode.ROLL;
     this.colourOn = PrimeGo.rgbCode.green;
-    this.colourOff = PrimeGo.rgbCode.greenDim;
+    this.colourOff = PrimeGo.rgbCode.greenDark;
     this.pads = new components.ComponentContainer();
     // NOTE: The Prime Go's standalone Roll mode includes triplet loop rolls, but
     //       Mixxx doesn't support those yet.
@@ -1760,7 +1735,7 @@ PrimeGo.samplerMode = function(deck, offset) {
     components.ComponentContainer.call(this);
     this.ledControl = PrimeGo.padMode.ROLL;
     this.colourOn = PrimeGo.rgbCode.green;
-    this.colourOff = PrimeGo.rgbCode.greenDim;
+    this.colourOff = PrimeGo.rgbCode.greenDark;
     this.pads = new components.ComponentContainer();
     const colourArray = [PrimeGo.rgbCode.yellow, PrimeGo.rgbCode.orange, PrimeGo.rgbCode.purple, PrimeGo.rgbCode.red,
         PrimeGo.rgbCode.green, PrimeGo.rgbCode.teal, PrimeGo.rgbCode.cyan, PrimeGo.rgbCode.blue];
@@ -1770,7 +1745,7 @@ PrimeGo.samplerMode = function(deck, offset) {
             number: padIndex,
             midi: [0x92 + offset, 0x0E + padIndex],
             on: colourArray[padIndex - 1],
-            off: PrimeGo.rgbCode.greenDim,
+            off: PrimeGo.rgbCode.greenDark,
             outConnect: true,
             sendRGB: function(color_obj) {
                 const msg = [0xf0, 0x00, 0x02, 0x0b, 0x7f, 0x0C, 0x03, 0x00, 0x05,
@@ -1811,7 +1786,7 @@ PrimeGo.extraCueModeA = function(deck, offset) {
     components.ComponentContainer.call(this);
     this.ledControl = PrimeGo.padMode.SLICER;
     this.colourOn = PrimeGo.rgbCode.green;
-    this.colourOff = PrimeGo.rgbCode.greenDim;
+    this.colourOff = PrimeGo.rgbCode.greenDark;
     this.pads = new components.ComponentContainer();
     for (let i = 1; i <= 8; i++) {
         const padIndex = i;  // capture for closure
@@ -1845,7 +1820,7 @@ PrimeGo.extraCueModeA = function(deck, offset) {
     for (let j = 1; j <= 8; j++) {
         (function(btn) {
             engine.makeConnection(btn.group, btn.colorKey, function() {
-                if (engine.getValue(btn.group, btn.outKey) > 0) btn.output(1.0);
+                if (btn.inGetValue() > 0) btn.output(1.0);
             });
         })(this.pads[j]);
     }
@@ -1856,7 +1831,7 @@ PrimeGo.extraCueModeB = function(deck, offset) {
     components.ComponentContainer.call(this);
     this.ledControl = PrimeGo.padMode.SLICER;
     this.colourOn = PrimeGo.rgbCode.green;
-    this.colourOff = PrimeGo.rgbCode.greenDim;
+    this.colourOff = PrimeGo.rgbCode.greenDark;
     this.pads = new components.ComponentContainer();
     for (let i = 1; i <= 8; i++) {
         const padIndex = i;  // capture for closure
@@ -1890,7 +1865,7 @@ PrimeGo.extraCueModeB = function(deck, offset) {
     for (let j = 1; j <= 8; j++) {
         (function(btn) {
             engine.makeConnection(btn.group, btn.colorKey, function() {
-                if (engine.getValue(btn.group, btn.outKey) > 0) btn.output(1.0);
+                if (btn.inGetValue() > 0) btn.output(1.0);
             });
         })(this.pads[j]);
     }
