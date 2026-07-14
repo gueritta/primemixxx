@@ -144,20 +144,41 @@ export QT_QPA_GENERIC_PLUGINS=evdevtouch:/dev/input/event0,evdevkeyboard:/dev/in
 export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=/dev/input/event0:rotate=90
 export QT_QPA_EGLFS_PHYSICAL_WIDTH=155
 export QT_QPA_EGLFS_PHYSICAL_HEIGHT=98
-export PA_ALSA_PLUGHW=1
+# PA_ALSA_PLUGHW=1  # disabled: use hw: device directly, avoids software conversion
 export HOME=/tmp
 export XDG_RUNTIME_DIR=/tmp
-exec chrt -f 99 taskset -c 2,3 $BUNDLE/bin/mixxx -platform eglfs --settingsPath $BUNDLE/settings --resourcePath $BUNDLE "$@" &
+
+# Launch at SCHED_OTHER — NOT SCHED_FIFO 99! Setting RT on the main process
+# causes ALL 44+ child threads (Mali GPU, touchscreen, CachingReader, Qt pool,
+# GLib, LibraryScanner, etc.) to inherit SCHED_FIFO and compete with audio.
+# Instead, selectively boost only the 2 critical audio engine threads.
+taskset -c 2,3 $BUNDLE/bin/mixxx -platform eglfs --settingsPath $BUNDLE/settings --resourcePath $BUNDLE "$@" &
 MIXPID=$!
 
-# MIXXX's EngineWorkerSch/EngineSideChain threads default to SCHED_OTHER.
-# Boost them to SCHED_FIFO 98 to prevent audio dropouts.
-for i in 1 2 3 4 5 6 7 8 9 10; do
+# Audio-critical threads: SCHED_FIFO 98, pinned to cores 2-3
+# All other threads: SCHED_OTHER, banished to cores 0-1
+BANISH="mali-|CachingReader|QEvdevTouch|StatsManager|QDBus|VinylControl|\
+LibraryScanner|BrowseThread|AnalyzerThread|Controller$|VSync|gmain|gdbus|\
+Thread \(pooled\)|QQuickPixmapRea|QQmlThread"
+
+for i in $(seq 1 12); do
     sleep 1
     for tid in $(ls /proc/$MIXPID/task/ 2>/dev/null); do
         name=$(cat /proc/$MIXPID/task/$tid/comm 2>/dev/null)
         case "$name" in EngineWorkerSch|EngineSideChain)
-            chrt -f -p 98 $tid 2>/dev/null ;; esac
+            chrt -f -p 98 $tid 2>/dev/null
+            taskset -p 0x0C $tid 2>/dev/null ;; esac
+        if echo "$name" | grep -qE "$BANISH"; then
+            chrt -o -p 0 $tid 2>/dev/null
+            taskset -p 0x03 $tid 2>/dev/null
+        fi
+    done
+done
+# Main thread: low RT for MIDI/UI responsiveness on audio cores
+chrt -f -p 1 $MIXPID 2>/dev/null
+taskset -p 0x0C $MIXPID 2>/dev/null
+
+wait $MIXPID
     done
 done
 wait $MIXPID

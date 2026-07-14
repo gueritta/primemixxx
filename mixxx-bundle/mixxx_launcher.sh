@@ -37,26 +37,45 @@ export QT_QPA_GENERIC_PLUGINS="evdevtouch:/dev/input/event0 evdevkeyboard:/dev/i
 export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=/dev/input/event0:rotate=90
 export QT_QPA_EGLFS_PHYSICAL_WIDTH=155
 export QT_QPA_EGLFS_PHYSICAL_HEIGHT=98
-export PA_ALSA_PLUGHW=1
+# PA_ALSA_PLUGHW=1  # disabled: use hw: device directly, avoids software conversion layer
 export HOME=/tmp
 export XDG_RUNTIME_DIR=/tmp
 
-# Launch MIXXX with RT priority 99, pinned to cores 2-3.
-# MIXXX's internal EngineWorkerSch/EngineSideChain threads default to SCHED_OTHER,
-# so we boost them to SCHED_FIFO prio 98 after launch.
-chrt -f 99 taskset -c 2,3 $BUNDLE/bin/mixxx -platform eglfs --settingsPath $BUNDLE/settings --resourcePath $BUNDLE "$@" &
+# Launch MIXXX pinned to CPU cores 2-3 (audio-dedicated cores).
+# We do NOT set RT priority on the main process — that would cause ALL
+# 44+ child threads (Mali GPU, touchscreen, CachingReader, Qt pool, GLib,
+# LibraryScanner, etc.) to inherit SCHED_FIFO 99 and compete with audio.
+# Instead, we selectively boost only the 2 critical audio threads.
+taskset -c 2,3 $BUNDLE/bin/mixxx -platform eglfs --settingsPath $BUNDLE/settings --resourcePath $BUNDLE "$@" &
 MIXPID=$!
 
-for i in 1 2 3 4 5 6 7 8 9 10; do
+# Audio-critical threads that get SCHED_FIFO and stay on cores 2-3:
+AUDIO_THREADS="EngineWorkerSch|EngineSideChain"
+# Non-audio threads to banish to cores 0-1 at SCHED_OTHER:
+BANISH_PATTERNS="mali-|CachingReader|QEvdevTouch|StatsManager|QDBus|VinylControl|\
+LibraryScanner|BrowseThread|AnalyzerThread|Controller$|VSync|gmain|gdbus|\
+Thread \(pooled\)|QQuickPixmapRea|QQmlThread"
+
+for i in $(seq 1 12); do
     sleep 1
     for tid in $(ls /proc/$MIXPID/task/ 2>/dev/null); do
         name=$(cat /proc/$MIXPID/task/$tid/comm 2>/dev/null)
         case "$name" in
             EngineWorkerSch|EngineSideChain)
+                # Audio engine: SCHED_FIFO prio 98, locked to cores 2-3
                 chrt -f -p 98 $tid 2>/dev/null
+                taskset -p 0x0C $tid 2>/dev/null
                 ;;
         esac
+        # Banish all known non-audio threads to cores 0-1 at SCHED_OTHER
+        if echo "$name" | grep -qE "$BANISH_PATTERNS"; then
+            chrt -o -p 0 $tid 2>/dev/null
+            taskset -p 0x03 $tid 2>/dev/null
+        fi
     done
 done
+# Give main thread low RT priority for MIDI/event responsiveness
+chrt -f -p 1 $MIXPID 2>/dev/null
+taskset -p 0x0C $MIXPID 2>/dev/null
 
 wait $MIXPID
