@@ -11,7 +11,7 @@ Last updated: 2026-07-14
 - [x] Neon green + real black theme (#39ff14/#000000/#ffffff)
 - [x] Bigger fonts (11→14, 13→16, 14→18, 16→20px)
 - [x] Bigger margins/padding (~3× from original)
-- [x] Touch scaling fix: MinimumSize 1024→800 (matches framebuffer 800×1280)
+- [x] Touch scaling fix: MinimumSize 1024→800 (matches Qt logical width 1280; skin width axis is 800 in portrait render)
 - [x] Menubar SizeAwareStack breakpoints: 0-600/601-800/801+ (was 0-720/721-1000/1001+)
 - [x] Deck1 = Deck2 = same neon green (#77ff88/#5cff2e/#44dd55)
 - [x] EffectUnit2 colors unified with Deck1
@@ -36,11 +36,11 @@ Last updated: 2026-07-14
 
 ```
 Physical display:  1280×800 landscape
-Framebuffer:       800×1280 portrait (triple-buffered → 800×3840)
-Qt rendering:      800×1280 portrait (EGLFS_ROTATION=90)
-Display HW:        rotates 800×1280 → 1280×800 landscape
-Touch input:       rotate=90 (maps physical landscape → Qt portrait coords)
-Skin MinimumSize:  800,-1 (width MUST be 800 for 1:1 touch mapping)
+GPU framebuffer:   800×1280 portrait (triple-buffered → 800×3840)
+Qt logical screen: 1280×800 landscape (EGLFS_ROTATION=90 rotates the render)
+Display HW:        rotates 800×1280 framebuffer → 1280×800 visible landscape
+Touch input:       rotate=90 (ILI2117 physical landscape → Qt 1280×800 coords)
+Skin SizeAwareStack: lg template active at 1280px width (≥801px breakpoint)
 ```
 
 ---
@@ -110,7 +110,7 @@ PRIME_GO_Control_Surface (JavaScript)
 3. **Mali DDK mismatch**: Device has r1p0, Buildroot bundles r0p0. Fix: symlink to `/usr/lib/libmali.so.14.0`.
 4. **Qt version**: SD card bundles Qt 5.15.8 with custom `libqeglfs-mali-integration.so`. Device Qt 5.15.2 + `eglfs_emu` = black screen.
 5. **NO `QT_QPA_EGLFS_KMS_ATOMIC=1`** — breaks Mali integration.
-6. **Touch: `rotate=0` (not 90)** despite `EGLFS_ROTATION=90` — Mali renders portrait, display rotates to landscape, touch matches physical.
+6. **Touch: `rotate=90`** — ILI2117 reports in physical landscape orientation; Qt evdev plugin rotates 90° to match Qt's 1280×800 logical screen.
 7. **`mixxx-app.service` must NOT be masked** — TKGL uses `systemd-run --unit=mixxx-app`.
 8. **`--resourcePath` is `$BUNDLE` (root)**, NOT `$BUNDLE/bin`.
 9. **`print()` is silent on device** — use `console.warn()` or `engine.log()` for debug output.

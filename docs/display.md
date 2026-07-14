@@ -48,7 +48,7 @@ export QT_QPA_EGLFS_INTEGRATION=eglfs_mali          # Custom Mali integration (n
 export QT_QPA_EGLFS_ROTATION=90
 export QT_QPA_FONTDIR=/usr/share/fonts
 export QT_QPA_GENERIC_PLUGINS=evdevtouch:/dev/input/event0,evdevkeyboard:/dev/input/event1
-export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=/dev/input/event0:rotate=0
+export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=/dev/input/event0:rotate=90
 export HOME=/tmp
 ```
 

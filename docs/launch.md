@@ -89,7 +89,7 @@ export QT_QPA_EGLFS_INTEGRATION=eglfs_mali
 export QT_QPA_EGLFS_ROTATION=90
 export QT_QPA_FONTDIR=/usr/share/fonts
 export QT_QPA_GENERIC_PLUGINS=evdevtouch:/dev/input/event0,evdevkeyboard:/dev/input/event1
-export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=/dev/input/event0:rotate=0
+export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=/dev/input/event0:rotate=90
 export HOME=/tmp
 export XDG_RUNTIME_DIR=/tmp
 exec taskset -c 2,3 chrt -f 99 $BUNDLE/bin/mixxx -platform eglfs --settingsPath $BUNDLE/settings --resourcePath $BUNDLE
@@ -99,7 +99,7 @@ exec taskset -c 2,3 chrt -f 99 $BUNDLE/bin/mixxx -platform eglfs --settingsPath 
 | Variable | Value | Notes |
 |----------|-------|-------|
 | `LD_LIBRARY_PATH` | `$BUNDLE/lib:/usr/qt/lib:/usr/lib` | SD Qt 5.15.8 first, then device Qt 5.15.2 (/usr/qt/lib), then system |
-| `QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS` | `/dev/input/event0:rotate=0` | Touch coordinates match physical orientation |
+| `QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS` | `/dev/input/event0:rotate=90` | ILI2117 reports in physical landscape; rotate=90 maps to Qt's 1280×800 logical screen |
 | `HOME` | `/tmp` | Not `/root` |
 | `QT_QPA_EGLFS_KMS_ATOMIC` | not set | Not needed for Mali integration |
 | `--resourcePath` | `$BUNDLE` (root) | Not `$BUNDLE/bin` |

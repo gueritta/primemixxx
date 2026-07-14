@@ -312,7 +312,7 @@ These MUST come from device's `/lib` — bundled versions cause segfaults from k
 ## Known Issues (Current State)
 
 1. **Two binaries exist:** `mixxx.real` (17 MB) at the root is a DIFFERENT build that crashes with `EGLFS: OpenGL windows cannot be mixed with others`. The working binary is `lib/bin/mixxx` (~10 MB). `bin/mixxx` is a symlink pointing to `lib/bin/mixxx` — do NOT change it to point to `mixxx.real`.
-2. **Screen rotation:** `QT_QPA_EGLFS_ROTATION=90` — Mali renders portrait (800×1280), display controller rotates to landscape (1280×800). Touchscreen uses `rotate=0` because the touch coordinates match the physical orientation.
+2. **Screen rotation:** `QT_QPA_EGLFS_ROTATION=90` — Qt's logical screen is **1280×800 landscape**; the GPU framebuffer is 800×1280 portrait and the display controller rotates it. Touchscreen uses `rotate=90` to map the ILI2117's physical landscape coordinates to Qt's coordinate system.
 3. **Mali DDK mismatch:** Bundled `libEGL.so`/`libGLESv2.so` from Buildroot target r0p0; device has r1p0. **FIXED:** Symlinks on SD card point all EGL/GLES libs to `/usr/lib/libmali.so.14.0`.
 4. **Qt version:** SD card bundles Qt 5.15.8. Device's native Qt 5.15.2 is **NOT used**. Launcher includes `/usr/qt/lib` in `LD_LIBRARY_PATH` (between bundle and system paths) as fallback.
 5. **WiFi power save:** Must run `iw dev wlan0 set power_save off` — not persistent across reboots.
