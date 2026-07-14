@@ -1,0 +1,117 @@
+# Denon Prime 4 — Global TODO & Audit
+
+Last updated: 2026-07-14
+
+---
+
+## 🎨 SKIN (VDJ-Pro / RoundCorners)
+
+### ✅ DONE
+
+- [x] Neon green + real black theme (#39ff14/#000000/#ffffff)
+- [x] Bigger fonts (11→14, 13→16, 14→18, 16→20px)
+- [x] Bigger margins/padding (~3× from original)
+- [x] Touch scaling fix: MinimumSize 1024→800 (matches framebuffer 800×1280)
+- [x] Menubar SizeAwareStack breakpoints: 0-600/601-800/801+ (was 0-720/721-1000/1001+)
+- [x] Deck1 = Deck2 = same neon green (#77ff88/#5cff2e/#44dd55)
+- [x] EffectUnit2 colors unified with Deck1
+- [x] Sampler2 colors unified with Deck1
+- [x] MASTER → M (all 3 XML locations)
+- [x] Vinyl control unit removed from screen/default.xml + menubar toggles
+- [x] Microphone unit removed from screen/default.xml + menubar toggles
+- [x] Air/aux disabled (num_auxiliaries=0 in skin.xml)
+- [x] Brand compacted (150f→90f, spacers 10→2px)
+- [x] MIXXX version label removed from brand (freed space → VU meter)
+- [x] Menubar toggle buttons 23f→32f (all sizes: sm/md/lg)
+
+### 🔧 PENDING
+
+- [ ] **Create native 800px unit templates** (effect/sampler/mic still load 1024.xml → Qt scales 0.78× → touch targets misalign)
+- [ ] **Touch inconsistency on effects/samplers** — same root cause as above
+- [ ] **Remove dead space at right** — brand section + spacers = ~94f, investigate menubar expansion
+- [ ] EffectUnit1 hover color audit (verify #44dd55 matches Deck1)
+- [ ] style.qss approaching 50KB — consider splitting
+
+### 📐 Resolution Architecture
+
+```
+Physical display:  1280×800 landscape
+Framebuffer:       800×1280 portrait (triple-buffered → 800×3840)
+Qt rendering:      800×1280 portrait (EGLFS_ROTATION=90)
+Display HW:        rotates 800×1280 → 1280×800 landscape
+Touch input:       rotate=90 (maps physical landscape → Qt portrait coords)
+Skin MinimumSize:  800,-1 (width MUST be 800 for 1:1 touch mapping)
+```
+
+---
+
+## 🎛️ HARDWARE MAPPING (Denon Prime Go)
+
+### ✅ DONE
+
+- [x] Mapping path fix: mixxx.cfg → `controllers/Denon-Prime-Go.midi.xml` (was `settings/controllers/`)
+- [x] 146 MIDI mappings loaded, controller active
+- [x] Deck1 LEDs = green, Deck2 LEDs = blue (deckColors in script)
+- [x] SysEx RGB LED output (sendRGB with 7-bit encoding)
+- [x] Cue/Play/Sync transport LEDs (SysEx)
+- [x] Hotcue pad LEDs with color feedback
+- [x] Saved Loop pad LEDs with distinct colors
+- [x] Jog wheel touch detection + vinyl/scratch toggle
+- [x] Shift layer (Channel 6) for secondary functions
+- [x] Pitch fader (14-bit, dual-channel bindings)
+- [x] LED dim/bright for on/off states
+- [x] Vinyl toggle LED feedback (bright red = on, dim = off)
+- [x] PFL/headphone cue button with LED
+- [x] Pad mode switching (hotcue → savedLoop → roll → sampler → slicer)
+- [x] Browse encoder with shift acceleration (×1 vs ×20)
+
+### 🔧 PENDING
+
+- [ ] **Slicer mode not implemented** (TODO at line 1791)
+- [ ] **QuickEffect knob not implemented** (TODO at line 784)
+- [ ] **QuickEffect preset selection for 2 decks** (TODO at line 619)
+- [ ] **Denon SysEx ID verification** (line 85 — `[0x00, 0x02, 0x0b]` copied from Prime 4, may need different ID for Prime Go)
+- [ ] **MIDI mapping count in XML** — `grep -c "midi="` returns 0 (attribute format may differ from expected)
+- [ ] **`script.channelRegEx` NaN workaround** (line 1264 — may indicate MIXXX QJSEngine bug)
+- [ ] **No debug log on device** — `print()` silent on Buildroot Qt5 EGLFS, need `console.warn()` or `engine.log()`
+
+### ⚙️ Controller Architecture
+
+```
+PRIME_GO_Control_Surface (JavaScript)
+  ├── Channel 1-4: Deck pads/controls per deck
+  ├── Channel 5: Transport, mixer, browse, FX
+  ├── Channel 6: Shift layer (secondary functions)
+  ├── SysEx: RGB LED output (7-bit split values)
+  └── Pad modes: hotcue | savedLoop | roll | sampler | slicer(nyi)
+```
+
+---
+
+## 🚀 DEPLOYMENT
+
+### ✅ DONE
+
+- [x] `scripts/deploy-to-device.sh` — full deploy + stale settings cleanup + config path fix
+- [x] `scripts/quick-fix-deploy.sh` — fast partial deploy for iteration
+- [x] `scripts/fix-device-libs.sh` — removes system-critical libs from bundle
+
+### 🔧 PENDING
+
+- [ ] Deploy scripts don't sync skin theme files (`style.qss`, XML changes) — user manually SCPs these
+- [ ] No rollback mechanism for bad deploys
+
+---
+
+## ⚠️ CRITICAL PITFALLS
+
+1. **Two MIXXX binaries**: Only `lib/bin/mixxx` (~10MB) works. `mixxx.real` (~17MB) crashes with EGL errors.
+2. **System libs must NOT be in bundle**: libc/libm/libpthread/libdl/librt/libstdc++/libgcc/ld-linux/libatomic — must come from device `/lib`.
+3. **Mali DDK mismatch**: Device has r1p0, Buildroot bundles r0p0. Fix: symlink to `/usr/lib/libmali.so.14.0`.
+4. **Qt version**: SD card bundles Qt 5.15.8 with custom `libqeglfs-mali-integration.so`. Device Qt 5.15.2 + `eglfs_emu` = black screen.
+5. **NO `QT_QPA_EGLFS_KMS_ATOMIC=1`** — breaks Mali integration.
+6. **Touch: `rotate=0` (not 90)** despite `EGLFS_ROTATION=90` — Mali renders portrait, display rotates to landscape, touch matches physical.
+7. **`mixxx-app.service` must NOT be masked** — TKGL uses `systemd-run --unit=mixxx-app`.
+8. **`--resourcePath` is `$BUNDLE` (root)**, NOT `$BUNDLE/bin`.
+9. **`print()` is silent on device** — use `console.warn()` or `engine.log()` for debug output.
+10. **SizeAwareStack breakpoints must match 800px world** — any breakpoint ≥800 triggers wrong template at native resolution.

@@ -37,30 +37,25 @@ echo ""
 echo "=== Fix deployed! ==="
 echo ""
 
-# Step 4: Also sync to settings/controllers/ (MIXXX loads from here FIRST)
-echo "--- Syncing controllers to settings path ---"
-$SSH_CMD '
-BUNDLE_CTRL="/media/az01-internal/mixxx/controllers"
-SETTINGS_CTRL="/media/az01-internal/mixxx/settings/controllers"
-mkdir -p "$SETTINGS_CTRL"
-for f in Denon-Prime-Go-scripts.js Denon-Prime-Go.midi.xml Denon-Prime-Go-jog-wheel-scripts.js Denon-Prime-Go-Jog-Wheels.midi.xml midi-components-0.0.js; do
-  if [ -f "$BUNDLE_CTRL/$f" ]; then
-    cp "$BUNDLE_CTRL/$f" "$SETTINGS_CTRL/$f"
-    echo "  synced $f"
-  fi
-done
-'
-
 # Step 4: Clean stale settings/controllers/ copies and fix config path
-# MIXXX config may point to settings/controllers/ — fix to use controllers/
-echo "--- Cleaning stale settings/controllers/ copies ---"
+# CRITICAL: MIXXX loads controller XML from the path in mixxx.cfg, NOT auto-discovery.
+# Having TWO copies (controllers/ + settings/controllers/) causes confusion:
+#   - If config points to settings/controllers/ but files are in controllers/ → 0 mappings
+#   - If we bloat settings/controllers/ with extra files → MIXXX ships these are its own
+# RULE: Controller files go ONLY in controllers/. Config always points there.
+#        settings/controllers/ is for MIXXX's OWN controller definitions (shipped by MIXXX).
+#        Our custom Prime Go mapping must NOT be mixed into settings/controllers/.
+echo "--- Cleaning stale settings/controllers/ copies and fixing config ---"
 $SSH_CMD '
 CTRL_DIR="/media/az01-internal/mixxx/controllers"
 SETTINGS_DIR="/media/az01-internal/mixxx/settings/controllers"
+# Remove any stray Denon Prime Go files from MIXXX's own controller directory
 rm -f "$SETTINGS_DIR"/Denon-Prime-Go-scripts.js "$SETTINGS_DIR"/Denon-Prime-Go.midi.xml "$SETTINGS_DIR"/Denon-Prime-Go-jog-wheel-scripts.js "$SETTINGS_DIR"/Denon-Prime-Go-Jog-Wheels.midi.xml "$SETTINGS_DIR"/midi-components-0.0.js
 # Fix MIXXX config to point to controllers/ (not settings/controllers/)
 sed -i "s|/media/az01-internal/mixxx/settings/controllers/Denon-Prime-Go.midi.xml|/media/az01-internal/mixxx/controllers/Denon-Prime-Go.midi.xml|" /media/az01-internal/mixxx/settings/mixxx.cfg
 echo "  Stale copies removed, config fixed"
+# Verify no duplication
+[ -f "$SETTINGS_DIR/Denon-Prime-Go.midi.xml" ] && echo "  WARNING: still in settings/controllers!" || echo "  Verified: no duplicate in settings/controllers/"
 '
 
 echo ""
