@@ -13,6 +13,7 @@ echo "  2. Deploy updated lib/ + launcher"
 echo ""
 
 SSH_CMD="setsid ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o PreferredAuthentications=password -o PubkeyAuthentication=no root@$DEVICE_IP"
+SCP_CMD="setsid scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o PreferredAuthentications=password -o PubkeyAuthentication=no -r"
 
 # Step 1: Remove system libs on device
 echo "--- Removing system libs from device bundle ---"
@@ -33,23 +34,28 @@ tar cf - -C "$BUNDLE_DIR/lib" . | $SSH_CMD "cd $TARGET_DIR/lib && tar xf - && ec
 echo "--- Deploying launcher ---"
 cat "$BUNDLE_DIR/mixxx_launcher.sh" | $SSH_CMD "cat > $TARGET_DIR/mixxx_launcher.sh && chmod +x $TARGET_DIR/mixxx_launcher.sh && echo '  Launcher deployed'"
 
+# Step 4: Deploy VDJ-Pro skin
+echo "--- Deploying VDJ-Pro skin ---"
+$SSH_CMD "mkdir -p $TARGET_DIR/settings/skins/vdj-pro"
+$SCP_CMD "$BUNDLE_DIR/skins/vdj-pro/." "root@$DEVICE_IP:$TARGET_DIR/settings/skins/vdj-pro/" && echo "  VDJ-Pro skin deployed"
+
 echo ""
 echo "=== Fix deployed! ==="
 echo ""
 
-# Step 4: Clean stale settings/controllers/ copies and fix config path
+# Step 5: Clean stale settings/controllers/ copies and fix config path
 # CRITICAL: MIXXX loads controller XML from the path in mixxx.cfg, NOT auto-discovery.
 # Having TWO copies (controllers/ + settings/controllers/) causes confusion:
 #   - If config points to settings/controllers/ but files are in controllers/ → 0 mappings
-#   - If we bloat settings/controllers/ with extra files → MIXXX ships these are its own
+#   - If we bloat settings/controllers/ with extra files → MIXXX treats these as its own
 # RULE: Controller files go ONLY in controllers/. Config always points there.
-#        settings/controllers/ is for MIXXX's OWN controller definitions (shipped by MIXXX).
+#        settings/controllers/ is for MIXXX built-in controller definitions.
 #        Our custom Prime Go mapping must NOT be mixed into settings/controllers/.
 echo "--- Cleaning stale settings/controllers/ copies and fixing config ---"
 $SSH_CMD '
 CTRL_DIR="/media/az01-internal/mixxx/controllers"
 SETTINGS_DIR="/media/az01-internal/mixxx/settings/controllers"
-# Remove any stray Denon Prime Go files from MIXXX's own controller directory
+# Remove any stray Denon Prime Go files from the built-in controller directory
 rm -f "$SETTINGS_DIR"/Denon-Prime-Go-scripts.js "$SETTINGS_DIR"/Denon-Prime-Go.midi.xml "$SETTINGS_DIR"/Denon-Prime-Go-jog-wheel-scripts.js "$SETTINGS_DIR"/Denon-Prime-Go-Jog-Wheels.midi.xml "$SETTINGS_DIR"/midi-components-0.0.js
 # Fix MIXXX config to point to controllers/ (not settings/controllers/)
 sed -i "s|/media/az01-internal/mixxx/settings/controllers/Denon-Prime-Go.midi.xml|/media/az01-internal/mixxx/controllers/Denon-Prime-Go.midi.xml|" /media/az01-internal/mixxx/settings/mixxx.cfg

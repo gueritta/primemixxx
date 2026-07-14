@@ -236,12 +236,23 @@ SERVEOF"
 
 eval $SSH_CMD "$SSH_TARGET" "systemctl daemon-reload && systemctl enable usb-gadget-eth.service && echo 'USB Ethernet gadget installed and enabled'"
 
-# ── Step 6: Verify deployment ────────────────────────────────────────────────
+# ── Step 6: Deploy VDJ-Pro skin ──────────────────────────────────────────────
+echo ""
+echo "--- Deploying VDJ-Pro skin ---"
+eval $SSH_CMD "$SSH_TARGET" "mkdir -p '$DEVICE_MIXXX_DIR/settings/skins/vdj-pro'"
+eval $SCP_CMD "$BUNDLE_DIR/skins/vdj-pro/." "$SSH_TARGET:$DEVICE_MIXXX_DIR/settings/skins/vdj-pro/" || {
+  echo "ERROR: Failed to copy VDJ-Pro skin to device." >&2
+  exit 1
+}
+echo "VDJ-Pro skin deployed successfully."
+
+# ── Step 7: Verify deployment ────────────────────────────────────────────────
 echo ""
 echo "--- Verifying deployment ---"
 eval $SSH_CMD "$SSH_TARGET" "ls -la '$DEVICE_MIXXX_DIR/bin/mixxx' && echo 'MIXXX binary: OK'"
 eval $SSH_CMD "$SSH_TARGET" "ls '$DEVICE_MIXXX_DIR/lib/' | wc -l | xargs echo 'Library count:'"
 eval $SSH_CMD "$SSH_TARGET" "ls -la /usr/bin/switch-to-mixxx /usr/bin/switch-to-engine && echo 'Switcher scripts: OK'"
+eval $SSH_CMD "$SSH_TARGET" "ls -la '$DEVICE_MIXXX_DIR/settings/skins/vdj-pro' && echo 'VDJ-Pro skin: OK'"
 eval $SSH_CMD "$SSH_TARGET" "systemctl status mixxx.service --no-pager -l 2>&1 | head -5"
 
 echo ""
@@ -254,7 +265,7 @@ echo ""
 echo "NOTE: The device will still boot into Engine DJ by default."
 echo "      MIXXX must be started manually via the switcher."
 
-# ── Step 7: Clean stale settings/controllers copies and fix config ─────
+# ── Step 8: Clean stale settings/controllers copies and fix config ─────
 # MIXXX config may point to settings/controllers/ — fix to use controllers/
 echo ""
 echo "--- Cleaning stale settings/controllers/ and fixing config ---"
