@@ -1006,9 +1006,10 @@ PrimeGo.Deck = function(deckNumbers, midiChannel) {
         },
     });
 
-    // Jog Wheel
+    // Jog Wheel — Prime Go (QML: touchNote=33/0x21, ccUpper=0x37, ccLower=0x4D)
     this.jogWheel = new components.JogWheelBasic({
         deck: script.deckFromGroup(this.currentDeck),
+        midi: [0x92 + (midiChannel - 2), 0x21],  // for isPress in inputTouch
         wheelResolution: 1000,
         alpha: 1/8,
         beta: 1/8/32,
@@ -1354,8 +1355,12 @@ PrimeGo.hotcueMode = function(deck, offset) {
             on: padColoursOn[i-1],
             off: padColoursOff[i-1],
             sendRGB: function(color_obj) {
-                const msg = [0xf0, 0x00, 0x02, 0x0b, 0x7f, 0x0C, 0x03, 0x00, 0x05, 0x02 + offset, 0x0E + i, color_obj.red>>1, color_obj.green>>1, color_obj.blue>>1, 0xf7];
+                const msg = [0xf0, 0x00, 0x02, 0x0b, 0x7f, 0x0C, 0x03, 0x00, 0x05, 0x02 + offset, 0x0E + i,
+                    color_obj.red>>1, color_obj.green>>1, color_obj.blue>>1, 0xf7];
                 midi.sendSysexMsg(msg, msg.length);
+            },
+            output: function(value) {
+                this.sendRGB({red: value[0], green: value[1], blue: value[2]});
             },
             outConnect: false,
         });
@@ -1398,8 +1403,12 @@ PrimeGo.savedLoopMode = function(deck, offset) {
             on: padColoursOn[i-1],
             off: padColoursOff[i-1],
             sendRGB: function(color_obj) {
-                const msg = [0xf0, 0x00, 0x02, 0x0b, 0x7f, 0x0C, 0x03, 0x00, 0x05, 0x02 + offset, 0x0E + i, color_obj.red>>1, color_obj.green>>1, color_obj.blue>>1, 0xf7];
+                const msg = [0xf0, 0x00, 0x02, 0x0b, 0x7f, 0x0C, 0x03, 0x00, 0x05, 0x02 + offset, 0x0E + i,
+                    color_obj.red>>1, color_obj.green>>1, color_obj.blue>>1, 0xf7];
                 midi.sendSysexMsg(msg, msg.length);
+            },
+            output: function(value) {
+                this.sendRGB({red: value[0], green: value[1], blue: value[2]});
             },
             outConnect: false,
         });

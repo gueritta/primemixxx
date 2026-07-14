@@ -1182,22 +1182,22 @@
                 <Script-Binding/>
               </options>
             </control>
-            <control> <!-- Deck A - Shift Button -->
-              <group>[Shift]</group>
+            <control> <!-- Shift Button (global, ch15) -->
+              <group></group>
               <key>PrimeGo.shiftState</key>
               <description>Shift Button</description>
-              <status>0x92</status>
-              <midino>0x1C</midino>
+              <status>0x9F</status>
+              <midino>0x08</midino>
               <options>
                 <Script-Binding/>
               </options>
             </control>
-            <control> <!-- Deck A - Shift Button -->
-              <group>[Shift]</group>
+            <control> <!-- Shift Button release (global, ch15) -->
+              <group></group>
               <key>PrimeGo.shiftState</key>
               <description>Shift Button</description>
-              <status>0x82</status>
-              <midino>0x1C</midino>
+              <status>0x8F</status>
+              <midino>0x08</midino>
               <options>
                 <Script-Binding/>
               </options>
@@ -1925,22 +1925,22 @@
                 <Script-Binding/>
               </options>
             </control>
-            <control> <!-- Deck B - Shift Button -->
+            <control> <!-- Shift Button (global, ch15) -->
               <group></group>
               <key>PrimeGo.shiftState</key>
               <description>Shift Button</description>
-              <status>0x93</status>
-              <midino>0x1C</midino>
+              <status>0x9F</status>
+              <midino>0x08</midino>
               <options>
                 <Script-Binding/>
               </options>
             </control>
-            <control> <!-- Deck B - Shift Button -->
+            <control> <!-- Shift Button release (global, ch15) -->
               <group></group>
               <key>PrimeGo.shiftState</key>
               <description>Shift Button</description>
-              <status>0x83</status>
-              <midino>0x1C</midino>
+              <status>0x8F</status>
+              <midino>0x08</midino>
               <options>
                 <Script-Binding/>
               </options>
