@@ -272,12 +272,12 @@
             <!-- MIDDLE MIXER SECTION -->
             <control> <!-- Library Scroll Encoder -->
               <group>[Library]</group>
-              <key>MoveVertical</key>
-              <description>MIDI Learned from 210 messages.</description>
+              <key>PrimeGo.browseEncoder</key>
+              <description>Shift+encoder scrolls 15 tracks at a time.</description>
               <status>0xBF</status>
               <midino>0x05</midino>
               <options>
-                <selectknob/>
+                <script-binding/>
               </options>
             </control>
             <control> <!-- Library Scroll Button -->
@@ -400,22 +400,22 @@
 					<Script-Binding/>
 				</options>
 			</control>
-            <control> <!-- Headphone Gain Knob -->
+            <control> <!-- Headphone Gain Knob (QML: cueGainCC: 13) -->
               <group>[Master]</group>
-              <key>headGain</key>
-              <description>MIDI Learned from 408 messages.</description>
+              <key>headVolume</key>
+              <description>Cue Gain</description>
               <status>0xBF</status>
-              <midino>0x0A</midino>
+              <midino>0x0D</midino>
               <options>
                 <normal/>
               </options>
             </control>
-            <control> <!-- Headphone PFL/Master Mix Knob -->
+            <control> <!-- Headphone PFL/Master Mix Knob (QML: cueMixCC: 12) -->
               <group>[Master]</group>
               <key>headMix</key>
-              <description>MIDI Learned from 390 messages.</description>
+              <description>Cue Mix</description>
               <status>0xBF</status>
-              <midino>0x09</midino>
+              <midino>0x0C</midino>
               <options>
                 <normal/>
               </options>
@@ -562,6 +562,69 @@
 	      </options>
 	    </control>
 
+            <control> <!-- Eject / Source Button (QML: Media note=20) -->
+              <group></group>
+              <key>PrimeGo.ejectButton.input</key>
+              <description>Eject (normal) / Source (shift)</description>
+              <status>0x9F</status>
+              <midino>0x14</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+            <control> <!-- Eject / Source Button Off -->
+              <group></group>
+              <key>PrimeGo.ejectButton.input</key>
+              <description>Eject (normal) / Source (shift)</description>
+              <status>0x8F</status>
+              <midino>0x14</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+
+            <control> <!-- Mic 1 Button (QML: HardwareMixerMic note=36) -->
+              <group></group>
+              <key>PrimeGo.mic1Button.input</key>
+              <description>Mic 1 Talkover Toggle</description>
+              <status>0x9F</status>
+              <midino>0x24</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+            <control> <!-- Mic 1 Button Off -->
+              <group></group>
+              <key>PrimeGo.mic1Button.input</key>
+              <description>Mic 1 Talkover Toggle</description>
+              <status>0x8F</status>
+              <midino>0x24</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+
+            <control> <!-- Mic 2 Button (QML: HardwareMixerMic note=37) -->
+              <group></group>
+              <key>PrimeGo.mic2Button.input</key>
+              <description>Mic 2</description>
+              <status>0x9F</status>
+              <midino>0x25</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+            <control> <!-- Mic 2 Button Off -->
+              <group></group>
+              <key>PrimeGo.mic2Button.input</key>
+              <description>Mic 2</description>
+              <status>0x8F</status>
+              <midino>0x25</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+
             <control> <!-- Deck 1 - FX1 Button -->
               <group></group>
               <key>PrimeGo.mixerA.fxBankSelect[1].input</key>
@@ -678,6 +741,56 @@
                 <description>Deck 1 Volume Slider</description>
                 <status>0xB0</status>
                 <midino>0x0E</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control> <!-- Deck 1 - Sweep FX Knob (QML: SweepFxKnob cc=11) -->
+                <group></group>
+                <key>PrimeGo.mixerA.sweepFxKnob.input</key>
+                <description>Deck 1 Sweep FX Knob</description>
+                <status>0xB0</status>
+                <midino>0x0B</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control> <!-- Deck 1 - Sweep FX Filter (QML: SweepFxSelect note=14) -->
+                <group></group>
+                <key>PrimeGo.mixerA.sweepFxFilter.input</key>
+                <description>Deck 1 Sweep FX Filter Select</description>
+                <status>0x90</status>
+                <midino>0x0E</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control> <!-- Deck 1 - Sweep FX Filter Off -->
+                <group></group>
+                <key>PrimeGo.mixerA.sweepFxFilter.input</key>
+                <description>Deck 1 Sweep FX Filter Select</description>
+                <status>0x80</status>
+                <midino>0x0E</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control> <!-- Deck 1 - Sweep FX Wash (QML: SweepFxSelect note=15) -->
+                <group></group>
+                <key>PrimeGo.mixerA.sweepFxWash.input</key>
+                <description>Deck 1 Sweep FX Wash Select</description>
+                <status>0x90</status>
+                <midino>0x0F</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control> <!-- Deck 1 - Sweep FX Wash Off -->
+                <group></group>
+                <key>PrimeGo.mixerA.sweepFxWash.input</key>
+                <description>Deck 1 Sweep FX Wash Select</description>
+                <status>0x80</status>
+                <midino>0x0F</midino>
                 <options>
                     <Script-Binding/>
                 </options>
@@ -799,6 +912,56 @@
                 <description>Deck 2 Volume Slider</description>
                 <status>0xB1</status>
                 <midino>0x0E</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control> <!-- Deck 2 - Sweep FX Knob (QML: SweepFxKnob cc=11) -->
+                <group></group>
+                <key>PrimeGo.mixerB.sweepFxKnob.input</key>
+                <description>Deck 2 Sweep FX Knob</description>
+                <status>0xB1</status>
+                <midino>0x0B</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control> <!-- Deck 2 - Sweep FX Filter (QML: SweepFxSelect note=14) -->
+                <group></group>
+                <key>PrimeGo.mixerB.sweepFxFilter.input</key>
+                <description>Deck 2 Sweep FX Filter Select</description>
+                <status>0x91</status>
+                <midino>0x0E</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control> <!-- Deck 2 - Sweep FX Filter Off -->
+                <group></group>
+                <key>PrimeGo.mixerB.sweepFxFilter.input</key>
+                <description>Deck 2 Sweep FX Filter Select</description>
+                <status>0x81</status>
+                <midino>0x0E</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control> <!-- Deck 2 - Sweep FX Wash (QML: SweepFxSelect note=15) -->
+                <group></group>
+                <key>PrimeGo.mixerB.sweepFxWash.input</key>
+                <description>Deck 2 Sweep FX Wash Select</description>
+                <status>0x91</status>
+                <midino>0x0F</midino>
+                <options>
+                    <Script-Binding/>
+                </options>
+            </control>
+            <control> <!-- Deck 2 - Sweep FX Wash Off -->
+                <group></group>
+                <key>PrimeGo.mixerB.sweepFxWash.input</key>
+                <description>Deck 2 Sweep FX Wash Select</description>
+                <status>0x81</status>
+                <midino>0x0F</midino>
                 <options>
                     <Script-Binding/>
                 </options>
@@ -1042,6 +1205,26 @@
                 <Script-Binding/>
               </options>
             </control>
+            <control> <!-- Deck A - Cue Button ON (ch5 alt) -->
+              <group>[Channel1]</group>
+              <key>PrimeGo.leftDeck.cueButton.input</key>
+              <description>Deck A - Cue Button (ch5)</description>
+              <status>0x94</status>
+              <midino>0x09</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+            <control> <!-- Deck A - Cue Button OFF (ch5 alt) -->
+              <group>[Channel1]</group>
+              <key>PrimeGo.leftDeck.cueButton.input</key>
+              <description>Deck A - Cue Button (ch5)</description>
+              <status>0x84</status>
+              <midino>0x09</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
             <control> <!-- Deck A - Play/Stop Button / Stutter Button -->
               <group>[Channel1]</group>
               <key>PrimeGo.leftDeck.playButton.input</key>
@@ -1057,6 +1240,26 @@
               <key>PrimeGo.leftDeck.playButton.input</key>
               <description>Deck A - Play/Stop Button</description>
               <status>0x82</status>
+              <midino>0x0A</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+            <control> <!-- Deck A - Play/Stop Button (ch5 alt) -->
+              <group>[Channel1]</group>
+              <key>PrimeGo.leftDeck.playButton.input</key>
+              <description>Deck A - Play/Stop Button (ch5)</description>
+              <status>0x94</status>
+              <midino>0x0A</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+            <control> <!-- Deck A - Play/Stop Button OFF (ch5 alt) -->
+              <group>[Channel1]</group>
+              <key>PrimeGo.leftDeck.playButton.input</key>
+              <description>Deck A - Play/Stop Button (ch5)</description>
+              <status>0x84</status>
               <midino>0x0A</midino>
               <options>
                 <Script-Binding/>
@@ -1289,6 +1492,26 @@
               <key>PrimeGo.leftDeck.vinylButton.input</key>
               <description>Vinyl Mode</description>
               <status>0x92</status>
+              <midino>0x23</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+            <control> <!-- Deck A - Vinyl Button (ch5 alt) -->
+              <group>[Channel1]</group>
+              <key>PrimeGo.leftDeck.vinylButton.input</key>
+              <description>Vinyl Mode (ch5)</description>
+              <status>0x94</status>
+              <midino>0x23</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+            <control> <!-- Deck A - Vinyl Button (ch5 alt off) -->
+              <group>[Channel1]</group>
+              <key>PrimeGo.leftDeck.vinylButton.input</key>
+              <description>Vinyl Mode (ch5)</description>
+              <status>0x84</status>
               <midino>0x23</midino>
               <options>
                 <Script-Binding/>

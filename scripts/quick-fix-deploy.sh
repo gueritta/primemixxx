@@ -35,4 +35,31 @@ cat "$BUNDLE_DIR/mixxx_launcher.sh" | $SSH_CMD "cat > $TARGET_DIR/mixxx_launcher
 
 echo ""
 echo "=== Fix deployed! ==="
+echo ""
+
+# Step 4: Also sync to settings/controllers/ (MIXXX loads from here FIRST)
+echo "--- Syncing controllers to settings path ---"
+$SSH_CMD '
+BUNDLE_CTRL="/media/az01-internal/mixxx/controllers"
+SETTINGS_CTRL="/media/az01-internal/mixxx/settings/controllers"
+mkdir -p "$SETTINGS_CTRL"
+for f in Denon-Prime-Go-scripts.js Denon-Prime-Go.midi.xml Denon-Prime-Go-jog-wheel-scripts.js Denon-Prime-Go-Jog-Wheels.midi.xml midi-components-0.0.js; do
+  if [ -f "$BUNDLE_CTRL/$f" ]; then
+    cp "$BUNDLE_CTRL/$f" "$SETTINGS_CTRL/$f"
+    echo "  synced $f"
+  fi
+done
+'
+
+# Step 4: Clean stale settings/controllers/ copies (MIXXX loads these FIRST,
+# overriding our deploy. Remove them so MIXXX falls back to controllers/).
+echo "--- Cleaning stale settings/controllers/ copies ---"
+$SSH_CMD '
+CTRL_DIR="/media/az01-internal/mixxx/controllers"
+SETTINGS_DIR="/media/az01-internal/mixxx/settings/controllers"
+rm -f "$SETTINGS_DIR"/Denon-Prime-Go-scripts.js "$SETTINGS_DIR"/Denon-Prime-Go.midi.xml "$SETTINGS_DIR"/Denon-Prime-Go-jog-wheel-scripts.js "$SETTINGS_DIR"/Denon-Prime-Go-Jog-Wheels.midi.xml "$SETTINGS_DIR"/midi-components-0.0.js
+echo "  Stale copies removed"
+'
+
+echo ""
 echo "Run on device: cd /media/az01-internal/mixxx && ./mixxx_launcher.sh"

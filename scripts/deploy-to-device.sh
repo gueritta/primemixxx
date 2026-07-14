@@ -253,3 +253,15 @@ echo "  SD card backup:      $BACKUP_DIR"
 echo ""
 echo "NOTE: The device will still boot into Engine DJ by default."
 echo "      MIXXX must be started manually via the switcher."
+
+# ── Step 7: Clean stale settings/controllers copies ────────────────────
+# MIXXX loads from settings/controllers/ FIRST, overriding our deploy.
+# Remove stale copies so MIXXX falls back to controllers/.
+echo ""
+echo "--- Cleaning stale settings/controllers/ copies ---"
+eval $SSH_CMD "$SSH_TARGET" '
+CTRL_DIR="/media/az01-internal/mixxx/controllers"
+SETTINGS_DIR="/media/az01-internal/mixxx/settings/controllers"
+rm -f "$SETTINGS_DIR"/Denon-Prime-Go-scripts.js "$SETTINGS_DIR"/Denon-Prime-Go.midi.xml "$SETTINGS_DIR"/Denon-Prime-Go-jog-wheel-scripts.js "$SETTINGS_DIR"/Denon-Prime-Go-Jog-Wheels.midi.xml "$SETTINGS_DIR"/midi-components-0.0.js
+echo "Stale copies removed from settings/controllers/"
+'
