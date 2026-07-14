@@ -10,6 +10,9 @@
         <ObjectName>Row</ObjectName>
         <Layout>horizontal</Layout>
         <SizePolicy>me,max</SizePolicy>
+        <!-- Fixed height to prevent layout shift when sampler is hidden.
+             Reserving 100px keeps touch coordinates aligned. -->
+        <MinimumSize>-1,100</MinimumSize>
         <Children>
 
             <SizeAwareStack>
@@ -84,13 +87,15 @@
                         </Children>
                     </WidgetGroup>
                 </Children>
+                <!-- visible moved from outer container to inner stack;
+                     container stays at MinimumSize when content hidden -->
+                <Connection>
+                    <ConfigKey persist="true">[Samplers],show_samplers</ConfigKey>
+                    <BindProperty>visible</BindProperty>
+                </Connection>
             </SizeAwareStack>
 
         </Children>
-        <Connection>
-            <ConfigKey persist="true">[Samplers],show_samplers</ConfigKey>
-            <BindProperty>visible</BindProperty>
-        </Connection>
     </WidgetGroup>
     <!--
     **************************************************************************************
