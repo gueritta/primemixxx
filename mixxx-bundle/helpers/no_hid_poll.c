@@ -83,6 +83,21 @@ void udev_enumerate_unref(void *e) {
     real(e);
 }
 
+// --- libusb: return error from init to short-circuit hidapi-libusb ---
+// hidapi is statically linked, so we intercept libusb_init instead.
+// When libusb_init fails, hidapi's libusb backend returns empty device list.
+int libusb_init(void **ctx) {
+    (void)ctx;
+    return -1; // LIBUSB_ERROR_OTHER — makes hid_enumerate fail fast
+}
+void libusb_exit(void *ctx) { (void)ctx; }
+// Also stub out libusb open/close functions that hidapi might call
+int libusb_open(void *dev, void **handle) { (void)dev; (void)handle; return -1; }
+void libusb_close(void *handle) { (void)handle; }
+int libusb_get_device_list(void *ctx, void ***list) { (void)ctx; *list = NULL; return 0; }
+void libusb_free_device_list(void **list, int unref) { (void)list; (void)unref; }
+int libusb_get_device_descriptor(void *dev, void *desc) { (void)dev; (void)desc; return -1; }
+
 // --- poll: cap infinite timeouts to prevent permanent blocking ---
 int poll(struct pollfd *fds, nfds_t nfds, int timeout) {
     static int (*real)(struct pollfd *, nfds_t, int) = NULL;

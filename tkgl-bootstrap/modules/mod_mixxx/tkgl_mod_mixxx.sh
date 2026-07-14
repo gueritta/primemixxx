@@ -39,7 +39,7 @@ tkgl_mod_mixxx() {
         --working-directory="$MIXDIR" \
         --setenv=HOME=/root \
         --setenv=XDG_RUNTIME_DIR=/run/mixxx \
-        -- /bin/sh -c "exec '$ENTRYPOINT' --controllerDebug --developer > '$LOGFILE' 2>&1"
+        -- /bin/sh -c "exec '$ENTRYPOINT' > '$LOGFILE' 2>&1"
 
     if systemctl is-active --quiet mixxx-app.service; then
         log "mixxx-app.service started in an independent cgroup"
