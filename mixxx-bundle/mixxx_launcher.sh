@@ -1,9 +1,28 @@
 #!/bin/sh
 # MIXXX Launcher — Denon Prime Go (SD card)
-# Minimal launcher: sets env for SD card's bundled Qt 5.15.8 + eglfs_mali.
-# No USB mount, seed DB, GPU governor, or dialog suppression — those are
-# handled by the TKGL bootstrap framework that calls this script.
+# Sets env for SD card's bundled Qt 5.15.8 + eglfs_mali, CPU shielding,
+# and USB music library mount.
 BUNDLE=/media/az01-internal/mixxx
+MUSIC_DIR="$BUNDLE/music"
+
+# USB Music Library: mount USB drive to music directory if present.
+# Engine OS stores its library at /Engine Library/ and /Music/ on the USB key.
+# MIXXX scans $MUSIC_DIR for tracks — mounting a USB key there makes
+# the Engine OS collection available transparently.
+mount_usb_music() {
+    [ -d "$MUSIC_DIR" ] || mkdir -p "$MUSIC_DIR"
+    # Already mounted?
+    mountpoint -q "$MUSIC_DIR" && return 0
+    # Try common USB partitions
+    for dev in /dev/sda1 /dev/sdb1; do
+        if [ -b "$dev" ]; then
+            mount -o ro "$dev" "$MUSIC_DIR" 2>/dev/null && return 0
+        fi
+    done
+    return 1
+}
+mount_usb_music
+
 # Workaround: kernel 5.10.109-inmusic-rt64 never sends NLMSG_DONE for the
 # hidraw netlink dump, so udev's hid_enumerate() hangs forever. The LD_PRELOAD
 # library skips the hidraw udev scan and caps infinite poll() timeouts.
