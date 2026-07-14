@@ -591,6 +591,43 @@ PrimeGo.init = function(_id, _debug) {
         },
     });
 
+    PrimeGo.quickEffectPresetIndexes = {
+        filter: 11,
+        echo: 10,
+        wash: 17,
+        noise: 19,
+    };
+
+    PrimeGo.selectQuickEffectPreset = function(presetName) {
+        const presetIndex = PrimeGo.quickEffectPresetIndexes[presetName];
+        if (presetIndex === undefined) {
+            return;
+        }
+
+        for (let i = 1; i <= 2; i++) {
+            const effect = "[QuickEffectRack1_[Channel" + i + "]]";
+            let currentPreset = engine.getValue(effect, "loaded_chain_preset");
+            const numPresets = engine.getValue(effect, "num_chain_presets");
+
+            if (currentPreset < 0) {
+                currentPreset = 0;
+            }
+
+            if (numPresets > 0 && currentPreset !== presetIndex) {
+                const forwardSteps = script.posMod(presetIndex - currentPreset, numPresets);
+                const backwardSteps = script.posMod(currentPreset - presetIndex, numPresets);
+                const direction = forwardSteps <= backwardSteps ? 1 : -1;
+                const steps = Math.min(forwardSteps, backwardSteps);
+
+                for (let step = 0; step < steps; step++) {
+                    engine.setValue(effect, "chain_selector", direction);
+                }
+            }
+
+            engine.setParameter(effect, "enabled", 1);
+        }
+    };
+
     // Sweep FX - Filter Button
     PrimeGo.sweepFilter = new components.Button({
         midi: [0x9F, 0x0C],
@@ -598,33 +635,35 @@ PrimeGo.init = function(_id, _debug) {
         key: "enabled",
         on: 0x02,
         off: 0x01,
-        input: function(_channel, _control, value, _status, _group) {
-            for (let i = 1; i <= 2; i++) {
-                if (value > 0) {
-                    const effect = "[QuickEffectRack1_[Channel" + i + "]]";
-                    if (engine.getParameter(effect, "enabled") > 0) {
-                        engine.setParameter(effect, "enabled", 0);
-                    } else {
-                        engine.setParameter(effect, "enabled", 1);
-                    }
-                }
-            }
+        input: function(channel, control, value, status, _group) {
+            if (!this.isPress(channel, control, value, status)) return;
+            PrimeGo.selectQuickEffectPreset("filter");
         },
     });
-
-    // TODO: Implement selection of specific QuickEffect preset for all 2 decks
 
     // Sweep FX - Echo Button
     PrimeGo.sweepEcho = new components.Button({
         midi: [0x9F, 0x0D],
+        input: function(channel, control, value, status, _group) {
+            if (!this.isPress(channel, control, value, status)) return;
+            PrimeGo.selectQuickEffectPreset("echo");
+        },
     });
     // Sweep FX - Wash Button
     PrimeGo.sweepWash = new components.Button({
         midi: [0x9F, 0x0E],
+        input: function(channel, control, value, status, _group) {
+            if (!this.isPress(channel, control, value, status)) return;
+            PrimeGo.selectQuickEffectPreset("wash");
+        },
     });
     // Sweep FX - Noise Button
     PrimeGo.sweepNoise = new components.Button({
         midi: [0x9F, 0x0F],
+        input: function(channel, control, value, status, _group) {
+            if (!this.isPress(channel, control, value, status)) return;
+            PrimeGo.selectQuickEffectPreset("noise");
+        },
     });
 
     // Eject / Source Button (QML: Media { name='Eject', shift='Source', note=20, hasLed=true })
@@ -770,9 +809,7 @@ const mixerStrip = function(deckNumber, midiOffset) {
         },
     });
 
-    //TODO: QuickEffect Knob
-
-    // Sweep FX Knob (QML: SweepFxKnob { cc: 11 })
+    // QuickEffect Knob (QML: SweepFxKnob { cc: 11 })
     this.sweepFxKnob = new components.Pot({
         midi: [0xB0 + midiOffset, 0x0B],
         group: "[QuickEffectRack1_[Channel" + deckNumber + "]]",
