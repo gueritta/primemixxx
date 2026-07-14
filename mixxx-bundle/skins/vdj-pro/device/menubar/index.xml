@@ -19,7 +19,7 @@
                    <WidgetGroup>
                         <Layout>horizontal</Layout>
                         <MinimumSize>0,45</MinimumSize>
-                        <MaximumSize>720,45</MaximumSize>
+                        <MaximumSize>600,45</MaximumSize>
                         <Children>
 
                             <Template src="skin:device/menubar/menubar_sm.xml"/>
@@ -28,8 +28,8 @@
                    </WidgetGroup>
                    <WidgetGroup>
                         <Layout>horizontal</Layout>
-                        <MinimumSize>721,45</MinimumSize>
-                        <MaximumSize>1000,45</MaximumSize>
+                        <MinimumSize>601,45</MinimumSize>
+                        <MaximumSize>800,45</MaximumSize>
                         <Children>
 
                             <Template src="skin:device/menubar/menubar_md.xml"/>
@@ -38,7 +38,7 @@
                    </WidgetGroup>
                    <WidgetGroup>
                         <Layout>horizontal</Layout>
-                        <MinimumSize>1001,45</MinimumSize>
+                        <MinimumSize>801,45</MinimumSize>
                         <MaximumSize>-1,45</MaximumSize>
                         <Children>
 

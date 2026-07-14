@@ -20,7 +20,7 @@ QMenu {
 }
 
 QMenu::item {
-    padding: 8px 44px;
+    padding: 11px 44px;
 }
 
 QMenu::item:enabled {
@@ -35,7 +35,7 @@ QMenu::item:enabled:selected {
 QMenu::separator {
     height: 1px;
     background-color: #777777;
-    margin: 12px 10px;
+    margin: 16px 10px;
 }
 
 /* TOOLTIP
@@ -49,10 +49,10 @@ QToolTip {
 }
 
 #Body { background-color: #000000; font-family: 'Open Sans'; font-weight: normal; }
-#BorderTop { border: 0; border-top-right-radius: 8px; border-top-left-radius: 8px; background-color: #000000; margin: 6px 0 0 0; }
+#BorderTop { border: 0; border-top-right-radius: 8px; border-top-left-radius: 8px; background-color: #000000; margin: 9px 0 0 0; }
 #BorderBottom { border: 0; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; background-color: #000000; margin: 0 0 6px 0; }
 #Rectangle { border: 0; border-radius: 0; background-color: #000000; margin: 0; padding: 0; height: 0; width: 0; }
-#RoundedRectangle { border: 0; border-radius: 8px; background-color: #000000; margin: 6px; padding: 0; height: 0; width: 0; }
+#RoundedRectangle { border: 0; border-radius: 8px; background-color: #000000; margin: 9px; padding: 0; height: 0; width: 0; }
 
 /* DEVICE-SETTINGS-BOX
    ========================================================================== */
@@ -61,7 +61,7 @@ QToolTip {
     border: 0;
     border-radius: 8px;
     background-color: rgba(0, 0, 0, 180);
-    margin: 6px 0 6px 0;
+    margin: 9px 0 6px 0;
     padding: 0;
     height: 0;
     width: 0;
@@ -84,7 +84,7 @@ QToolTip {
     border: 0;
     border-radius: 8px;
     background-color: #000000;
-    margin: 6px 0 6px 0;
+    margin: 9px 0 6px 0;
     padding: 0;
     height: 0;
     width: 0;
@@ -95,10 +95,10 @@ QToolTip {
 
 WSearchLineEdit {
     min-height: 40px;
-    padding: 6px 6px 6px 16px;
+    padding: 9px 6px 6px 16px;
     border: 0;
     border-radius: 8px;
-    margin: 6px 0 6px 0;
+    margin: 9px 0 6px 0;
     font-size: 20px;
     background-color: #000000;
     color: #ffffff;
@@ -106,10 +106,10 @@ WSearchLineEdit {
 
 WSearchLineEdit:focus {
     min-height: 40px;
-    padding: 6px 6px 6px 16px;
+    padding: 9px 6px 6px 16px;
     border: 0;
     border-radius: 8px;
-    margin: 6px 0 6px 0;
+    margin: 9px 0 6px 0;
     font-size: 20px;
     background-color: #2a2a2a;
     color: #ffffff;
@@ -148,7 +148,7 @@ QTreeView::item {
     border: 0;
     width: 400px;
     height: 28px;
-    padding-left: 14px;
+    padding-left: 18px;
 }
 
 QTreeView::item:hover {
@@ -261,7 +261,7 @@ QHeaderView::section {
     font-size: 20px;
     font-weight: bold;
     margin: 0;
-    padding: 12px 0 0 3px;
+    padding: 16px 0 0 3px;
     background: transparent;
     color: #ffffff;
     border-radius: 0;
@@ -469,28 +469,28 @@ QTableView::indicator:unchecked {
  * dlgautodj.ui
  */
 #DlgAutoDJ > QPushButton#pushButtonShuffle {
-    margin: 6px 1px 13px 10px;
+    margin: 9px 1px 13px 10px;
     border-top-left-radius: 5px;
     border-bottom-left-radius: 5px;
 }
 
 #DlgAutoDJ > QPushButton#pushButtonAddRandom {
-    margin: 6px 1px 13px 0;
+    margin: 9px 1px 13px 0;
 }
 
 #DlgAutoDJ > QPushButton#pushButtonSkipNext {
-    margin: 6px 1px 13px 0;
+    margin: 9px 1px 13px 0;
 }
 
 #DlgAutoDJ > QPushButton#pushButtonFadeNow {
-    margin: 6px 1px 13px 0;
+    margin: 9px 1px 13px 0;
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
 }
 
 #DlgAutoDJ > QSpinBox#spinBoxTransition {
     min-height: 56px;
-    margin: 6px 0 13px 10px;
+    margin: 9px 0 13px 10px;
     padding: 0 44px;
     font-size: 20px;
     color: #000000;
@@ -541,19 +541,19 @@ QTableView::indicator:unchecked {
 }
 
 #DlgAutoDJ > QLabel#labelTransitionAppendix {
-    margin: 6px 0 13px 0;
+    margin: 9px 0 13px 0;
     padding: 0 44px 0 0;
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
 }
 
 #DlgAutoDJ > QLabel#labelSelectionInfo {
-    margin: 6px 10px 13px 0;
+    margin: 9px 10px 13px 0;
     border-radius: 5px;
 }
 
 #DlgAutoDJ > QPushButton#pushButtonAutoDJ {
-    margin: 6px 10px 13px 0;
+    margin: 9px 10px 13px 0;
     border-radius: 5px;
 }
 
@@ -561,13 +561,13 @@ QTableView::indicator:unchecked {
  * dlgmissing.ui
  */
 #DlgMissing > QPushButton#btnSelect {
-    margin: 6px 1px 13px 0;
+    margin: 9px 1px 13px 0;
     border-top-left-radius: 5px;
     border-bottom-left-radius: 5px;
 }
 
 #DlgMissing > QPushButton#btnPurge {
-    margin: 6px 10px 13px 0;
+    margin: 9px 10px 13px 0;
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
 }
@@ -576,17 +576,17 @@ QTableView::indicator:unchecked {
  * dlghidden.ui
  */
 #DlgHidden > QPushButton#btnSelect {
-    margin: 6px 1px 13px 0;
+    margin: 9px 1px 13px 0;
     border-top-left-radius: 5px;
     border-bottom-left-radius: 5px;
 }
 
 #DlgHidden > QPushButton#btnPurge {
-    margin: 6px 1px 13px 0;
+    margin: 9px 1px 13px 0;
 }
 
 #DlgHidden > QPushButton#btnUnhide {
-    margin: 6px 10px 13px 0;
+    margin: 9px 10px 13px 0;
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
 }
@@ -595,12 +595,12 @@ QTableView::indicator:unchecked {
  * dlgrecording.ui
  */
 #DlgRecording > QLabel#label {
-    margin: 6px 10px 13px 0;
+    margin: 9px 10px 13px 0;
     border-radius: 5px;
 }
 
 #DlgRecording > QPushButton#pushButtonRecording {
-    margin: 6px 10px 13px 0;
+    margin: 9px 10px 13px 0;
     border-radius: 5px;
 }
 
@@ -609,7 +609,7 @@ QTableView::indicator:unchecked {
  */
 WLibrary QRadioButton {
     color: #ffffff;
-    margin: 9px 10px 6px 0px;
+    margin: 12px 10px 6px 0px;
     outline: none;
 }
 
@@ -620,7 +620,7 @@ WLibrary QRadioButton::indicator {
 }
 
 WLibrary QRadioButton#radioButtonRecentlyAdded {
-    margin: 9px 10px 6px 14px;
+    margin: 12px 10px 6px 14px;
 }
 
 WLibrary QRadioButton::indicator:checked {
@@ -633,18 +633,18 @@ WLibrary QRadioButton::indicator:unchecked {
 
 
 #DlgAnalysis > QLabel#labelProgress {
-    margin: 6px 10px 13px 0;
+    margin: 9px 10px 13px 0;
     border-radius: 5px;
 }
 
 #DlgAnalysis > QPushButton#pushButtonSelectAll {
-    margin: 6px 1px 13px 0;
+    margin: 9px 1px 13px 0;
     border-top-left-radius: 5px;
     border-bottom-left-radius: 5px;
 }
 
 #DlgAnalysis > QPushButton#pushButtonAnalyze {
-  margin: 6px 10px 13px 0;
+  margin: 9px 10px 13px 0;
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
 }
@@ -655,7 +655,7 @@ WLibrary QRadioButton::indicator:unchecked {
 
 QTextBrowser {
     border: 0;
-    padding: 20px;
+    padding: 27px;
     margin: 0;
     border-radius: 0;
     background-color: #000000;
@@ -849,14 +849,14 @@ QScrollBar::sub-page:vertical {
 #Sampler2 #Title,
 #Sampler2 #Hyphen,
 #EffectUnit2 #EffectChainName {
-    color: #66ff99;
+    color: #77ff88;
     font-size: 18px;
 }
 
 #Sampler2 #Time,
 #Sampler2 #VisualBpm,
 #Sampler2 #SyncMode {
-    color: #66ff99;
+    color: #77ff88;
     font-size: 20px;
 }
 
@@ -931,7 +931,7 @@ QScrollBar::sub-page:vertical {
 
 #Logo {
     background: transparent url(skin:/background/logo.png) no-repeat center left;
-    padding-top: 33px;
+    padding-top: 44px;
 }
 
 #Version {
@@ -1060,7 +1060,7 @@ QScrollBar::sub-page:vertical {
  * EffectUnit2
  */
 #EffectUnit2 #EffectLabel {
-    background-color: #55ee88;
+    background-color: #5cff2e;
 }
 
  /**
@@ -1977,7 +1977,7 @@ QScrollBar::sub-page:vertical {
 #EffectUnit2 #Btn-bbrr[value="1"],
 #EffectUnit2 #Btn-nbr[value="1"],
 #EffectUnit2 #Btn-nbr-bisected[value="1"] {
-    background-color: #55ee88;
+    background-color: #5cff2e;
 }
 
 #EffectUnit2 #Btn-br[value="1"]:hover,
@@ -1991,7 +1991,7 @@ QScrollBar::sub-page:vertical {
 #EffectUnit2 #Btn-bbrr[value="1"]:hover,
 #EffectUnit2 #Btn-nbr[value="1"]:hover,
 #EffectUnit2 #Btn-nbr-bisected[value="1"]:hover {
-    background-color: #44cc66;
+    background-color: #44dd55;
 }
 
 /**
@@ -2227,7 +2227,7 @@ QScrollBar::sub-page:vertical {
 
 #MasterVu, #ChannelVu {
     background: transparent url(skin:/background/bg_4_vu.svg) repeat-x right center;
-    padding-top: 2px;
+    padding-top: 4px;
 }
 
 #MasterVuBottom, #ChannelVuBottom {

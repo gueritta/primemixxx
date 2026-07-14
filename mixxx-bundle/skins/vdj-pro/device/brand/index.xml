@@ -38,7 +38,7 @@
 
                                     <VuMeter>
                                         <TooltipId>audio_latency_usage</TooltipId>
-                                        <Size>35f,10f</Size>
+                                        <Size>70f,10f</Size>
                                         <PathVu scalemode="STRETCH">background/bg_7_vu_on.png</PathVu>
                                         <PathBack scalemode="STRETCH">background/bg_7_vu_off.png</PathBack>
                                         <Horizontal>true</Horizontal>
@@ -50,13 +50,6 @@
                                                 <ConfigKey>[Master],audio_latency_usage</ConfigKey>
                                         </Connection>
                                     </VuMeter>
-
-                                    <Label>
-                                        <Size>35f,10f</Size>
-                                        <ObjectName>Version</ObjectName>
-                                        <Text>v.2.5.6</Text>
-                                        <Alignment>right</Alignment>
-                                    </Label>
 
                                 </Children>
                             </WidgetGroup>    
