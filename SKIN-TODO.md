@@ -11,26 +11,29 @@ Last updated: 2026-07-14
 - [x] Neon green + real black theme (#39ff14/#000000/#ffffff)
 - [x] Bigger fonts (11→14, 13→16, 14→18, 16→20px)
 - [x] Bigger margins/padding (~3× from original)
-- [x] Touch scaling fix: MinimumSize 1024→800 (matches Qt logical width 1280; skin width axis is 800 in portrait render)
-- [x] Menubar SizeAwareStack breakpoints: 0-600/601-800/801+ (was 0-720/721-1000/1001+)
+- [x] Touch scaling fix: MinimumSize 1024→800 (matches Qt logical width 1280)
+- [x] Menubar SizeAwareStack breakpoints: 0-600/601-800/801+
 - [x] Deck1 = Deck2 = same neon green (#77ff88/#5cff2e/#44dd55)
 - [x] EffectUnit2 colors unified with Deck1
 - [x] Sampler2 colors unified with Deck1
 - [x] MASTER → M (all 3 XML locations)
-- [x] Vinyl control unit removed from screen/default.xml + menubar toggles
-- [x] Microphone unit removed from screen/default.xml + menubar toggles
-- [x] Air/aux disabled (num_auxiliaries=0 in skin.xml)
+- [x] Vinyl/microphone units hidden, air/aux disabled
 - [x] Brand compacted (150f→90f, spacers 10→2px)
-- [x] MIXXX version label removed from brand (freed space → VU meter)
-- [x] Menubar toggle buttons 23f→32f (all sizes: sm/md/lg)
+- [x] MIXXX version label removed, menubar buttons 23f→32f
+- [x] **Deck XML flattening + boilerplate purge** (-1157 lines)
+- [x] **44px touch target bumps** (search, tree items, headers, tables)
+- [x] **100px phantom reserves dropped** from effect/mic/sampler units
+- [x] **VIEW button split**: normal=maximize_library, shift+VIEW=show_menubar
+- [x] **style.qss split into 5 modules** (_base, _library, _controls, _buttons, _deck2)
+- [x] **Touch design system documented** (4px grid, 44px min, font/radius/spacing scale)
 
 ### 🔧 PENDING
 
-- [ ] **Create native 800px unit templates** (effect/sampler/mic still load 1024.xml → Qt scales 0.78× → touch targets misalign)
-- [ ] **Touch inconsistency on effects/samplers** — same root cause as above
-- [ ] **Remove dead space at right** — brand section + spacers = ~94f, investigate menubar expansion
-- [ ] EffectUnit1 hover color audit (verify #44dd55 matches Deck1)
-- [ ] style.qss approaching 50KB — consider splitting
+- [ ] **Remove dead space at right** — brand section + spacers = ~94f
+- [ ] EffectUnit1 hover color audit (#44dd55 match)
+- [ ] **Touch verification on device** — test effect/sampler touch targets with 800px templates
+- [ ] **Standardize XML button widths** to design system (15me/20me/25me → consistent scale)
+- [ ] Drop or simplify sm/md breakpoints? Device always runs lg(801+) at 1280px
 
 ### 📐 Resolution Architecture
 
