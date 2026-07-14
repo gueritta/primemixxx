@@ -1202,7 +1202,7 @@
                 <Script-Binding/>
               </options>
             </control>
-			<control> <!-- Pitch Fader LSB -->
+			<control> <!-- Pitch Fader LSB (ch5) -->
 				<key>PrimeGo.leftDeck.tempoFader.inputLSB</key>
 				<status>0xB4</status>
 				<midino>0x4B</midino>
@@ -1210,9 +1210,25 @@
 					<Script-Binding/>
 				</options>
 			</control>
-			<control> <!-- Pitch Fader MSB -->
+			<control> <!-- Pitch Fader LSB (alt ch3) -->
+				<key>PrimeGo.leftDeck.tempoFader.inputLSB</key>
+				<status>0xB2</status>
+				<midino>0x4B</midino>
+				<options>
+					<Script-Binding/>
+				</options>
+			</control>
+			<control> <!-- Pitch Fader MSB (ch5) -->
 				<key>PrimeGo.leftDeck.tempoFader.inputMSB</key>
 				<status>0xB4</status>
+				<midino>0x1F</midino>
+				<options>
+					<Script-Binding/>
+				</options>
+			</control>
+			<control> <!-- Pitch Fader MSB (alt ch3) -->
+				<key>PrimeGo.leftDeck.tempoFader.inputMSB</key>
+				<status>0xB2</status>
 				<midino>0x1F</midino>
 				<options>
 					<Script-Binding/>
@@ -1929,7 +1945,7 @@
                 <Script-Binding/>
               </options>
             </control>
-			<control> <!-- Pitch Fader LSB -->
+			<control> <!-- Pitch Fader LSB (ch6) -->
 				<key>PrimeGo.rightDeck.tempoFader.inputLSB</key>
 				<status>0xB5</status>
 				<midino>0x4B</midino>
@@ -1937,9 +1953,25 @@
 					<Script-Binding/>
 				</options>
 			</control>
-			<control> <!-- Pitch Fader MSB -->
+			<control> <!-- Pitch Fader LSB (alt ch4) -->
+				<key>PrimeGo.rightDeck.tempoFader.inputLSB</key>
+				<status>0xB3</status>
+				<midino>0x4B</midino>
+				<options>
+					<Script-Binding/>
+				</options>
+			</control>
+			<control> <!-- Pitch Fader MSB (ch6) -->
 				<key>PrimeGo.rightDeck.tempoFader.inputMSB</key>
 				<status>0xB5</status>
+				<midino>0x1F</midino>
+				<options>
+					<Script-Binding/>
+				</options>
+			</control>
+			<control> <!-- Pitch Fader MSB (alt ch4) -->
+				<key>PrimeGo.rightDeck.tempoFader.inputMSB</key>
+				<status>0xB3</status>
 				<midino>0x1F</midino>
 				<options>
 					<Script-Binding/>
