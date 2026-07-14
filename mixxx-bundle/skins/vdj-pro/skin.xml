@@ -97,7 +97,7 @@
 
     <ObjectName>Body</ObjectName>
     <Style src="skin:style.qss"/>
-    <MinimumSize>1024,-1</MinimumSize>
+    <MinimumSize>800,-1</MinimumSize>
     <SizePolicy>me,me</SizePolicy>
     <Layout>vertical</Layout>
     <Children>

@@ -23,11 +23,11 @@
         <SetVariable name="Widget2">[Deck2]</SetVariable>
         <SetVariable name="Group2">[Channel2]</SetVariable>
         <SetVariable name="Align2">top</SetVariable> <!-- Values: top/center/bottom -->
-        <SetVariable name="SignalHighColor2">#66ff99</SetVariable>
-        <SetVariable name="SignalMidColor2">#55ee88</SetVariable>
-        <SetVariable name="SignalLowColor2">#44cc66</SetVariable>
-        <SetVariable name="MarkRangeColor2">#335544</SetVariable>
-        <SetVariable name="MarkRangeDisabledColor2">#77aa77</SetVariable>
+        <SetVariable name="SignalHighColor2">#4488ff</SetVariable>
+        <SetVariable name="SignalMidColor2">#3366ee</SetVariable>
+        <SetVariable name="SignalLowColor2">#2244cc</SetVariable>
+        <SetVariable name="MarkRangeColor2">#112244</SetVariable>
+        <SetVariable name="MarkRangeDisabledColor2">#4466aa</SetVariable>
 
         <SetVariable name="Number3">3</SetVariable>
         <SetVariable name="Widget3">[Deck3]</SetVariable>
@@ -65,11 +65,11 @@
         <SetVariable name="Widget2">[Deck2]</SetVariable>
         <SetVariable name="Group2">[Channel2]</SetVariable>
         <SetVariable name="Align2">bottom</SetVariable> <!-- Values: top/center/bottom -->
-        <SetVariable name="SignalHighColor2">#66ff99</SetVariable>
-        <SetVariable name="SignalMidColor2">#55ee88</SetVariable>
-        <SetVariable name="SignalLowColor2">#44cc66</SetVariable>
-        <SetVariable name="MarkRangeColor2">#335544</SetVariable>
-        <SetVariable name="MarkRangeDisabledColor2">#77aa77</SetVariable>
+        <SetVariable name="SignalHighColor2">#4488ff</SetVariable>
+        <SetVariable name="SignalMidColor2">#3366ee</SetVariable>
+        <SetVariable name="SignalLowColor2">#2244cc</SetVariable>
+        <SetVariable name="MarkRangeColor2">#112244</SetVariable>
+        <SetVariable name="MarkRangeDisabledColor2">#4466aa</SetVariable>
 
         <SetVariable name="Number3">1</SetVariable>
         <SetVariable name="Widget3">[Mixer1]</SetVariable>

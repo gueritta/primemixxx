@@ -10,7 +10,7 @@
         <Children>
                 
             <WidgetGroup on_hide_select="0">
-                <MinimumSize>1024,-1</MinimumSize>
+                <MinimumSize>800,-1</MinimumSize>
                 <SizePolicy>me,me</SizePolicy>
                 <Layout>vertical</Layout>
                 <Children>
@@ -21,7 +21,7 @@
             </WidgetGroup>
             
             <WidgetGroup trigger="[Master],maximize_library" on_hide_select="0">
-                <MinimumSize>1024,-1</MinimumSize>
+                <MinimumSize>800,-1</MinimumSize>
                 <SizePolicy>me,me</SizePolicy>
                 <Layout>vertical</Layout>
                 <Children>
@@ -32,7 +32,7 @@
             </WidgetGroup>
 
             <WidgetGroup trigger="[Deck1],show_editmode" on_hide_select="0">
-                <MinimumSize>1024,-1</MinimumSize>
+                <MinimumSize>800,-1</MinimumSize>
                 <SizePolicy>me,me</SizePolicy>
                 <Layout>vertical</Layout>
                 <Children>
@@ -43,7 +43,7 @@
             </WidgetGroup>
 
             <WidgetGroup trigger="[Deck2],show_editmode" on_hide_select="0">
-                <MinimumSize>1024,-1</MinimumSize>
+                <MinimumSize>800,-1</MinimumSize>
                 <SizePolicy>me,me</SizePolicy>
                 <Layout>vertical</Layout>
                 <Children>
@@ -54,7 +54,7 @@
             </WidgetGroup>
 
             <WidgetGroup trigger="[Deck3],show_editmode" on_hide_select="0">
-                <MinimumSize>1024,-1</MinimumSize>
+                <MinimumSize>800,-1</MinimumSize>
                 <SizePolicy>me,me</SizePolicy>
                 <Layout>vertical</Layout>
                 <Children>
@@ -65,7 +65,7 @@
             </WidgetGroup>
 
             <WidgetGroup trigger="[Deck4],show_editmode" on_hide_select="0">
-                <MinimumSize>1024,-1</MinimumSize>
+                <MinimumSize>800,-1</MinimumSize>
                 <SizePolicy>me,me</SizePolicy>
                 <Layout>vertical</Layout>
                 <Children>
