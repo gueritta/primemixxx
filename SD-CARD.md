@@ -115,8 +115,25 @@ exec /media/az01-internal/mixxx/mixxx_launcher.sh "$@"
 ```sh
 #!/bin/sh
 # MIXXX Launcher — Denon Prime Go (SD card)
-# Minimal: env only. USB mount, seed DB, GPU governor handled by TKGL bootstrap.
+# Sets env for SD card's bundled Qt 5.15.8 + eglfs_mali, CPU shielding,
+# and USB music library mount.
 BUNDLE=/media/az01-internal/mixxx
+MUSIC_DIR="$BUNDLE/music"
+
+# USB Music Library: mount USB drive to music directory if present
+mount_usb_music() {
+    [ -d "$MUSIC_DIR" ] || mkdir -p "$MUSIC_DIR"
+    mountpoint -q "$MUSIC_DIR" && return 0
+    for dev in /dev/sda1 /dev/sdb1; do
+        if [ -b "$dev" ]; then
+            mount -o ro "$dev" "$MUSIC_DIR" 2>/dev/null && return 0
+        fi
+    done
+    return 1
+}
+mount_usb_music
+
+export LD_PRELOAD=$BUNDLE/lib/no_hid_poll.so
 export QT_PLUGIN_PATH="$BUNDLE/qt-plugins"
 export LD_LIBRARY_PATH="$BUNDLE/lib:/usr/qt/lib:/usr/lib"
 export QT_QPA_PLATFORM=eglfs
@@ -124,10 +141,13 @@ export QT_QPA_EGLFS_INTEGRATION=eglfs_mali
 export QT_QPA_EGLFS_ROTATION=90
 export QT_QPA_FONTDIR=/usr/share/fonts
 export QT_QPA_GENERIC_PLUGINS=evdevtouch:/dev/input/event0,evdevkeyboard:/dev/input/event1
-export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=/dev/input/event0:rotate=0
+export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=/dev/input/event0:rotate=90
+export QT_QPA_EGLFS_PHYSICAL_WIDTH=155
+export QT_QPA_EGLFS_PHYSICAL_HEIGHT=98
+export PA_ALSA_PLUGHW=1
 export HOME=/tmp
 export XDG_RUNTIME_DIR=/tmp
-exec taskset -c 2,3 chrt -f 99 $BUNDLE/bin/mixxx -platform eglfs --settingsPath $BUNDLE/settings --resourcePath $BUNDLE
+exec chrt -f 99 taskset -c 2,3 $BUNDLE/bin/mixxx -platform eglfs --settingsPath $BUNDLE/settings --resourcePath $BUNDLE "$@"
 ```
 
 ### Key differences from the repo's old template:
@@ -137,9 +157,10 @@ exec taskset -c 2,3 chrt -f 99 $BUNDLE/bin/mixxx -platform eglfs --settingsPath 
 | `HOME` | `/root` | `/tmp` |
 | `LD_LIBRARY_PATH` | `$BUNDLE/lib:/usr/lib` | `$BUNDLE/lib:/usr/qt/lib:/usr/lib` |
 | `QT_QPA_EGLFS_KMS_ATOMIC` | `1` | not set |
-| `QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS` | `rotate=90` | `rotate=0` |
 | `QT_QPA_GENERIC_PLUGINS` | `evdevtouch:evdevmouse:evdevkeyboard` | `evdevtouch:/dev/input/event0,evdevkeyboard:/dev/input/event1` |
-| USB mount / seed DB / GPU governor / `systemctl stop engine` | In launcher | Handled by TKGL bootstrap |
+| `LD_PRELOAD` | not set | `$BUNDLE/lib/no_hid_poll.so` |
+| CPU shielding | not set | `chrt -f 99 taskset -c 2,3` |
+| USB music mount | manual | `mount_usb_music()` in launcher |
 
 ## Systemd Service
 
@@ -172,13 +193,31 @@ systemctl unmask mixxx-app.service 2>/dev/null || true
 
 ### Problem
 1. MIXXX sandbox silently blocks vfat filesystems → USB library won't scan
-2. MIXXX loads library directories from SQLite `directories` table, NOT from `mixxx.cfg` → fresh DB = empty `directories` table = scanner idle
-3. First-run wizard (which imports config→DB) is skipped by EGLFS dialog suppression
+2. First-run wizard (which imports config→DB) is skipped by EGLFS dialog suppression
 
 ### Solution
-1. **Bind-mount USB to ext4 path** bypasses sandbox: `mount --bind /media/AE1F-B2D6/tuv /media/az01-internal/mixxx/music`
-2. **Seed DB** (`mixxxdb.seed`) pre-populated with `directories` table entry pointing to the bind-mount path
+1. **Mount USB to ext4 path** bypasses sandbox: `mount -o ro /dev/sda1 /media/az01-internal/mixxx/music`
+2. **Seed DB** (`mixxxdb.seed`) pre-populated with `directories` table entry pointing to the music path
 3. **Wrapper** restores seed DB if current DB is missing or < 5KB
+
+### CRITICAL: Library directories live in SQLite, NOT mixxx.cfg
+The `directories` table in `mixxxdb.sqlite` stores music library paths.
+The `[Recording] Directory` in `mixxx.cfg` is ONLY for saving recordings — it has
+nothing to do with music library scanning. `RescanOnStartup 1` does nothing
+if the `directories` table is empty.
+
+To verify/repair the library directory entry:
+```bash
+sqlite3 /media/az01-internal/mixxx/settings/mixxxdb.sqlite \
+  "SELECT directory FROM directories;"
+```
+If empty, insert the library path:
+```bash
+sqlite3 /media/az01-internal/mixxx/settings/mixxxdb.sqlite \
+  "INSERT INTO directories (id, directory, volume) VALUES (1, '/media/az01-internal/mixxx/music', 1);"
+```
+Then restart MIXXX with `RescanOnStartup 1` in `[Library]` section of `mixxx.cfg`.
+Set back to `0` after scan completes to avoid re-scanning every boot.
 
 ### Config (mixxx.cfg)
 ```ini
@@ -187,7 +226,7 @@ FirstRun=1
 HasScreenedForLibraryDir=1
 [Library]
 Directory[0]=/media/az01-internal/mixxx/music
-RescanOnStartup=1
+RescanOnStartup=0
 ```
 
 ## Switcher Scripts (on device)
