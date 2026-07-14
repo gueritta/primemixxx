@@ -10,14 +10,14 @@
             <WidgetGroup>
                 <Layout>horizontal</Layout>
                 <SizePolicy>me,f</SizePolicy>
-                <MinimumSize>-1,45</MinimumSize>
-                <MaximumSize>-1,45</MaximumSize>
+                <MinimumSize>-1,56</MinimumSize>
+                <MaximumSize>-1,56</MaximumSize>
                 <Children>
 
                     <WidgetGroup><!-- margin left -->
                         <SizePolicy>f,f</SizePolicy>
-                        <MinimumSize>10,45</MinimumSize>
-                        <MaximumSize>10,45</MaximumSize>
+                        <MinimumSize>10,56</MinimumSize>
+                        <MaximumSize>10,56</MaximumSize>
                     </WidgetGroup>
 
                     <PushButton>
@@ -43,15 +43,15 @@
                             <WidgetGroup>
                                 <Layout>vertical</Layout>
                                 <SizePolicy>me,f</SizePolicy>
-                                <MinimumSize>-1,45</MinimumSize>
-                                <MaximumSize>-1,45</MaximumSize>
+                                <MinimumSize>-1,56</MinimumSize>
+                                <MaximumSize>-1,56</MaximumSize>
                                 <Children>
 
                                     <WidgetGroup>
                                         <Layout>horizontal</Layout>
                                         <SizePolicy>me,f</SizePolicy>
-                                        <MinimumSize>-1,23</MinimumSize>
-                                        <MaximumSize>-1,23</MaximumSize>
+                                        <MinimumSize>-1,28</MinimumSize>
+                                        <MaximumSize>-1,28</MaximumSize>
                                         <Children>
 
                                             <Template src="skin:device/editdeck/button_hotcue.xml">
@@ -76,8 +76,8 @@
                                     <WidgetGroup>
                                         <Layout>horizontal</Layout>
                                         <SizePolicy>me,f</SizePolicy>
-                                        <MinimumSize>-1,22</MinimumSize>
-                                        <MaximumSize>-1,22</MaximumSize>
+                                        <MinimumSize>-1,28</MinimumSize>
+                                        <MaximumSize>-1,28</MaximumSize>
                                         <Children>
 
                                             <Template src="skin:device/editdeck/button_hotcue.xml">
@@ -105,15 +105,15 @@
                             <WidgetGroup>
                                 <Layout>vertical</Layout>
                                 <SizePolicy>me,f</SizePolicy>
-                                <MinimumSize>-1,45</MinimumSize>
-                                <MaximumSize>-1,45</MaximumSize>
+                                <MinimumSize>-1,56</MinimumSize>
+                                <MaximumSize>-1,56</MaximumSize>
                                 <Children>
 
                                     <WidgetGroup>
                                         <Layout>horizontal</Layout>
                                         <SizePolicy>me,f</SizePolicy>
-                                        <MinimumSize>-1,23</MinimumSize>
-                                        <MaximumSize>-1,23</MaximumSize>
+                                        <MinimumSize>-1,28</MinimumSize>
+                                        <MaximumSize>-1,28</MaximumSize>
                                         <Children>
 
                                             <Template src="skin:device/editdeck/marker_button.xml">
@@ -152,8 +152,8 @@
                                     <WidgetGroup>
                                         <Layout>horizontal</Layout>
                                         <SizePolicy>me,f</SizePolicy>
-                                        <MinimumSize>-1,22</MinimumSize>
-                                        <MaximumSize>-1,22</MaximumSize>
+                                        <MinimumSize>-1,28</MinimumSize>
+                                        <MaximumSize>-1,28</MaximumSize>
                                         <Children>
 
                                             <Template src="skin:device/editdeck/marker_button.xml">
@@ -195,15 +195,15 @@
                             <WidgetGroup>
                                 <Layout>vertical</Layout>
                                 <SizePolicy>me,f</SizePolicy>
-                                <MinimumSize>-1,45</MinimumSize>
-                                <MaximumSize>-1,45</MaximumSize>
+                                <MinimumSize>-1,56</MinimumSize>
+                                <MaximumSize>-1,56</MaximumSize>
                                 <Children>
 
                                     <WidgetGroup>
                                         <Layout>horizontal</Layout>
                                         <SizePolicy>me,f</SizePolicy>
-                                        <MinimumSize>-1,23</MinimumSize>
-                                        <MaximumSize>-1,23</MaximumSize>
+                                        <MinimumSize>-1,28</MinimumSize>
+                                        <MaximumSize>-1,28</MaximumSize>
                                         <Children>
 
                                             <Template src="skin:device/editdeck/marker_button.xml">
@@ -252,8 +252,8 @@
                                     <WidgetGroup>
                                         <Layout>horizontal</Layout>
                                         <SizePolicy>me,f</SizePolicy>
-                                        <MinimumSize>-1,22</MinimumSize>
-                                        <MaximumSize>-1,22</MaximumSize>
+                                        <MinimumSize>-1,28</MinimumSize>
+                                        <MaximumSize>-1,28</MaximumSize>
                                         <Children>
 
                                             <Template src="skin:device/editdeck/marker_button.xml">

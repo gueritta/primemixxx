@@ -16,27 +16,27 @@
         <ObjectName>EffectChain</ObjectName>
         <Layout>horizontal</Layout>
         <SizePolicy>me,f</SizePolicy>
-        <MinimumSize>-1,45</MinimumSize>
-        <MaximumSize>-1,45</MaximumSize>
+        <MinimumSize>-1,56</MinimumSize>
+        <MaximumSize>-1,56</MaximumSize>
         <Children>
 
             <WidgetGroup>
                 <Layout>vertical</Layout>
                 <SizePolicy>f,f</SizePolicy>
-                <MinimumSize>105,45</MinimumSize>
-                <MaximumSize>105,45</MaximumSize>
+                <MinimumSize>105,56</MinimumSize>
+                <MaximumSize>105,56</MaximumSize>
                 <Children>
 
                     <WidgetGroup>
                         <Layout>horizontal</Layout>
                         <SizePolicy>f,f</SizePolicy>
-                        <MinimumSize>105,23</MinimumSize>
-                        <MaximumSize>105,23</MaximumSize>
+                        <MinimumSize>105,28</MinimumSize>
+                        <MaximumSize>105,28</MaximumSize>
                         <Children>
 
                             <EffectName>
                                 <ObjectName>EffectName</ObjectName>
-                                <Size>105f,23f</Size>
+                                <Size>105f,28f</Size>
                                 <EffectRack><Variable name="EffectRackNumber"/></EffectRack>
                                 <EffectUnit><Variable name="EffectUnitNumber"/></EffectUnit>
                                 <Effect><Variable name="EffectNumber"/></Effect>
@@ -48,13 +48,13 @@
                     <WidgetGroup>
                         <Layout>horizontal</Layout>
                         <SizePolicy>f,f</SizePolicy>
-                        <MinimumSize>105,22</MinimumSize>
-                        <MaximumSize>105,22</MaximumSize>
+                        <MinimumSize>105,28</MinimumSize>
+                        <MaximumSize>105,28</MaximumSize>
                         <Children>
 
                           <PushButton>
                                 <ObjectName>Btn-bblr</ObjectName>
-                                <Size>35f,22f</Size>
+                                <Size>35f,28f</Size>
                                 <NumberStates>1</NumberStates>
                                 <State>
                                     <Number>0</Number>
@@ -69,7 +69,7 @@
 
                             <PushButton>
                                 <ObjectName>Btn-nbr-bisected</ObjectName>
-                                <Size>35f,22f</Size>
+                                <Size>35f,28f</Size>
                                 <NumberStates>1</NumberStates>
                                 <State>
                                     <Number>0</Number>
@@ -84,7 +84,7 @@
 
                             <PushButton>
                                 <ObjectName>Btn-bbrr</ObjectName>
-                                <Size>35f,22f</Size>
+                                <Size>35f,28f</Size>
                                 <NumberStates>2</NumberStates>
                                 <State>
                                     <Number>0</Number>

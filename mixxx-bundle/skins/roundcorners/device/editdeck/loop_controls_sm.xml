@@ -10,23 +10,23 @@
         <ObjectName>Rectangle</ObjectName>
         <Layout>horizontal</Layout>
         <SizePolicy>me,f</SizePolicy>
-        <MinimumSize>-1,45</MinimumSize>
-        <MaximumSize>-1,45</MaximumSize>
+        <MinimumSize>-1,56</MinimumSize>
+        <MaximumSize>-1,56</MaximumSize>
         <Children>
 
             <WidgetGroup>
                 <Layout>vertical</Layout>
                 <SizePolicy>me,f</SizePolicy>
-                <MinimumSize>-1,45</MinimumSize>
-                <MaximumSize>-1,45</MaximumSize>
+                <MinimumSize>-1,56</MinimumSize>
+                <MaximumSize>-1,56</MaximumSize>
                 <Children>
 
                     <WidgetGroup>
                         <ObjectName>BeatLoopButtons</ObjectName>
                         <Layout>horizontal</Layout>
                         <SizePolicy>me,f</SizePolicy>
-                        <MinimumSize>-1,23</MinimumSize>
-                        <MaximumSize>-1,23</MaximumSize>
+                        <MinimumSize>-1,28</MinimumSize>
+                        <MaximumSize>-1,28</MaximumSize>
                         <Children>
 
                             <Template src="skin:device/editdeck/loop_button.xml">
@@ -47,8 +47,8 @@
                     <WidgetGroup>
                         <Layout>horizontal</Layout>
                         <SizePolicy>me,f</SizePolicy>
-                        <MinimumSize>-1,23</MinimumSize>
-                        <MaximumSize>-1,23</MaximumSize>
+                        <MinimumSize>-1,28</MinimumSize>
+                        <MaximumSize>-1,28</MaximumSize>
                         <Children>
 
                             <Template src="skin:device/editdeck/loop_button.xml">
@@ -77,14 +77,14 @@
             <WidgetGroup>
                 <Layout>horizontal</Layout>
                 <SizePolicy>me,f</SizePolicy>
-                <MinimumSize>-1,45</MinimumSize>
-                <MaximumSize>-1,45</MaximumSize>
+                <MinimumSize>-1,56</MinimumSize>
+                <MaximumSize>-1,56</MaximumSize>
                 <Children>
 
                     <WidgetStack>
                         <SizePolicy>me,f</SizePolicy>
-                        <MinimumSize>-1,45</MinimumSize>
-                        <MaximumSize>-1,45</MaximumSize>
+                        <MinimumSize>-1,56</MinimumSize>
+                        <MaximumSize>-1,56</MaximumSize>
                         <NextControl><Variable name="Widget"/>,loopmove_nextpage</NextControl>
                         <PrevControl><Variable name="Widget"/>,loopmove_prevpage</PrevControl>
                         <Children>
@@ -123,16 +123,16 @@
             <WidgetGroup>
                 <Layout>vertical</Layout>
                 <SizePolicy>me,f</SizePolicy>
-                <MinimumSize>-1,45</MinimumSize>
-                <MaximumSize>-1,45</MaximumSize>
+                <MinimumSize>-1,56</MinimumSize>
+                <MaximumSize>-1,56</MaximumSize>
                 <Children>
 
                     <WidgetGroup>
                         <ObjectName>BeatLoopButtons</ObjectName>
                         <Layout>horizontal</Layout>
                         <SizePolicy>me,f</SizePolicy>
-                        <MinimumSize>-1,23</MinimumSize>
-                        <MaximumSize>-1,23</MaximumSize>
+                        <MinimumSize>-1,28</MinimumSize>
+                        <MaximumSize>-1,28</MaximumSize>
                         <Children>
 
                             <PushButton>
@@ -173,8 +173,8 @@
                     <WidgetGroup>
                         <Layout>horizontal</Layout>
                         <SizePolicy>me,f</SizePolicy>
-                        <MinimumSize>-1,23</MinimumSize>
-                        <MaximumSize>-1,23</MaximumSize>
+                        <MinimumSize>-1,28</MinimumSize>
+                        <MaximumSize>-1,28</MaximumSize>
                         <Children>
 
                             <PushButton>

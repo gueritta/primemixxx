@@ -10,12 +10,8 @@
         <ObjectName>Rectangle</ObjectName>
         <Layout>horizontal</Layout>
         <SizePolicy>me,f</SizePolicy>
-        <MinimumSize>-1,45</MinimumSize>
-        <MaximumSize>-1,45</MaximumSize>
-        <Children>
-
-            <PushButton>
-                <ObjectName>Btn-br</ObjectName>
+        <MinimumSize>-1,56</MinimumSize>
+        <MaximumSize>-1,56</MaximumSize>
                 <Size>25me,45f</Size>
                 <NumberStates>2</NumberStates>
                 <RightClickIsPushButton>true</RightClickIsPushButton>
@@ -67,15 +63,15 @@
                     <WidgetGroup>
                         <Layout>vertical</Layout>
                         <SizePolicy>me,f</SizePolicy>
-                        <MinimumSize>-1,45</MinimumSize>
-                        <MaximumSize>-1,45</MaximumSize>
+                        <MinimumSize>-1,56</MinimumSize>
+                        <MaximumSize>-1,56</MaximumSize>
                         <Children>
 
                             <WidgetGroup>
                                 <Layout>horizontal</Layout>
                                 <SizePolicy>me,f</SizePolicy>
-                                <MinimumSize>-1,23</MinimumSize>
-                                <MaximumSize>-1,23</MaximumSize>
+                                <MinimumSize>-1,28</MinimumSize>
+                                <MaximumSize>-1,28</MaximumSize>
                                 <Children>
 
                                     <Template src="skin:device/sampler/button_hotcue.xml">
@@ -100,8 +96,8 @@
                             <WidgetGroup>
                                 <Layout>horizontal</Layout>
                                 <SizePolicy>me,f</SizePolicy>
-                                <MinimumSize>-1,22</MinimumSize>
-                                <MaximumSize>-1,22</MaximumSize>
+                                <MinimumSize>-1,28</MinimumSize>
+                                <MaximumSize>-1,28</MaximumSize>
                                 <Children>
 
                                     <Template src="skin:device/sampler/button_hotcue.xml">
@@ -129,15 +125,15 @@
                     <WidgetGroup>
                         <Layout>vertical</Layout>
                         <SizePolicy>me,f</SizePolicy>
-                        <MinimumSize>-1,45</MinimumSize>
-                        <MaximumSize>-1,45</MaximumSize>
+                        <MinimumSize>-1,56</MinimumSize>
+                        <MaximumSize>-1,56</MaximumSize>
                         <Children>
 
                             <WidgetGroup>
                                 <Layout>horizontal</Layout>
                                 <SizePolicy>me,f</SizePolicy>
-                                <MinimumSize>-1,23</MinimumSize>
-                                <MaximumSize>-1,23</MaximumSize>
+                                <MinimumSize>-1,28</MinimumSize>
+                                <MaximumSize>-1,28</MaximumSize>
                                 <Children>
 
                                     <Template src="skin:device/sampler/button_hotcue.xml">
@@ -162,8 +158,8 @@
                             <WidgetGroup>
                                 <Layout>horizontal</Layout>
                                 <SizePolicy>me,f</SizePolicy>
-                                <MinimumSize>-1,22</MinimumSize>
-                                <MaximumSize>-1,22</MaximumSize>
+                                <MinimumSize>-1,28</MinimumSize>
+                                <MaximumSize>-1,28</MaximumSize>
                                 <Children>
 
                                     <Template src="skin:device/sampler/button_hotcue.xml">

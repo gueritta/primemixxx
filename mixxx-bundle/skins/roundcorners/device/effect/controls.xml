@@ -10,8 +10,8 @@
         <ObjectName>Rectangle</ObjectName>
         <Layout>vertical</Layout>
         <SizePolicy>me,f</SizePolicy>
-        <MinimumSize>-1,55</MinimumSize>
-        <MaximumSize>-1,55</MaximumSize>
+        <MinimumSize>-1,66</MinimumSize>
+        <MaximumSize>-1,66</MaximumSize>
         <Children>
 
             <WidgetGroup><!-- margin-top -->
@@ -23,29 +23,29 @@
             <WidgetGroup>
                 <Layout>horizontal</Layout>
                 <SizePolicy>me,f</SizePolicy>
-                <MinimumSize>-1,45</MinimumSize>
-                <MaximumSize>-1,45</MaximumSize>
+                <MinimumSize>-1,56</MinimumSize>
+                <MaximumSize>-1,56</MaximumSize>
                 <Children>
 
                     <WidgetGroup><!-- margin-left -->
                         <SizePolicy>f,f</SizePolicy>
-                        <MinimumSize>10,45</MinimumSize>
-                        <MaximumSize>10,45</MaximumSize>
+                        <MinimumSize>10,56</MinimumSize>
+                        <MaximumSize>10,56</MaximumSize>
                     </WidgetGroup>
 
                     <WidgetGroup>
                         <Layout>vertical</Layout>
                         <SizePolicy>me,f</SizePolicy>
-                        <MinimumSize>-1,45</MinimumSize>
-                        <MaximumSize>-1,45</MaximumSize>
+                        <MinimumSize>-1,56</MinimumSize>
+                        <MaximumSize>-1,56</MaximumSize>
                         <Children>
 
                             <WidgetGroup>
                                 <ObjectName>EffectAssignToButtons</ObjectName>
                                 <Layout>horizontal</Layout>
                                 <SizePolicy>me,f</SizePolicy>
-                                <MinimumSize>-1,23</MinimumSize>
-                                <MaximumSize>-1,23</MaximumSize>
+                                <MinimumSize>-1,28</MinimumSize>
+                                <MaximumSize>-1,28</MaximumSize>
                                 <Children>
 
                                     <Template src="skin:device/effect/assign_button.xml">
@@ -72,8 +72,8 @@
                             <WidgetGroup>
                                 <Layout>horizontal</Layout>
                                 <SizePolicy>me,f</SizePolicy>
-                                <MinimumSize>-1,22</MinimumSize>
-                                <MaximumSize>-1,22</MaximumSize>
+                                <MinimumSize>-1,28</MinimumSize>
+                                <MaximumSize>-1,28</MaximumSize>
                                 <Children>
 
                                     <Template src="skin:device/effect/assign_button.xml">
@@ -108,8 +108,8 @@
                     <WidgetGroup>
                         <Layout>horizontal</Layout>
                         <SizePolicy>me,f</SizePolicy>
-                        <MinimumSize>-1,45</MinimumSize>
-                        <MaximumSize>-1,45</MaximumSize>
+                        <MinimumSize>-1,56</MinimumSize>
+                        <MaximumSize>-1,56</MaximumSize>
                         <Children>
 
                             <PushButton>
@@ -144,13 +144,13 @@
 
                             <WidgetGroup><!-- margin right -->
                                 <SizePolicy>f,f</SizePolicy>
-                                <MinimumSize>10,45</MinimumSize>
-                                <MaximumSize>10,45</MaximumSize>
+                                <MinimumSize>10,56</MinimumSize>
+                                <MaximumSize>10,56</MaximumSize>
                             </WidgetGroup>
 
                             <WidgetGroup>
                                 <Layout>vertical</Layout>
-                                <Size>30f,45f</Size>
+                                <Size>30f,56f</Size>
                                 <Children>
 
                                     <KnobComposed>
@@ -165,8 +165,8 @@
                                     </KnobComposed>
 
                                     <WidgetGroup>
-                                        <MinimumSize>-1,3</MinimumSize>
-                                        <MaximumSize>-1,3</MaximumSize>
+                                        <MinimumSize>-1,4</MinimumSize>
+                                        <MaximumSize>-1,4</MaximumSize>
                                     </WidgetGroup>
 
                                     <Label>
@@ -180,8 +180,8 @@
 
                             <WidgetGroup><!-- margin right -->
                                 <SizePolicy>f,f</SizePolicy>
-                                <MinimumSize>10,45</MinimumSize>
-                                <MaximumSize>10,45</MaximumSize>
+                                <MinimumSize>10,56</MinimumSize>
+                                <MaximumSize>10,56</MaximumSize>
                             </WidgetGroup>
 
                             <PushButton>
@@ -208,8 +208,8 @@
 
                     <WidgetGroup><!-- margin right -->
                         <SizePolicy>f,f</SizePolicy>
-                        <MinimumSize>10,45</MinimumSize>
-                        <MaximumSize>10,45</MaximumSize>
+                        <MinimumSize>10,56</MinimumSize>
+                        <MaximumSize>10,56</MaximumSize>
                     </WidgetGroup>
 
                 </Children>

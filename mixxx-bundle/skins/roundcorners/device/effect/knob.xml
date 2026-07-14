@@ -80,8 +80,8 @@
             </WidgetGroup>
 
             <WidgetGroup>
-                <MinimumSize>-1,3</MinimumSize>
-                <MaximumSize>-1,3</MaximumSize>
+                <MinimumSize>-1,4</MinimumSize>
+                <MaximumSize>-1,4</MaximumSize>
             </WidgetGroup>
 
             <EffectParameterName>
