@@ -51,14 +51,16 @@ for f in Denon-Prime-Go-scripts.js Denon-Prime-Go.midi.xml Denon-Prime-Go-jog-wh
 done
 '
 
-# Step 4: Clean stale settings/controllers/ copies (MIXXX loads these FIRST,
-# overriding our deploy. Remove them so MIXXX falls back to controllers/).
+# Step 4: Clean stale settings/controllers/ copies and fix config path
+# MIXXX config may point to settings/controllers/ — fix to use controllers/
 echo "--- Cleaning stale settings/controllers/ copies ---"
 $SSH_CMD '
 CTRL_DIR="/media/az01-internal/mixxx/controllers"
 SETTINGS_DIR="/media/az01-internal/mixxx/settings/controllers"
 rm -f "$SETTINGS_DIR"/Denon-Prime-Go-scripts.js "$SETTINGS_DIR"/Denon-Prime-Go.midi.xml "$SETTINGS_DIR"/Denon-Prime-Go-jog-wheel-scripts.js "$SETTINGS_DIR"/Denon-Prime-Go-Jog-Wheels.midi.xml "$SETTINGS_DIR"/midi-components-0.0.js
-echo "  Stale copies removed"
+# Fix MIXXX config to point to controllers/ (not settings/controllers/)
+sed -i "s|/media/az01-internal/mixxx/settings/controllers/Denon-Prime-Go.midi.xml|/media/az01-internal/mixxx/controllers/Denon-Prime-Go.midi.xml|" /media/az01-internal/mixxx/settings/mixxx.cfg
+echo "  Stale copies removed, config fixed"
 '
 
 echo ""

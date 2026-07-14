@@ -254,14 +254,15 @@ echo ""
 echo "NOTE: The device will still boot into Engine DJ by default."
 echo "      MIXXX must be started manually via the switcher."
 
-# ── Step 7: Clean stale settings/controllers copies ────────────────────
-# MIXXX loads from settings/controllers/ FIRST, overriding our deploy.
-# Remove stale copies so MIXXX falls back to controllers/.
+# ── Step 7: Clean stale settings/controllers copies and fix config ─────
+# MIXXX config may point to settings/controllers/ — fix to use controllers/
 echo ""
-echo "--- Cleaning stale settings/controllers/ copies ---"
+echo "--- Cleaning stale settings/controllers/ and fixing config ---"
 eval $SSH_CMD "$SSH_TARGET" '
 CTRL_DIR="/media/az01-internal/mixxx/controllers"
 SETTINGS_DIR="/media/az01-internal/mixxx/settings/controllers"
 rm -f "$SETTINGS_DIR"/Denon-Prime-Go-scripts.js "$SETTINGS_DIR"/Denon-Prime-Go.midi.xml "$SETTINGS_DIR"/Denon-Prime-Go-jog-wheel-scripts.js "$SETTINGS_DIR"/Denon-Prime-Go-Jog-Wheels.midi.xml "$SETTINGS_DIR"/midi-components-0.0.js
-echo "Stale copies removed from settings/controllers/"
+# Fix MIXXX config to point to controllers/ (not settings/controllers/)
+sed -i "s|/media/az01-internal/mixxx/settings/controllers/Denon-Prime-Go.midi.xml|/media/az01-internal/mixxx/controllers/Denon-Prime-Go.midi.xml|" /media/az01-internal/mixxx/settings/mixxx.cfg
+echo "Stale copies removed, config path fixed."
 '
