@@ -1,10 +1,59 @@
-/* MAIN COMMENT BLOCK
-   ========================================================================== */
-
-
+/* ═══════════════════════════════════════════════════════════════════════════
+   ROUNDCORNERS SKIN — TOUCH DESIGN SYSTEM
+   ════════════════════════════════════════════════════════════════════════════
+   
+   Target device: Denon Prime 4 / Prime Go (1280×800, 10.1" touchscreen)
+   Qt version:    5.15.8 EGLFS (no window manager, direct framebuffer)
+   
+   ── GRID ───────────────────────────────────────────────────────────────────
+   Base unit:      4px
+   All sizes should be multiples of 4px where possible.
+   
+   ── TOUCH TARGETS ──────────────────────────────────────────────────────────
+   Minimum:        44×44px  (finger-friendly on 10.1" 1280×800)
+   Row height:     45px     (standard interactive row, 1px tolerance)
+   Sub-row:        22px     (half-height, non-interactive labels)
+   
+   ── SPACING ────────────────────────────────────────────────────────────────
+   Inter-element:  8px      (between adjacent interactive controls)
+   Margin outer:   4px      (screen edge padding)
+   Margin inner:   10px     (section padding)
+   
+   ── FONT SCALE ─────────────────────────────────────────────────────────────
+   Body:           14px     (library track text, small labels)
+   Label:          16px     (button text, deck info)
+   Subheader:      18px     (section headers)
+   Header:         20px     (main UI headers, column headers)
+   
+   ── BORDER RADIUS ──────────────────────────────────────────────────────────
+   Small:          5px      (buttons, inputs, small containers)
+   Large:          8px      (panels, search bar, section borders)
+   
+   ── COLORS ─────────────────────────────────────────────────────────────────
+   Neon green (Deck 1, 3):
+     High:  #77ff88   Mid:  #5cff2e   Low:  #44dd55
+     Mark:  #337744   Mark disabled:  #88aa88
+   
+   Blue (Deck 2):
+     High:  #4488ff   Mid:  #3366ee   Low:  #2244cc
+     Mark:  #112244   Mark disabled:  #4466aa
+   
+   Deck 4:
+     High:  #88cc66   Mid:  #77bb55   Low:  #3b2e18
+     Mark:  #557733   Mark disabled:  #669966
+   
+   Background:  #000000 (true black)
+   Surface:     #2a2a2a (dark gray panels)
+   Muted:       #777777 (inactive/dimmed)
+   
+   ── RESPONSIVE BREAKPOINTS ─────────────────────────────────────────────────
+   sm:  0–600px    (compact, icons only)
+   md:  601–800px  (medium, short labels)
+   lg:  801px+     (full labels, device native at 1280px)
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 /**
- * Minor Comment Block
+ * Global reset — all widget groups start transparent with no border
  */
 
 WWidgetGroup { border: 0; border-radius: 0; margin: 0; padding: 0; background: transparent; color: #aaaaaa; }

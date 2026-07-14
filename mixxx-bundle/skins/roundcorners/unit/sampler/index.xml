@@ -18,8 +18,7 @@
                 <Children>
                     <WidgetGroup>
                         <Layout>horizontal</Layout>
-                        <MinimumSize>0,0</MinimumSize>
-                        <MaximumSize>899,-1</MaximumSize>
+                        <MaximumSize>900,-1</MaximumSize>
                         <Children>
 
                             <Template src="skin:unit/sampler/800.xml"/>
@@ -28,60 +27,20 @@
                     </WidgetGroup>
                     <WidgetGroup>
                         <Layout>horizontal</Layout>
-                        <MinimumSize>900,0</MinimumSize>
-                        <MaximumSize>999,-1</MaximumSize>
+                        <MinimumSize>901,0</MinimumSize>
+                        <MaximumSize>1100,-1</MaximumSize>
                         <Children>
 
-                            <Template src="skin:unit/sampler/1152.xml"/>
+                            <Template src="skin:unit/sampler/1024.xml"/>
 
                         </Children>
                     </WidgetGroup>
                     <WidgetGroup>
                         <Layout>horizontal</Layout>
-                        <MinimumSize>1000,0</MinimumSize>
-                        <MaximumSize>1062,-1</MaximumSize>
-                        <Children>
-
-                            <Template src="skin:unit/sampler/1280.xml"/>
-
-                        </Children>
-                    </WidgetGroup>
-                    <WidgetGroup>
-                        <Layout>horizontal</Layout>
-                        <MinimumSize>1063,0</MinimumSize>
-                        <MaximumSize>1124,-1</MaximumSize>
+                        <MinimumSize>1101,0</MinimumSize>
                         <Children>
 
                             <Template src="skin:unit/sampler/1360.xml"/>
-
-                        </Children>
-                    </WidgetGroup>
-                    <WidgetGroup>
-                        <Layout>horizontal</Layout>
-                        <MinimumSize>1125,0</MinimumSize>
-                        <MaximumSize>1249,-1</MaximumSize>
-                        <Children>
-
-                            <Template src="skin:unit/sampler/1440.xml"/>
-
-                        </Children>
-                    </WidgetGroup>
-                    <WidgetGroup>
-                        <Layout>horizontal</Layout>
-                        <MinimumSize>1250,0</MinimumSize>
-                        <MaximumSize>1499,-1</MaximumSize>
-                        <Children>
-
-                            <Template src="skin:unit/sampler/1600.xml"/>
-
-                        </Children>
-                    </WidgetGroup>
-                    <WidgetGroup>
-                        <Layout>horizontal</Layout>
-                        <MinimumSize>1500,0</MinimumSize>
-                        <Children>
-
-                            <Template src="skin:unit/sampler/1920.xml"/>
 
                         </Children>
                     </WidgetGroup>

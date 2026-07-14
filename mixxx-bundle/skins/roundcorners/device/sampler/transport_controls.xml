@@ -46,7 +46,7 @@
 
             <PushButton>
                 <ObjectName>Btn-blr</ObjectName>
-                <Size>20f,45f</Size>
+                <Size>25f,45f</Size>
                 <NumberStates>1</NumberStates>
                 <State>
                     <Number>0</Number>
@@ -193,7 +193,7 @@
 
             <PushButton>
                 <ObjectName>Btn-brr</ObjectName>
-                <Size>20f,45f</Size>
+                <Size>25f,45f</Size>
                 <NumberStates>1</NumberStates>
                 <State>
                     <Number>0</Number>
@@ -246,7 +246,7 @@
                     <PushButton>
                         <ObjectName>Btn-btrr</ObjectName>
                         <TooltipId>quantize</TooltipId>
-                        <Size>20me,23f</Size>
+                        <Size>25me,28f</Size>
                         <NumberStates>2</NumberStates>
                         <State>
                             <Number>0</Number>
@@ -266,7 +266,7 @@
                     <PushButton>
                         <ObjectName>Btn-bbrr</ObjectName>
                         <TooltipId>orientation</TooltipId>
-                        <Size>20me,23f</Size>
+                        <Size>25me,28f</Size>
                         <NumberStates>3</NumberStates>
                         <State>
                             <Number>0</Number>

@@ -114,7 +114,7 @@
 
                             <PushButton>
                                 <ObjectName>Btn-blr</ObjectName>
-                                <Size>20me,45f</Size>
+                                <Size>28me,45f</Size>
                                 <NumberStates>1</NumberStates>
                                 <State>
                                     <Number>0</Number>
@@ -129,7 +129,7 @@
 
                             <PushButton>
                                 <ObjectName>Btn-brr</ObjectName>
-                                <Size>20me,45f</Size>
+                                <Size>28me,45f</Size>
                                 <NumberStates>1</NumberStates>
                                 <State>
                                     <Number>0</Number>
@@ -186,7 +186,7 @@
 
                             <PushButton>
                                 <ObjectName>Btn-br</ObjectName>
-                                <Size>20me,45f</Size>
+                                <Size>28me,45f</Size>
                                 <NumberStates>2</NumberStates>
                                 <State>
                                     <Number>0</Number>

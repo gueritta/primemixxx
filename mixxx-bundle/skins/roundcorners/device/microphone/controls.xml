@@ -80,7 +80,7 @@
                     <PushButton>
                         <ObjectName>Btn-btrr</ObjectName>
                         <TooltipId>microphone_talkover</TooltipId>
-                        <Size>20me,23f</Size>
+                        <Size>25me,28f</Size>
                         <NumberStates>3</NumberStates>
                         <State>
                             <Number>0</Number>
@@ -103,7 +103,7 @@
                     <PushButton>
                         <ObjectName>Btn-bbrr</ObjectName>
                         <TooltipId>orientation</TooltipId>
-                        <Size>20me,23f</Size>
+                        <Size>25me,28f</Size>
                         <NumberStates>3</NumberStates>
                         <State>
                             <Number>0</Number>
