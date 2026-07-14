@@ -1,0 +1,98 @@
+/**
+ * VinylControl4
+ */
+#VinylControl4 #Btn-br[value="1"],
+#VinylControl4 #Btn-btr[value="1"],
+#VinylControl4 #Btn-bbr[value="1"],
+#VinylControl4 #Btn-blr[value="1"],
+#VinylControl4 #Btn-brr[value="1"],
+#VinylControl4 #Btn-btlr[value="1"],
+#VinylControl4 #Btn-btrr[value="1"],
+#VinylControl4 #Btn-bblr[value="1"],
+#VinylControl4 #Btn-bbrr[value="1"],
+#VinylControl4 #Btn-nbr[value="1"],
+#VinylControl4 #Btn-nbr-bisected[value="1"] {
+    background-color: #77bb55;
+}
+
+#Vinylcontrol4 #Btn-br[value="1"]:hover,
+#Vinylcontrol4 #Btn-btr[value="1"]:hover,
+#Vinylcontrol4 #Btn-bbr[value="1"]:hover,
+#Vinylcontrol4 #Btn-blr[value="1"]:hover,
+#Vinylcontrol4 #Btn-brr[value="1"]:hover,
+#Vinylcontrol4 #Btn-btlr[value="1"]:hover,
+#Vinylcontrol4 #Btn-btrr[value="1"]:hover,
+#Vinylcontrol4 #Btn-bblr[value="1"]:hover,
+#Vinylcontrol4 #Btn-bbrr[value="1"]:hover,
+#Vinylcontrol4 #Btn-nbr[value="1"]:hover,
+#Vinylcontrol4 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #669933;
+}
+
+
+#Slider {
+    background: transparent url(skin:/background/bg_1_slider.svg) repeat-y center top;
+}
+
+#SliderTop {
+    background: transparent url(skin:/background/bg_1_slider_top.svg) no-repeat center top;
+}
+
+#SliderBottom {
+    background: transparent url(skin:/background/bg_1_slider_bottom.svg) no-repeat center top;
+}
+
+#PitchSlider {
+    background: transparent url(skin:/background/bg_2_slider.svg) repeat-y center top;
+}
+
+#PitchSliderTop {
+    background: transparent url(skin:/background/bg_2_slider_top.svg) no-repeat center top;
+}
+
+#PitchSliderBottom {
+    background: transparent url(skin:/background/bg_2_slider_bottom.svg) no-repeat center top;
+}
+
+#CrossFader {
+    background: transparent url(skin:/background/bg_3_slider.svg) no-repeat center top;
+}
+
+#CrossFaderLeft {
+    background: transparent url(skin:/background/bg_3_slider_left.svg) no-repeat center top;
+}
+
+#CrossFaderRight {
+    background: transparent url(skin:/background/bg_3_slider_right.svg) no-repeat center top;
+}
+
+#Vu {
+    background: transparent url(skin:/background/bg_1_vu.svg) repeat-y center top;
+}
+
+#VuBottom {
+    background: transparent url(skin:/background/bg_1_vu_bottom.svg) no-repeat center top;
+}
+
+#MasterVu, #ChannelVu {
+    background: transparent url(skin:/background/bg_4_vu.svg) repeat-x right center;
+    padding-top: 4px;
+}
+
+#MasterVuBottom, #ChannelVuBottom {
+    background: transparent url(skin:/background/bg_4_vu_bottom.svg) no-repeat left center;
+}
+
+
+#TransportRow,
+#HotCueRow,
+#LoopRow,
+#BeatGridRow {
+    border: 0;
+    border-radius: 0;
+    background-color: #000000;
+    margin: 0;
+    padding: 0;
+}
+
+/* AGGRESSIVE DECK2 BLUE OVERRIDE */

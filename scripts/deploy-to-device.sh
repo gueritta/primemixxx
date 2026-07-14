@@ -238,6 +238,8 @@ eval $SSH_CMD "$SSH_TARGET" "systemctl daemon-reload && systemctl enable usb-gad
 
 # ── Step 6: Deploy VDJ-Pro skin ──────────────────────────────────────────────
 echo ""
+echo "--- Building style.qss from modules ---"
+"$SCRIPT_DIR/build-style-qss.sh"
 echo "--- Deploying VDJ-Pro skin ---"
 eval $SSH_CMD "$SSH_TARGET" "mkdir -p '$DEVICE_MIXXX_DIR/settings/skins/vdj-pro'"
 eval $SCP_CMD "$BUNDLE_DIR/skins/vdj-pro/." "$SSH_TARGET:$DEVICE_MIXXX_DIR/settings/skins/vdj-pro/" || {

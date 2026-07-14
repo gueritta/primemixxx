@@ -34,7 +34,11 @@ tar cf - -C "$BUNDLE_DIR/lib" . | $SSH_CMD "cd $TARGET_DIR/lib && tar xf - && ec
 echo "--- Deploying launcher ---"
 cat "$BUNDLE_DIR/mixxx_launcher.sh" | $SSH_CMD "cat > $TARGET_DIR/mixxx_launcher.sh && chmod +x $TARGET_DIR/mixxx_launcher.sh && echo '  Launcher deployed'"
 
-# Step 4: Deploy VDJ-Pro skin
+# Step 4: Build style.qss from modular QSS files
+echo "--- Building style.qss from modules ---"
+"$(dirname "$0")/build-style-qss.sh"
+
+# Step 5: Deploy VDJ-Pro skin
 echo "--- Deploying VDJ-Pro skin ---"
 $SSH_CMD "mkdir -p $TARGET_DIR/settings/skins/vdj-pro"
 $SCP_CMD "$BUNDLE_DIR/skins/vdj-pro/." "root@$DEVICE_IP:$TARGET_DIR/settings/skins/vdj-pro/" && echo "  VDJ-Pro skin deployed"
@@ -43,7 +47,7 @@ echo ""
 echo "=== Fix deployed! ==="
 echo ""
 
-# Step 5: Clean stale settings/controllers/ copies and fix config path
+# Step 6: Clean stale settings/controllers/ copies and fix config path
 # CRITICAL: MIXXX loads controller XML from the path in mixxx.cfg, NOT auto-discovery.
 # Having TWO copies (controllers/ + settings/controllers/) causes confusion:
 #   - If config points to settings/controllers/ but files are in controllers/ → 0 mappings

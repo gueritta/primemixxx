@@ -1,0 +1,92 @@
+/* MAIN COMMENT BLOCK
+   ========================================================================== */
+
+
+
+/**
+ * Minor Comment Block
+ */
+
+WWidgetGroup { border: 0; border-radius: 0; margin: 0; padding: 0; background: transparent; color: #aaaaaa; }
+
+/* CONTEXT MENU
+   ========================================================================== */
+
+QMenu {
+    background-color: #000000;
+    border: 1px solid #000000;
+    font-size: 18px;
+    color: #aaaaaa;
+}
+
+QMenu::item {
+    padding: 11px 44px;
+}
+
+QMenu::item:enabled {
+    color: #ffffff;
+}
+
+QMenu::item:enabled:selected {
+    background-color: #39ff14;
+    color: #000000;
+}
+
+QMenu::separator {
+    height: 1px;
+    background-color: #777777;
+    margin: 16px 10px;
+}
+
+/* TOOLTIP
+   ========================================================================== */
+
+QToolTip {
+    background-color: #000000;
+    border: 1px solid #000000;
+    font-size: 18px;
+    color: #ffffff;
+}
+
+#Body { background-color: #000000; font-family: 'Open Sans'; font-weight: normal; }
+#BorderTop { border: 0; border-top-right-radius: 8px; border-top-left-radius: 8px; background-color: #000000; margin: 9px 0 0 0; }
+#BorderBottom { border: 0; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; background-color: #000000; margin: 0 0 6px 0; }
+#Rectangle { border: 0; border-radius: 0; background-color: #000000; margin: 0; padding: 0; height: 0; width: 0; }
+#RoundedRectangle { border: 0; border-radius: 8px; background-color: #000000; margin: 9px; padding: 0; height: 0; width: 0; }
+
+/* DEVICE-SETTINGS-BOX
+   ========================================================================== */
+
+#OuterConfigBox {
+    border: 0;
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 180);
+    margin: 9px 0 6px 0;
+    padding: 0;
+    height: 0;
+    width: 0;
+}
+
+#InnerConfigBox {
+    border: 0;
+    border-radius: 8px;
+    background-color: rgba(25, 25, 25, 210);
+    margin: 0;
+    padding: 0;
+    height: 0;
+    width: 0;
+}
+
+/* PASSTHROUGH-BOX
+   ========================================================================== */
+
+#OuterPassthroughBox {
+    border: 0;
+    border-radius: 8px;
+    background-color: #000000;
+    margin: 9px 0 6px 0;
+    padding: 0;
+    height: 0;
+    width: 0;
+}
+
