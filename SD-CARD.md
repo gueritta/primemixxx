@@ -179,9 +179,6 @@ chrt -f -p 1 $MIXPID 2>/dev/null
 taskset -p 0x0C $MIXPID 2>/dev/null
 
 wait $MIXPID
-    done
-done
-wait $MIXPID
 ```
 
 ### Key differences from the repo's old template:
@@ -193,8 +190,33 @@ wait $MIXPID
 | `QT_QPA_EGLFS_KMS_ATOMIC` | `1` | not set |
 | `QT_QPA_GENERIC_PLUGINS` | `evdevtouch:evdevmouse:evdevkeyboard` | `evdevtouch:/dev/input/event0,evdevkeyboard:/dev/input/event1` |
 | `LD_PRELOAD` | not set | `$BUNDLE/lib/no_hid_poll.so` |
-| CPU shielding | not set | `chrt -f 99 taskset -c 2,3` |
+| CPU shielding | not set | `taskset -c 2,3` + engine thread RT boost (see launcher) |
 | USB music mount | manual | `mount_usb_music()` in launcher |
+| `PA_ALSA_PLUGHW` | `1` | disabled (use hw: directly) |
+
+## Audio Optimization Stack
+
+### Thread Scheduling
+- **2 audio threads** at SCHED_FIFO 98 on dedicated cores 2-3: EngineWorkerSch, EngineSideChain
+- **Main thread** at SCHED_FIFO 1 on cores 2-3 (low RT for MIDI/UI responsiveness)
+- **44+ non-audio threads** (Mali GPU, touchscreen, CachingReader, Qt pool, GLib, etc.)
+  banished to cores 0-1 at SCHED_OTHER via launcher post-launch loop
+- **RT throttling disabled** (`sched_rt_runtime_us=-1`)
+
+### IRQ Affinity
+- All non-audio IRQs (GPU, USB, MMC) pinned to CPU 0 via TKGL module at boot
+- Audio DMA IRQ (45) left untouched — stays on default core with audio engine
+
+### ALSA Configuration
+- Device: `hw:JP11,0` (direct, no plughw conversion)
+- Format: S32_LE, 4 channels, 44100 Hz
+- latency=5: period_size=1024 (23.2ms), buffer_size=2048 (46.4ms total)
+
+### Kernel Limitations (unfixable without rebuild)
+- `CONFIG_NO_HZ_FULL` not set: 1ms timer tick fires on ALL cores including isolated 2-3
+- `CONFIG_HZ=1000`: 1kHz scheduler tick — ~0.1-0.2% CPU steal on audio cores
+- No `rcu_nocbs`: RCU callbacks can land on audio cores
+- `isolcpus=1-3` in cmdline but incomplete without `nohz_full` companion
 
 ## Systemd Service
 

@@ -29,6 +29,16 @@ tkgl_mod_mixxx() {
     done
     udevadm trigger --subsystem-match=block --action=add 2>/dev/null || true
 
+    # Pin non-audio IRQs to CPU 0 to prevent GPU/USB/MMC interrupts from
+    # preempting audio engine threads on isolated cores 2-3.
+    for irq in /proc/irq/*/smp_affinity; do
+        irqnum=$(echo "$irq" | grep -oE '[0-9]+')
+        # Skip IRQs 0-31 (system-critical) and 45 (audio DMA controller)
+        [ "$irqnum" -le 31 ] 2>/dev/null && continue
+        [ "$irqnum" = "45" ] && continue
+        echo 1 > "$irq" 2>/dev/null
+    done
+
     log "starting mixxx-app.service; log: $LOGFILE"
     # Env vars intentionally NOT set here — the SD card launcher handles all of:
     # Qt 5.15.8, eglfs_mali, USB bind-mount, seed DB restore, CPU shielding.
