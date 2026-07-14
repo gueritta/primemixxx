@@ -165,7 +165,7 @@ components.Button.prototype.off = 0x01;
 
 // Function to send specific RGB values through SysEx messages
 const sendSysexRGB = function(channel, control, red, green, blue) {
-    const msg = [0xf0, 0x00, 0x02, 0x0b, 0x7f, 0x08, 0x03, 0x00, 0x05, channel, control, red, green, blue, 0xf7];
+    const msg = [0xf0, 0x00, 0x02, 0x0b, 0x7f, 0x0C, 0x03, 0x00, 0x05, channel, control, red, green, blue, 0xf7];
     midi.sendSysexMsg(msg, msg.length);
 };
 
@@ -1221,19 +1221,19 @@ PrimeGo.PadSection = function(deck, offset) {
              *
             for (const modeLayers of Object.values(modes)) {
                 const mode = modeLayers.current();
-                midi.sendShortMsg(0x94 + offset, mode.ledControl, theContainer.currentMode === mode ? mode.colourOn : mode.colourOff);
+                midi.sendShortMsg(0x92 + offset, mode.ledControl, theContainer.currentMode === mode ? mode.colourOn : mode.colourOff);
             }
             */
             for (const modeLayers of Object.values(modes)) {
                 const mode = modeLayers.current();
                 if (theContainer.currentMode !== mode) {
-                    midi.sendShortMsg(0x94 + offset, mode.ledControl, mode.colourOff);
+                    midi.sendShortMsg(0x92 + offset, mode.ledControl, mode.colourOff);
                 }
             }
             for (const modeLayers of Object.values(modes)) {
                 const mode = modeLayers.current();
                 if (theContainer.currentMode === mode) {
-                    midi.sendShortMsg(0x94 + offset, mode.ledControl, mode.colourOn);
+                    midi.sendShortMsg(0x92 + offset, mode.ledControl, mode.colourOn);
                 }
             }
         },
@@ -1266,6 +1266,7 @@ PrimeGo.PadSection = function(deck, offset) {
 
         // Assign mode select buttons in XML file
         this.padModeButtonPressed = function(channel, control, value, _status, _group) {
+            print("DBG_PAD_MODE: channel="+channel+" control=0x"+control.toString(16)+" value="+value+" status="+_status);
             if (value) {
                 this.setPadMode(control);
             }
@@ -1290,6 +1291,7 @@ PrimeGo.PadSection.prototype = Object.create(components.ComponentContainer.proto
 // Assign pads mapped in XML file
 PrimeGo.PadSection.prototype.performancePad = function(channel, control, value, status, group) {
     const i = (control - 0x0E);
+    print("DBG_PERF_PAD: channel="+channel+" padIdx="+i+" control=0x"+control.toString(16)+" value="+value+" status="+status);
     this.currentMode.pads[i].input(channel, control, value, status, group);
 };
 
@@ -1304,9 +1306,9 @@ PrimeGo.hotcueMode = function(deck, offset) {
         this.pads[i] = new components.HotcueButton({
             number: i,
             group: deck.currentDeck,
-            midi: [0x94 + offset, 0x0E + i],
+            midi: [0x92 + offset, 0x0E + i],
             sendRGB: function(color_obj) {
-                const msg = [0xf0, 0x00, 0x02, 0x0b, 0x7f, 0x08, 0x03, 0x00, 0x05, 0x04 + offset, 0x0E + i, color_obj.red>>1, color_obj.green>>1, color_obj.blue>>1, 0xf7];
+                const msg = [0xf0, 0x00, 0x02, 0x0b, 0x7f, 0x0C, 0x03, 0x00, 0x05, 0x02 + offset, 0x0E + i, color_obj.red>>1, color_obj.green>>1, color_obj.blue>>1, 0xf7];
                 midi.sendSysexMsg(msg, msg.length);
             },
             on: this.colourOn,
@@ -1328,9 +1330,9 @@ PrimeGo.savedLoopMode = function(deck, offset) {
         this.pads[i] = new components.HotcueButton({
             number: i + 8,
             group: deck.currentDeck,
-            midi: [0x94 + offset, 0x0E + i],
+            midi: [0x92 + offset, 0x0E + i],
             sendRGB: function(color_obj) {
-                const msg = [0xf0, 0x00, 0x02, 0x0b, 0x7f, 0x08, 0x03, 0x00, 0x05, 0x04 + offset, 0x0E + i, color_obj.red>>1, color_obj.green>>1, color_obj.blue>>1, 0xf7];
+                const msg = [0xf0, 0x00, 0x02, 0x0b, 0x7f, 0x0C, 0x03, 0x00, 0x05, 0x02 + offset, 0x0E + i, color_obj.red>>1, color_obj.green>>1, color_obj.blue>>1, 0xf7];
                 midi.sendSysexMsg(msg, msg.length);
             },
             on: this.colourOn,
@@ -1352,7 +1354,7 @@ PrimeGo.autoloopMode = function(deck, offset) {
     for (let i = 1; i <= 8; i++) {
         const loopSize = (this.loopSize[i - 1]);
         this.pads[i] = new components.Button({
-            midi: [0x94 + offset, 0x0E + i],
+            midi: [0x92 + offset, 0x0E + i],
             group: deck.currentDeck,
             outKey: "beatloop_" + loopSize + "_enabled",
             inKey: "beatloop_" + loopSize + "_toggle",
@@ -1377,7 +1379,7 @@ PrimeGo.rollMode = function(deck, offset) {
     for (let i = 1; i <= 8; i++) {
         const rollSize = (this.rollSize[i - 1]);
         this.pads[i] = new components.Button({
-            midi: [0x94 + offset, 0x0E + i],
+            midi: [0x92 + offset, 0x0E + i],
             group: deck.currentDeck,
             outKey: "beatloop_" + rollSize + "_enabled",
             inKey: "beatlooproll_" + rollSize + "_activate",
@@ -1404,7 +1406,7 @@ PrimeGo.samplerMode = function(deck, offset) {
     for (let i = 1; i <= 8; i++) {
         this.pads[i] = new components.SamplerButton({
             number: i,
-            midi: [0x94 + offset, 0x0E + i],
+            midi: [0x92 + offset, 0x0E + i],
             on: colourArray[i - 1],
             off: PrimeGo.rgbCode.whiteDark,
             outConnect: false,
@@ -1443,7 +1445,7 @@ PrimeGo.extraCueModeA = function(deck, offset) {
         this.pads[i] = new components.HotcueButton({
             number: i + 16,
             group: deck.currentDeck,
-            midi: [0x94 + offset, 0x0E + i],
+            midi: [0x92 + offset, 0x0E + i],
             on: this.colourOn,
             off: this.colourOff,
             outConnect: false,
@@ -1462,7 +1464,7 @@ PrimeGo.extraCueModeB = function(deck, offset) {
         this.pads[i] = new components.HotcueButton({
             number: i + 24,
             group: deck.currentDeck,
-            midi: [0x94 + offset, 0x0E + i],
+            midi: [0x92 + offset, 0x0E + i],
             on: this.colourOn,
             off: this.colourOff,
             outConnect: false,
