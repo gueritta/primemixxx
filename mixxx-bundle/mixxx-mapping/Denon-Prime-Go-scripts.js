@@ -1361,6 +1361,16 @@ PrimeGo.autoloopMode = function(deck, offset) {
             on: PrimeGo.rgbCode.white,
             off: PrimeGo.rgbCode.greenDark,
             outConnect: false,
+            sendRGB: function(color_obj) {
+                const msg = [0xf0, 0x00, 0x02, 0x0b, 0x7f, 0x0C, 0x03, 0x00, 0x05,
+                    0x02 + offset, 0x0E + i, color_obj.red>>1, color_obj.green>>1, color_obj.blue>>1, 0xf7];
+                midi.sendSysexMsg(msg, msg.length);
+            },
+            output: function(value) {
+                if (this.sendRGB !== undefined) {
+                    this.sendRGB(value);
+                }
+            },
         });
     }
 };
@@ -1386,6 +1396,16 @@ PrimeGo.rollMode = function(deck, offset) {
             on: PrimeGo.rgbCode.white,
             off: PrimeGo.rgbCode.green,
             outConnect: false,
+            sendRGB: function(color_obj) {
+                const msg = [0xf0, 0x00, 0x02, 0x0b, 0x7f, 0x0C, 0x03, 0x00, 0x05,
+                    0x02 + offset, 0x0E + i, color_obj.red>>1, color_obj.green>>1, color_obj.blue>>1, 0xf7];
+                midi.sendSysexMsg(msg, msg.length);
+            },
+            output: function(value) {
+                if (this.sendRGB !== undefined) {
+                    this.sendRGB(value);
+                }
+            },
         });
         if (i % 2 === 0 & i < 8) {
             this.pads[i].off = 0x23;
@@ -1410,6 +1430,16 @@ PrimeGo.samplerMode = function(deck, offset) {
             on: colourArray[i - 1],
             off: PrimeGo.rgbCode.whiteDark,
             outConnect: false,
+            sendRGB: function(color_obj) {
+                const msg = [0xf0, 0x00, 0x02, 0x0b, 0x7f, 0x0C, 0x03, 0x00, 0x05,
+                    0x02 + offset, 0x0E + i, color_obj.red>>1, color_obj.green>>1, color_obj.blue>>1, 0xf7];
+                midi.sendSysexMsg(msg, msg.length);
+            },
+            output: function(value) {
+                if (this.sendRGB !== undefined) {
+                    this.sendRGB(value);
+                }
+            },
         });
     }
 };
@@ -1449,6 +1479,11 @@ PrimeGo.extraCueModeA = function(deck, offset) {
             on: this.colourOn,
             off: this.colourOff,
             outConnect: false,
+            sendRGB: function(color_obj) {
+                const msg = [0xf0, 0x00, 0x02, 0x0b, 0x7f, 0x0C, 0x03, 0x00, 0x05,
+                    0x02 + offset, 0x0E + i, color_obj.red>>1, color_obj.green>>1, color_obj.blue>>1, 0xf7];
+                midi.sendSysexMsg(msg, msg.length);
+            },
         });
     }
 };
@@ -1468,6 +1503,11 @@ PrimeGo.extraCueModeB = function(deck, offset) {
             on: this.colourOn,
             off: this.colourOff,
             outConnect: false,
+            sendRGB: function(color_obj) {
+                const msg = [0xf0, 0x00, 0x02, 0x0b, 0x7f, 0x0C, 0x03, 0x00, 0x05,
+                    0x02 + offset, 0x0E + i, color_obj.red>>1, color_obj.green>>1, color_obj.blue>>1, 0xf7];
+                midi.sendSysexMsg(msg, msg.length);
+            },
         });
     }
 };
