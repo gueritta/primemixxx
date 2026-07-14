@@ -954,12 +954,20 @@ PrimeGo.Deck = function(deckNumbers, midiChannel) {
     this.vinylButton = new components.Button({
         midi: [0x90 + midiChannel, 0x23],
         type: components.Button.prototype.types.toggle,
+        outKey: "scratch2_enable",
         input: function(channel, control, value, status, _group) {
             if (!this.isPress(channel, control, value, status)) {
                 return;
             }
             theDeck.jogWheel.vinylMode = !theDeck.jogWheel.vinylMode;
             this.trigger();
+        },
+        output: function(value) {
+            if (value > 0) {
+                sendSysexRGB(midiChannel, 0x23, 0x7f, 0x00, 0x00); // red = vinyl on
+            } else {
+                sendSysexRGB(midiChannel, 0x23, 0x1f, 0x1f, 0x1f); // dim white = vinyl off
+            }
         },
         trigger: function() {
             this.output(theDeck.jogWheel.vinylMode);
@@ -1018,23 +1026,7 @@ PrimeGo.Deck = function(deckNumbers, midiChannel) {
         },
     });
 
-    // Jog Wheel LED
-    this.jogWheelLed = new components.Component({
-        midi: [0x90 + midiChannel, 0x21],
-        outKey: "scratch2_enable",
-        on: [0x7f, 0x7f, 0x7f],
-        off: colDeckSysex[deckNumbers - 1],
-        output: function(value) {
-            if (value > 0) {
-                sendSysexRGB(midiChannel, 0x21, ...this.on);
-            } else {
-                sendSysexRGB(midiChannel, 0x21, ...this.off);
-            }
-        },
-        trigger: function() {
-            sendSysexRGB(midiChannel, 0x21, ...this.off);
-        },
-    });
+    // No jog wheel LED on Prime Go — touchNote 33 (0x21) is capacitive sense only
 
     // Slip Mode Button
     this.slipButton = new components.Button({
@@ -1295,48 +1287,88 @@ PrimeGo.PadSection.prototype.performancePad = function(channel, control, value, 
     this.currentMode.pads[i].input(channel, control, value, status, group);
 };
 
-// HOTCUE MODE
+// HOTCUE MODE — each pad has distinct color like Prime Go standalone
 PrimeGo.hotcueMode = function(deck, offset) {
     components.ComponentContainer.call(this);
     this.ledControl = PrimeGo.padMode.HOTCUE;
-    this.colourOn = PrimeGo.rgbCode.blue;
+    this.colourOn = PrimeGo.rgbCode.blue; // mode select button color
     this.colourOff = PrimeGo.rgbCode.whiteDark;
+    const padColoursOn = [
+        PrimeGo.rgbCodeSysex.red,
+        PrimeGo.rgbCodeSysex.orange,
+        PrimeGo.rgbCodeSysex.yellow,
+        PrimeGo.rgbCodeSysex.green,
+        PrimeGo.rgbCodeSysex.aqua,
+        PrimeGo.rgbCodeSysex.blue,
+        PrimeGo.rgbCodeSysex.violet,
+        PrimeGo.rgbCodeSysex.magenta,
+    ];
+    const padColoursOff = [
+        PrimeGo.rgbCodeSysex.redDark,
+        PrimeGo.rgbCodeSysex.orangeDark,
+        PrimeGo.rgbCodeSysex.yellowDark,
+        PrimeGo.rgbCodeSysex.greenDark,
+        PrimeGo.rgbCodeSysex.aquaDark,
+        PrimeGo.rgbCodeSysex.blueDark,
+        PrimeGo.rgbCodeSysex.violetDark,
+        PrimeGo.rgbCodeSysex.magentaDark,
+    ];
     this.pads = new components.ComponentContainer();
     for (let i = 1; i <= 8; i++) {
         this.pads[i] = new components.HotcueButton({
             number: i,
             group: deck.currentDeck,
             midi: [0x92 + offset, 0x0E + i],
+            on: padColoursOn[i-1],
+            off: padColoursOff[i-1],
             sendRGB: function(color_obj) {
                 const msg = [0xf0, 0x00, 0x02, 0x0b, 0x7f, 0x0C, 0x03, 0x00, 0x05, 0x02 + offset, 0x0E + i, color_obj.red>>1, color_obj.green>>1, color_obj.blue>>1, 0xf7];
                 midi.sendSysexMsg(msg, msg.length);
             },
-            on: this.colourOn,
-            off: this.colourOff,
             outConnect: false,
         });
     }
 };
 PrimeGo.hotcueMode.prototype = Object.create(components.ComponentContainer.prototype);
 
-// SAVED LOOP MODE
+// SAVED LOOP MODE — distinct colors per pad (hotcues 9-16)
 PrimeGo.savedLoopMode = function(deck, offset) {
     components.ComponentContainer.call(this);
     this.ledControl = PrimeGo.padMode.LOOP;
     this.colourOn = PrimeGo.rgbCode.blue;
     this.colourOff = PrimeGo.rgbCode.whiteDark;
+    const padColoursOn = [
+        PrimeGo.rgbCodeSysex.red,
+        PrimeGo.rgbCodeSysex.orange,
+        PrimeGo.rgbCodeSysex.yellow,
+        PrimeGo.rgbCodeSysex.green,
+        PrimeGo.rgbCodeSysex.aqua,
+        PrimeGo.rgbCodeSysex.blue,
+        PrimeGo.rgbCodeSysex.violet,
+        PrimeGo.rgbCodeSysex.magenta,
+    ];
+    const padColoursOff = [
+        PrimeGo.rgbCodeSysex.redDark,
+        PrimeGo.rgbCodeSysex.orangeDark,
+        PrimeGo.rgbCodeSysex.yellowDark,
+        PrimeGo.rgbCodeSysex.greenDark,
+        PrimeGo.rgbCodeSysex.aquaDark,
+        PrimeGo.rgbCodeSysex.blueDark,
+        PrimeGo.rgbCodeSysex.violetDark,
+        PrimeGo.rgbCodeSysex.magentaDark,
+    ];
     this.pads = new components.ComponentContainer();
     for (let i = 1; i <= 8; i++) {
         this.pads[i] = new components.HotcueButton({
             number: i + 8,
             group: deck.currentDeck,
             midi: [0x92 + offset, 0x0E + i],
+            on: padColoursOn[i-1],
+            off: padColoursOff[i-1],
             sendRGB: function(color_obj) {
                 const msg = [0xf0, 0x00, 0x02, 0x0b, 0x7f, 0x0C, 0x03, 0x00, 0x05, 0x02 + offset, 0x0E + i, color_obj.red>>1, color_obj.green>>1, color_obj.blue>>1, 0xf7];
                 midi.sendSysexMsg(msg, msg.length);
             },
-            on: this.colourOn,
-            off: this.colourOff,
             outConnect: false,
         });
     }
