@@ -791,6 +791,13 @@ PrimeGo.Deck = function(deckNumbers, midiChannel) {
     // Sync Button
     this.syncButton = new components.SyncButton({
         midi: [0x90 + midiChannel, 0x08],
+        output: function(value) {
+            if (value > 0) {
+                sendSysexRGB(midiChannel, 0x08, 0x7f, 0x7f, 0x7f); // white
+            } else {
+                sendSysexRGB(midiChannel, 0x08, 0x06, 0x06, 0x06); // dim
+            }
+        },
     });
 
     // Cue Button (QML: cueShiftAction = SetCuePoint)
@@ -798,6 +805,13 @@ PrimeGo.Deck = function(deckNumbers, midiChannel) {
         midi: [0x90 + midiChannel, 0x09],
         shift: function() {
             this.inKey = "cue_set";
+        },
+        output: function(value) {
+            if (value > 0) {
+                sendSysexRGB(midiChannel, 0x09, 0x7f, 0x4f, 0x00); // orange
+            } else {
+                sendSysexRGB(midiChannel, 0x09, 0x06, 0x03, 0x00); // dim orange
+            }
         },
     });
 
@@ -811,7 +825,14 @@ PrimeGo.Deck = function(deckNumbers, midiChannel) {
         shift: function() {
             this.inKey = "play_stutter";
             this.type = components.Button.prototype.types.push;
-        }
+        },
+        output: function(value) {
+            if (value > 0) {
+                sendSysexRGB(midiChannel, 0x0A, 0x00, 0x7f, 0x00); // green
+            } else {
+                sendSysexRGB(midiChannel, 0x0A, 0x00, 0x06, 0x00); // dim green
+            }
+        },
     });
 
     // Performance Pads
