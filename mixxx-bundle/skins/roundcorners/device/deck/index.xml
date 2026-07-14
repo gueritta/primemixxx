@@ -45,9 +45,10 @@
 
                     <Template src="skin:device/deck/loop.xml"/>
 
-                    <WidgetGroup><!-- dyn.expander -->
+                    <WidgetGroup><!-- dyn.expander: fixed to 10px to prevent over-expansion into sampler/FX area -->
                         <ObjectName>TransportRow</ObjectName>
-                        <Size>me,me</Size>
+                        <Size>me,10f</Size>
+                        <MaximumSize>-1,10</MaximumSize>
                     </WidgetGroup>
 
                     <Template src="skin:device/deck/border_bottom.xml"/>
