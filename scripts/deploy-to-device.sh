@@ -236,17 +236,17 @@ SERVEOF"
 
 eval $SSH_CMD "$SSH_TARGET" "systemctl daemon-reload && systemctl enable usb-gadget-eth.service && echo 'USB Ethernet gadget installed and enabled'"
 
-# ── Step 6: Deploy VDJ-Pro skin ──────────────────────────────────────────────
+# ── Step 6: Deploy RoundCorners skin ─────────────────────────────────────────
 echo ""
 echo "--- Building style.qss from modules ---"
 "$SCRIPT_DIR/build-style-qss.sh"
-echo "--- Deploying VDJ-Pro skin ---"
-eval $SSH_CMD "$SSH_TARGET" "mkdir -p '$DEVICE_MIXXX_DIR/settings/skins/vdj-pro'"
-eval $SCP_CMD "$BUNDLE_DIR/skins/vdj-pro/." "$SSH_TARGET:$DEVICE_MIXXX_DIR/settings/skins/vdj-pro/" || {
-  echo "ERROR: Failed to copy VDJ-Pro skin to device." >&2
+echo "--- Deploying RoundCorners skin ---"
+eval $SSH_CMD "$SSH_TARGET" "mkdir -p '$DEVICE_MIXXX_DIR/settings/skins/RoundCorners'"
+eval $SCP_CMD "$BUNDLE_DIR/skins/roundcorners/." "$SSH_TARGET:$DEVICE_MIXXX_DIR/settings/skins/RoundCorners/" || {
+  echo "ERROR: Failed to copy RoundCorners skin to device." >&2
   exit 1
 }
-echo "VDJ-Pro skin deployed successfully."
+echo "RoundCorners skin deployed successfully."
 
 # ── Step 7: Verify deployment ────────────────────────────────────────────────
 echo ""
@@ -254,7 +254,7 @@ echo "--- Verifying deployment ---"
 eval $SSH_CMD "$SSH_TARGET" "ls -la '$DEVICE_MIXXX_DIR/bin/mixxx' && echo 'MIXXX binary: OK'"
 eval $SSH_CMD "$SSH_TARGET" "ls '$DEVICE_MIXXX_DIR/lib/' | wc -l | xargs echo 'Library count:'"
 eval $SSH_CMD "$SSH_TARGET" "ls -la /usr/bin/switch-to-mixxx /usr/bin/switch-to-engine && echo 'Switcher scripts: OK'"
-eval $SSH_CMD "$SSH_TARGET" "ls -la '$DEVICE_MIXXX_DIR/settings/skins/vdj-pro' && echo 'VDJ-Pro skin: OK'"
+eval $SSH_CMD "$SSH_TARGET" "ls -la '$DEVICE_MIXXX_DIR/settings/skins/RoundCorners' && echo 'RoundCorners skin: OK'"
 eval $SSH_CMD "$SSH_TARGET" "systemctl status mixxx.service --no-pager -l 2>&1 | head -5"
 
 echo ""

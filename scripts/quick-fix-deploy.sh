@@ -38,10 +38,10 @@ cat "$BUNDLE_DIR/mixxx_launcher.sh" | $SSH_CMD "cat > $TARGET_DIR/mixxx_launcher
 echo "--- Building style.qss from modules ---"
 "$(dirname "$0")/build-style-qss.sh"
 
-# Step 5: Deploy VDJ-Pro skin
-echo "--- Deploying VDJ-Pro skin ---"
-$SSH_CMD "mkdir -p $TARGET_DIR/settings/skins/vdj-pro"
-$SCP_CMD "$BUNDLE_DIR/skins/vdj-pro/." "root@$DEVICE_IP:$TARGET_DIR/settings/skins/vdj-pro/" && echo "  VDJ-Pro skin deployed"
+# Step 5: Deploy RoundCorners skin
+echo "--- Deploying RoundCorners skin ---"
+$SSH_CMD "mkdir -p $TARGET_DIR/settings/skins/RoundCorners"
+$SCP_CMD "$BUNDLE_DIR/skins/roundcorners/." "root@$DEVICE_IP:$TARGET_DIR/settings/skins/RoundCorners/" && echo "  RoundCorners skin deployed"
 
 echo ""
 echo "=== Fix deployed! ==="
