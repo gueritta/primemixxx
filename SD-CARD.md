@@ -147,7 +147,20 @@ export QT_QPA_EGLFS_PHYSICAL_HEIGHT=98
 export PA_ALSA_PLUGHW=1
 export HOME=/tmp
 export XDG_RUNTIME_DIR=/tmp
-exec chrt -f 99 taskset -c 2,3 $BUNDLE/bin/mixxx -platform eglfs --settingsPath $BUNDLE/settings --resourcePath $BUNDLE "$@"
+exec chrt -f 99 taskset -c 2,3 $BUNDLE/bin/mixxx -platform eglfs --settingsPath $BUNDLE/settings --resourcePath $BUNDLE "$@" &
+MIXPID=$!
+
+# MIXXX's EngineWorkerSch/EngineSideChain threads default to SCHED_OTHER.
+# Boost them to SCHED_FIFO 98 to prevent audio dropouts.
+for i in 1 2 3 4 5 6 7 8 9 10; do
+    sleep 1
+    for tid in $(ls /proc/$MIXPID/task/ 2>/dev/null); do
+        name=$(cat /proc/$MIXPID/task/$tid/comm 2>/dev/null)
+        case "$name" in EngineWorkerSch|EngineSideChain)
+            chrt -f -p 98 $tid 2>/dev/null ;; esac
+    done
+done
+wait $MIXPID
 ```
 
 ### Key differences from the repo's old template:

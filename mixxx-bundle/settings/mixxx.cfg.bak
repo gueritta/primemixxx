@@ -10,7 +10,7 @@ Transition 10
 UseIgnoreTime 0
 
 [BPM]
-BPMDetectionEnabled 0
+BPMDetectionEnabled 1
 BeatDetectionFixedTempoAssumption 1
 FastAnalysisEnabled 0
 ReanalyzeImported 0
@@ -18,13 +18,28 @@ ReanalyzeWhenSettingsChange 0
 sync_lock_algorithm 0
 
 [Channel1]
-vinylcontrol_enabled 0
+vinylcontrol_lead_in_time 28
+vinylcontrol_pitch_estimator_type Kalman filter (accurate)
+vinylcontrol_speed_type 33.3 RPM
+vinylcontrol_vinyl_type Serato CV02 Vinyl, Side A
+
 [Channel2]
-vinylcontrol_enabled 0
+vinylcontrol_lead_in_time 28
+vinylcontrol_pitch_estimator_type Kalman filter (accurate)
+vinylcontrol_speed_type 33.3 RPM
+vinylcontrol_vinyl_type Serato CV02 Vinyl, Side A
+
 [Channel3]
-vinylcontrol_enabled 0
+vinylcontrol_lead_in_time 28
+vinylcontrol_pitch_estimator_type Kalman filter (accurate)
+vinylcontrol_speed_type 33.3 RPM
+vinylcontrol_vinyl_type Serato CV02 Vinyl, Side A
+
 [Channel4]
-vinylcontrol_enabled 0
+vinylcontrol_lead_in_time 28
+vinylcontrol_pitch_estimator_type Kalman filter (accurate)
+vinylcontrol_speed_type 33.3 RPM
+vinylcontrol_vinyl_type Serato CV02 Vinyl, Side A
 
 [Config]
 HotcueColorPalette Mixxx Hotcue Colors
@@ -80,7 +95,7 @@ AdoptMetaknobValue 1
 
 [Key]
 FastAnalysisEnabled 0
-KeyDetectionEnabled 0
+KeyDetectionEnabled 1
 KeyNotation Traditional
 ReanalyzeWhenSettingsChange 0
 
@@ -108,12 +123,12 @@ EnableWaveformGenerationWithAnalysis 0
 RescanOnStartup 0
 SearchDebouncingTimeoutMillis 300
 SeratoMetadataExport 0
-ShowBansheeLibrary 0
-ShowITunesLibrary 0
-ShowRekordboxLibrary 0
-ShowRhythmboxLibrary 0
-ShowSeratoLibrary 0
-ShowTraktorLibrary 0
+ShowBansheeLibrary 1
+ShowITunesLibrary 1
+ShowRekordboxLibrary 1
+ShowRhythmboxLibrary 1
+ShowSeratoLibrary 1
+ShowTraktorLibrary 1
 SupportedFileExtensions aiff,aif,caf,flac,it,mod,ult,uni,m15,mtm,669,med,mp3,mpga,oga,ogg,opus,spx,ogv,okt,s3m,stm,wav,xm
 SyncTrackMetadataExport 0
 TrackLoadAction 0
@@ -123,8 +138,8 @@ history_track_duplicate_distance 6
 search_bpm_fuzzy_range 75
 
 [Logging]
-logFlushLevel=warning 
-logLevel=warning 
+logFlushLevel=debug 
+logLevel=debug 
 
 [Master]
 keylock_engine 1
@@ -211,8 +226,6 @@ timing_shift_buttons 0
 
 [Soundcard]
 Samplerate 44100
-AudioThreadPriority 99
-RealtimePriority 99
 
 [Vamp]
 AnalyserBeatPluginID qm-tempotracker:0
@@ -225,7 +238,6 @@ show_signal_quality 0
 [Waveform]
 DefaultZoom 3
 EndOfTrackWarningTime 30
-FrameRate 10
 OverviewNormalized 0
 PlayMarkerPosition 0.5
 UntilMarkAlign 1
