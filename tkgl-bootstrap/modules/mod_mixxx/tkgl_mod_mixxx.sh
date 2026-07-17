@@ -43,6 +43,11 @@ tkgl_mod_mixxx() {
     # Env vars intentionally NOT set here — the SD card launcher handles all of:
     # Qt 5.15.8, eglfs_mali, USB bind-mount, seed DB restore, CPU shielding.
     # Passing --settingsPath or -platform here would override the SD launcher's settings.
+
+    # Start power button monitor to gracefully shut down MIXXX on button press
+    systemctl start powerbutton-monitor.service 2>/dev/null || true
+    log "powerbutton-monitor started"
+
     systemd-run --unit=mixxx-app --collect --service-type=exec \
         --property=RuntimeDirectory=mixxx \
         --property=RuntimeDirectoryMode=0700 \
