@@ -2,7 +2,7 @@
 # build-style-qss.sh — Concatenate modular QSS files into style.qss
 # Source: style_qss/_*.qss → Output: style.qss
 
-SKIN_DIR="$(cd "$(dirname "$0")/../mixxx-bundle/skins/vdj-pro" && pwd)"
+SKIN_DIR="$(cd "$(dirname "$0")/../mixxx-bundle/skins/roundcorners" && pwd)"
 MODULES=(
     "_base.qss"
     "_library.qss"

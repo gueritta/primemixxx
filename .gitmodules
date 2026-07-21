@@ -2,3 +2,6 @@
 	path = buildroot-customizations
 	url = ../buildroot-enginedevices.git
 	branch = mixxx
+[submodule "mixxx-bundle/skins/LateNightMini"]
+	path = mixxx-bundle/skins/LateNightMini
+	url = https://github.com/ghztomash/LateNightMini.git
