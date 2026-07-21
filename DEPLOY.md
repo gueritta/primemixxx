@@ -46,39 +46,17 @@ ssh root@primego.local switch-to-engine
 
 ## How It Works
 
-There are **two launch paths**:
+For the full boot chain, architecture, and launch path details, see
+[`docs/ONBOARDING.md`](docs/ONBOARDING.md).
 
-### Path 1: TKGL Bootstrap at Boot (Autostart)
-The working autostart chain used on device:
-
-```
-tkgl-mixxx.service → /data/tkgl-bootstrap-launcher
-  → tkgl_mod_mixxx.sh → systemd-run --unit=mixxx-app
-    → /data/mixxx/mixxx → SD card launcher → MIXXX
-```
-
-- **`/data/mixxx/mixxx`**: A thin delegation script (116 bytes) that calls the SD card launcher:
-  `#!/bin/sh\nexec /media/az01-internal/mixxx/mixxx_launcher.sh "$@"\n`
-- **`mixxx-app.service` must NOT be masked**: The TKGL module uses `systemd-run --unit=mixxx-app` to create a transient unit. If masked (`/dev/null`), it fails silently and MIXXX won't start. Unmask with `systemctl unmask mixxx-app.service`
-- MIXXX uses **SD card's bundled Qt 5.15.8** + custom `libqeglfs-mali-integration.so` (not device Qt 5.15.2 + eglfs_emu)
-
-### Path 2: Manual Switch (SSH)
-When you run `switch-to-mixxx`:
-1. Stops `engine.service`
-2. Starts `mixxx.service` which runs the SD card launcher
-3. `switch-to-engine` reverses the process
+**Quick summary:**
+- **Autostart (TKGL):** `tkgl-mixxx.service` → bootstrap → `systemd-run --unit=mixxx-app` → SD card launcher → MIXXX
+- **Manual switch:** `ssh root@primego.local switch-to-mixxx` / `switch-to-engine`
 
 ### Boot Verification
 ```bash
-# After reboot, verify MIXXX is running
 ssh root@primego.local 'ps | grep mixxx'
-# Should show: /media/az01-internal/mixxx/bin/mixxx -platform eglfs ...
-
-# Check transient service was created
 ssh root@primego.local 'systemctl status mixxx-app.service'
-# Should show: Active: active (running)
-
-# Check USB bind-mount
 ssh root@primego.local 'mount | grep "az01-internal/mixxx/music"'
 ```
 
@@ -137,9 +115,3 @@ ssh root@primego.local systemctl enable mixxx.service
 # Device will now boot directly into MIXXX (skipping Engine)
 ```
 
-## Architecture Reference
-
-See `docs/` for detailed technical documentation:
-- `docs/audio.md` — ALSA routing, XMOS/AKM hardware chain, sound cards
-- `docs/display.md` — Mali-T76x GPU, Qt5 EGLFS, DDK mismatch resolution
-- `docs/launch.md` — CPU shielding, tkgl_bootstrap framework, wrapper scripts

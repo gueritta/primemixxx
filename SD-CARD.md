@@ -235,7 +235,8 @@ tkgl-mixxx.service → /data/tkgl-bootstrap-launcher → tkgl_mod_mixxx.sh
   → systemd-run --unit=mixxx-app → /data/mixxx/mixxx → SD card launcher → MIXXX
 ```
 
-### Important: `mixxx-app.service` must NOT be masked
+### Important: `mixxx-app.service` and masking
+
 The TKGL module uses `systemd-run --unit=mixxx-app` to create a transient unit.
 If the name is masked (`/dev/null`), `systemd-run` fails silently and MIXXX
 won't start at boot. If masked, unmask with:
@@ -304,10 +305,12 @@ systemctl start engine
 
 ## CRITICAL: System Libs NOT on SD Card
 
-These MUST come from device's `/lib` — bundled versions cause segfaults from kernel ABI mismatch:
+These 9 libraries are provided by the device's `/lib` — bundling them causes segfaults from kernel ABI mismatch:
 - `libc.so.6`, `libm.so.6`, `libpthread.so.0`, `libdl.so.2`
 - `librt.so.1`, `libstdc++.so.6`, `libgcc_s.so.1`
 - `ld-linux-armhf.so.3`, `libatomic.so.1`
+
+The `fix-device-libs.sh` script removes these from the bundle after collection.
 
 ## Known Issues (Current State)
 
