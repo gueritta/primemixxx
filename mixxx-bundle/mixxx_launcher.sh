@@ -49,6 +49,11 @@ export QT_QPA_EGLFS_PHYSICAL_HEIGHT=98
 export HOME=/tmp
 export XDG_RUNTIME_DIR=/tmp
 
+# Disable RT throttling — audio threads need 100% of their timeslice.
+# Without this, the kernel reserves 5% of CPU time for non-RT tasks,
+# starving the audio engine under load.
+echo -1 > /proc/sys/kernel/sched_rt_runtime_us
+
 # Launch MIXXX pinned to CPU cores 2-3 (audio-dedicated cores).
 # We do NOT set RT priority on the main process — that would cause ALL
 # 44+ child threads to inherit SCHED_FIFO and compete with audio.
