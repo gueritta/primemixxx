@@ -100,6 +100,31 @@ The critical property: if anything goes wrong with TKGL or the SD card, you can
 unplug the SD card and reboot to stock Engine OS. The internal storage is never
 modified at runtime.
 
+### Restarting MIXXX (after skin/config changes)
+
+MIXXX runs as a transient systemd unit (`mixxx-app.service`) launched by TKGL
+via `systemd-run --unit=mixxx-app`. The boot chain is:
+
+```
+engine.service → TKGL bootstrap → tkgl_mod_mixxx.sh → systemd-run --unit=mixxx-app
+```
+
+`tkgl_mod_mixxx.sh` checks if `mixxx-app.service` is already active and skips
+relaunch if so. Therefore, the ONLY correct restart sequence is:
+
+```sh
+# 1. Stop the transient unit first
+systemctl stop mixxx-app.service
+
+# 2. Trigger TKGL to recreate it
+systemctl restart engine.service
+```
+
+**DO NOT** use any of these (they will silently fail to restart MIXXX):
+- `systemctl restart mixxx-app.service` — TKGL sees the unit still running and skips
+- `pkill mixxx` + `systemctl restart engine.service` — orphaned unit stays "active", TKGL skips
+- `kill -9 <pid>` — same problem as pkill
+
 ### CPU Shielding Strategy
 
 MIXXX launches with `taskset -c 2,3` to isolate on cores 2-3. After launch, a
