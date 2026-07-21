@@ -180,12 +180,14 @@ echo \"Engine DJ is now running. Use 'switch-to-mixxx' to go back.\"
 SWEOF"
 eval $SSH_CMD "$SSH_TARGET" "chmod +x /usr/bin/switch-to-engine"
 
-# ── Step 5b: Install USB Ethernet gadget ──────────────────────────────────
+# ── Step 5b: Install USB Ethernet gadget + WiFi power save fix ────────────
 echo ""
-echo "--- Installing USB Ethernet gadget ---"
+echo "--- Installing USB Ethernet gadget + WiFi power save fix ---"
 
 eval $SSH_CMD "$SSH_TARGET" "cat > /usr/sbin/usb-gadget-eth.sh << 'GADGETEOF'
 #!/bin/sh
+# USB Ethernet Gadget — makes the Prime Go appear as a USB Ethernet adapter.
+# Connected computer gets network access at 192.168.42.1 (host: 192.168.42.2/24).
 GADGET_DIR=/sys/kernel/config/usb_gadget/g_ether
 if [ -d \"\$GADGET_DIR\" ]; then exit 0; fi
 mkdir -p \"\$GADGET_DIR\" || exit 1
@@ -204,22 +206,15 @@ echo \"02:00:42:00:00:02\" > \"\$GADGET_DIR/functions/ecm.usb0/host_addr\"
 ln -s \"\$GADGET_DIR/functions/ecm.usb0\" \"\$GADGET_DIR/configs/c.1/\"
 UDC=\$(ls /sys/class/udc/ 2>/dev/null | head -1)
 [ -n \"\$UDC\" ] && echo \"\$UDC\" > \"\$GADGET_DIR/UDC\"
+# Wait for usb0, then configure IP (no systemd-networkd on minimal Buildroot)
+for i in \$(seq 1 20); do [ -d /sys/class/net/usb0 ] && break; sleep 1; done
+if [ -d /sys/class/net/usb0 ]; then
+    ip link set usb0 up
+    ip addr add 192.168.42.1/24 dev usb0 2>/dev/null
+fi
 GADGETEOF"
 
 eval $SSH_CMD "$SSH_TARGET" "chmod +x /usr/sbin/usb-gadget-eth.sh"
-
-eval $SSH_CMD "$SSH_TARGET" "cat > /etc/systemd/network/usb0.network << 'NETEOF'
-[Match]
-Name=usb0
-[Network]
-Address=192.168.42.1/24
-DHCPServer=yes
-[DHCPserver]
-PoolOffset=10
-PoolSize=50
-EmitDNS=yes
-DNS=192.168.42.1
-NETEOF"
 
 eval $SSH_CMD "$SSH_TARGET" "cat > /etc/systemd/system/usb-gadget-eth.service << 'SERVEOF'
 [Unit]
@@ -235,6 +230,12 @@ WantedBy=multi-user.target
 SERVEOF"
 
 eval $SSH_CMD "$SSH_TARGET" "systemctl daemon-reload && systemctl enable usb-gadget-eth.service && echo 'USB Ethernet gadget installed and enabled'"
+
+# WiFi power save disable — prevents SSH disconnections after ~30s idle
+eval $SSH_CMD "$SSH_TARGET" "cat > /etc/udev/rules.d/99-wifi-power-save.rules << 'WIFIRULE'
+ACTION==\"add\", SUBSYSTEM==\"net\", KERNEL==\"wlan*\", RUN+=\"/usr/sbin/iw dev \$name set power_save off\"
+WIFIRULE"
+eval $SSH_CMD "$SSH_TARGET" "udevadm control --reload-rules && echo 'WiFi power save udev rule installed'"
 
 # ── Step 6: Deploy RoundCorners skin ─────────────────────────────────────────
 echo ""
