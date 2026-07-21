@@ -2,6 +2,13 @@
 # MIXXX Launcher — Denon Prime Go (SD card)
 # Sets env for SD card's bundled Qt 5.15.8 + eglfs_mali, CPU shielding,
 # and USB music library mount.
+
+# Guard against duplicate instances (systemd-run may restart before old process exits)
+if pidof mixxx > /dev/null 2>&1; then
+    echo "Mixxx already running, exiting."
+    exit 0
+fi
+
 BUNDLE=/media/az01-internal/mixxx
 MUSIC_DIR="$BUNDLE/music"
 

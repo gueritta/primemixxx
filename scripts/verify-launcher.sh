@@ -1,14 +1,12 @@
 #!/bin/sh
 # Confirms only ONE launcher exists that calls ./bin/mixxx
 # Confirms TKGL module does NOT contain a launcher copy
-# Confirms tkgl_mod_mixxx.sh is under 50 lines (thin caller)
+# Confirms tkgl_mod_mixxx.sh matches device version (67 lines — includes Mali governor, IRQ, powerbutton)
 set -e
 
 failures=0
 
 # 1. Only one launcher invokes bin/mixxx (the canonical SD card launcher)
-#    The entry point /data/mixxx/mixxx delegates, it doesn't invoke bin/mixxx directly.
-#    No other .sh file outside the canonical path should invoke bin/mixxx.
 LAUNCHER_COUNT=$(grep -rl "bin/mixxx" --include="*.sh" mixxx-bundle/ 2>/dev/null | wc -l)
 if [ "$LAUNCHER_COUNT" -ne 1 ]; then
     echo "FAIL: Expected exactly 1 launcher invoking bin/mixxx in mixxx-bundle/, found $LAUNCHER_COUNT"
@@ -26,20 +24,32 @@ else
     echo "OK: No launcher copy in tkgl-bootstrap"
 fi
 
-# 3. TKGL module is a thin caller (under 50 lines — all config lives in SD launcher)
+# 3. TKGL module matches device version (67 lines — captured from device 2026-07-21)
+#    Includes: Mali governor, IRQ affinity, powerbutton-monitor, udev trigger, error handling
 TKGL_LINES=$(wc -l < tkgl-bootstrap/modules/mod_mixxx/tkgl_mod_mixxx.sh)
-if [ "$TKGL_LINES" -gt 50 ]; then
-    echo "FAIL: tkgl_mod_mixxx.sh is $TKGL_LINES lines (max 50)"
+if [ "$TKGL_LINES" -lt 55 ]; then
+    echo "FAIL: tkgl_mod_mixxx.sh is $TKGL_LINES lines — appears to be stripped version (device has 67)"
+    failures=$((failures + 1))
+elif [ "$TKGL_LINES" -gt 80 ]; then
+    echo "FAIL: tkgl_mod_mixxx.sh is $TKGL_LINES lines — unexpectedly large, review manually"
     failures=$((failures + 1))
 else
-    echo "OK: tkgl_mod_mixxx.sh is $TKGL_LINES lines (thin caller)"
+    echo "OK: tkgl_mod_mixxx.sh is $TKGL_LINES lines (matches device ~67 lines)"
 fi
 
-# 4. No other .sh file outside canonical path invokes bin/mixxx directly
-EXTRA=$(grep -rl "exec.*bin/mixxx" --include="*.sh" tkgl-bootstrap/ buildroot-customizations/ 2>/dev/null | grep -v "/data/mixxx/mixxx" | wc -l)
+# 4. Launcher has duplicate-instance guard (device-verified feature)
+if grep -q "pidof mixxx" mixxx-bundle/mixxx_launcher.sh; then
+    echo "OK: Launcher has pidof guard"
+else
+    echo "FAIL: Launcher missing pidof guard (present on device)"
+    failures=$((failures + 1))
+fi
+
+# 5. No other .sh file outside canonical path invokes bin/mixxx directly
+EXTRA=$(grep -rl "bin/mixxx" --include="*.sh" tkgl-bootstrap/ buildroot-customizations/ 2>/dev/null | grep -v "/data/mixxx/mixxx" | grep -v "post-build" | wc -l)
 if [ "$EXTRA" -ne 0 ]; then
     echo "FAIL: $EXTRA launcher(s) outside canonical path invoke bin/mixxx directly:"
-    grep -rl "exec.*bin/mixxx" --include="*.sh" tkgl-bootstrap/ buildroot-customizations/ 2>/dev/null | grep -v "/data/mixxx/mixxx"
+    grep -rl "bin/mixxx" --include="*.sh" tkgl-bootstrap/ buildroot-customizations/ 2>/dev/null | grep -v "/data/mixxx/mixxx" | grep -v "post-build"
     failures=$((failures + 1))
 else
     echo "OK: No external launchers invoke bin/mixxx directly"

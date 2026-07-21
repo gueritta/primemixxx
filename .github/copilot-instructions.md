@@ -75,19 +75,52 @@
 
 ## FILE LAYOUT — Absolute Paths, Single Source of Truth
 
+> NOTE: `/data/mixxx` and `/media/az01-internal/mixxx` are the same filesystem (bind mount of mmcblk0p7).
+> TKGL bootstrap lives on a SEPARATE SD card at `/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/`.
+
+### SD Card Bundle (local: `mixxx-bundle/`, device: `/data/mixxx/` = `/media/az01-internal/mixxx/`)
+
+| Artifact Type | Canonical Location (local repo) | Device path |
+|---|---|---|
+| MIDI JS mappings | `mixxx-bundle/mixxx-mapping/prime-go/*.js` | `/data/mixxx/controllers/*.js` (flat, no `mixxx-mapping/` subdir) |
+| MIDI XML mappings | `mixxx-bundle/mixxx-mapping/prime-go/*.midi.xml` | `/data/mixxx/controllers/*.midi.xml` |
+| Launcher script | `mixxx-bundle/mixxx_launcher.sh` | `/data/mixxx/mixxx_launcher.sh` |
+| MIXXX settings template | `mixxx-bundle/settings/mixxx.cfg` | `/data/mixxx/settings/mixxx.cfg` (runtime-modified, diff from template) |
+
+### TKGL Bootstrap (local: `tkgl-bootstrap/`, device: `/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/`)
+
+| Artifact Type | Canonical Location (local repo) | Device path |
+|---|---|---|
+| TKGL module entry | `tkgl-bootstrap/modules/mod_mixxx/tkgl_mod_mixxx.sh` | `…/modules/mod_mixxx/tkgl_mod_mixxx.sh` |
+| TKGL install module | `tkgl-bootstrap/modules/mod_install/tkgl_mod_install.sh` | `…/modules/mod_install/tkgl_mod_install.sh` |
+| TKGL bootstrap script | `tkgl-bootstrap/scripts/tkgl_bootstrap` | `…/scripts/tkgl_bootstrap` |
+| TKGL path config | `tkgl-bootstrap/scripts/tkgl_path` | `…/scripts/tkgl_path` |
+| TKGL doer list | `tkgl-bootstrap/doer_list` | `…/doer_list` |
+
+### Firmware Overlay (local: `buildroot-customizations/…/rootfs_overlay/`, device: `/`)
+
+| Artifact Type | Canonical Location (local repo) | Device path |
+|---|---|---|
+| Entry point (thin delegator) | `buildroot-customizations/…/data/mixxx/mixxx` | `/data/mixxx/mixxx` |
+| Firmware launcher (thin delegator) | `buildroot-customizations/…/usr/bin/mixxx_launcher.sh` | `/usr/bin/mixxx_launcher.sh` |
+
+### Other
+
 | Artifact Type | Canonical Location |
 |---|---|
-| MIDI JS mappings | `mixxx-bundle/mixxx-mapping/prime-go/*.js` |
-| MIDI XML mappings | `mixxx-bundle/mixxx-mapping/prime-go/*.midi.xml` |
-| Launcher script | `mixxx-bundle/mixxx_launcher.sh` |
-| TKGL module entry | `tkgl-bootstrap/modules/mod_mixxx/tkgl_mod_mixxx.sh` |
-| TKGL config | `tkgl-bootstrap/modules/mod_mixxx/mixxx.cfg` |
-| Entry point (internal) | `buildroot-customizations/…/data/mixxx/mixxx` |
-| Firmware launcher | `buildroot-customizations/…/usr/bin/mixxx_launcher.sh` |
 | Buildroot defconfig | `buildroot/configs/denon_prime_go_defconfig` |
 | SD card layout spec | `SD-CARD.md` |
 | User documentation | `docs/` |
 | Onboarding (prose, context) | `docs/ONBOARDING.md` |
+
+### Device-Only Paths (not in local repo — managed on device)
+
+| Path | Purpose |
+|---|---|
+| `/data/mixxx/settings/mixxx.cfg` | Active MIXXX config (runtime-generated, differs from template) |
+| `/data/mixxx/settings/controllers/` | Active controller preset copies |
+| `/data/mixxx/lib/` | Qt 5.15.8 + Mali symlinks + no_hid_poll.so |
+| `/data/mixxx/bin/mixxx` → `../lib/bin/mixxx` | MIXXX binary symlink |
 
 ---
 
@@ -97,7 +130,7 @@
 - MIXXX binary:     lib/bin/mixxx (10 MB), NOT mixxx.real (17 MB)
 - Qt version:       5.15.8 (bundled on SD), NOT 5.15.2 (device system)
 - Mali DDK:         r1p0 ONLY, via symlinks to /usr/lib/libmali.so.14.0
-- Kernel:           5.10.109-inmusic-rt64 (PREEMPT_RT)
+- Kernel:           6.1.111-inmusic-2024-09-19-rt41 (PREEMPT_RT)
 - Buildroot:        2021.02.10
 - Device arch:      armv7l (Cortex-A17)
 - Cross-compiler:   buildroot/output/host/bin/arm-buildroot-linux-gnueabihf-
@@ -110,11 +143,13 @@
 ## DIRECTORY ROLES — What each directory IS and MUST NOT contain
 
 ```
-mixxx-bundle/                                         | SD card root. Contains everything deployed. Source of truth.
-mixxx-bundle/mixxx-mapping/prime-go/                  | Prime Go mappings. ALL controller JS/XML lives here.
-tkgl-bootstrap/                                       | Device-side bootstrap. Modules here. NO document copies.
-tkgl-bootstrap/modules/mod_mixxx/                     | TKGL boot path. tkgl_mod_mixxx.sh (thin caller) + config. NO launcher or mapping copies.
-buildroot-customizations/board/inmusic/jp11/rootfs_overlay/ | Firmware overlay. Entry point + firmware launcher only.
+mixxx-bundle/                                         | SD card root. Source of truth for all deployed content.
+mixxx-bundle/mixxx-mapping/prime-go/                  | LOCAL-ONLY canonical mapping directory. Device has flat controllers/.
+mixxx-bundle/controllers/                             | Symlinks into mixxx-mapping/prime-go/ (local-only, reflects device flat dir).
+mixxx-bundle/settings/                                | MIXXX settings template (mixxx.cfg, soundconfig.xml).
+tkgl-bootstrap/                                       | LOCAL representation of /media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/.
+tkgl-bootstrap/modules/mod_mixxx/                     | TKGL module + backup. NO mapping copies (symlinks OK). NO launcher copy.
+buildroot-customizations/board/inmusic/jp11/rootfs_overlay/ | Firmware overlay. Entry point + firmware launcher only. Both thin delegators.
 scripts/                                              | Build/deploy tooling. No runtime artifacts.
 docs/                                                 | Human documentation. No rules, no code.
 ```
@@ -154,6 +189,43 @@ docs/                                                 | Human documentation. No 
 5. No KMS_ATOMIC in any launcher:
    grep -r "KMS_ATOMIC" --include="*.sh" mixxx-bundle/ tkgl-bootstrap/ buildroot-customizations/ 2>/dev/null && \
      { echo "FAIL: KMS_ATOMIC set in launcher"; exit 1; } || true
+
+6. Launcher has duplicate-instance guard (device-verified feature):
+   grep -q "pidof mixxx" mixxx-bundle/mixxx_launcher.sh || \
+     { echo "FAIL: launcher missing pidof guard"; exit 1; }
+
+7. TKGL module captured from device (not hand-edited):
+   if [ -f "tkgl-bootstrap/modules/mod_mixxx/tkgl_mod_mixxx.sh" ]; then
+     lines=$(wc -l < "tkgl-bootstrap/modules/mod_mixxx/tkgl_mod_mixxx.sh")
+     if [ "$lines" -lt 50 ]; then
+       echo "FAIL: tkgl_mod_mixxx.sh is too short (<50 lines), likely stripped version"; exit 1
+     fi
+   fi
+```
+
+---
+
+## MANDATORY COPIES — Files that MUST exist in multiple locations
+
+These are NOT duplicates — they serve different purposes:
+
+| File | Locations | Why |
+|---|---|---|
+| `Denon-Prime-Go-scripts.js` | `mixxx-bundle/controllers/` (symlink), `tkgl-bootstrap/…/` (symlink) | Symlinks to canonical `mixxx-mapping/prime-go/`. OK. |
+| `Denon-Prime-Go.midi.xml` | Same as above | Same. |
+| `mixxx.cfg` | `mixxx-bundle/settings/` (template), `/data/mixxx/settings/` (runtime) | Template vs active config — different content, different purpose. |
+| `mixxx_launcher.sh` | `mixxx-bundle/` ONLY | Single canonical launcher. TKGL module calls entry point which delegates to it. |
+
+---
+
+## DEVICE FILESYSTEM REALITY (verified 2026-07-21)
+
+```
+/data/mixxx  ==  /media/az01-internal/mixxx    (same mmcblk0p7 ext4 bind mount)
+/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/  (separate SD card, ext4)
+
+Boot chain:
+  TKGL bootstrap → systemd-run → /data/mixxx/mixxx (entry) → /media/az01-internal/mixxx/mixxx_launcher.sh
 ```
 
 ---
@@ -161,12 +233,14 @@ docs/                                                 | Human documentation. No 
 ## AGENT BEHAVIOR RULES
 
 ```
+- DEVICE IS GROUND TRUTH. Before modifying any file, verify against the device via SSH.
 - When generating a new controller mapping, place it in mixxx-bundle/mixxx-mapping/prime-go/ ONLY.
 - When asked to modify launcher behavior, modify ONLY mixxx-bundle/mixxx_launcher.sh.
 - When asked to fix a build issue, check the VERSION CONSTRAINTS section first.
 - Before claiming a fix is complete, run the PRE-COMMIT CHECKS.
 - If a user asks to copy a file instead of symlinking, WARN about duplication rules.
 - NEVER hardcode the device IP or password in any generated script. Use the DEVICE_IP env var.
+- Device password is in DEPLOY.md (denonprime4). Never hardcode it.
 - After any SCP-based file change on the device, update the local repo to match. The repo is always the source of truth.
 ```
 
@@ -176,8 +250,10 @@ docs/                                                 | Human documentation. No 
 
 ```
 - Device IP:          set via DEVICE_IP env var, never hardcoded
-- Device hostname:    primego.local (mDNS)
+- Device hostname:    primego.local (mDNS, may not resolve from all networks)
+- Device SSH pass:    denonprime4 (from DEPLOY.md — never hardcode)
 - Device arch:        armv7l (Cortex-A17)
+- Device kernel:      6.1.111-inmusic-2024-09-19-rt41 (PREEMPT_RT)
 - Cross-compiler:     buildroot/output/host/bin/arm-buildroot-linux-gnueabihf-
 - ALSA device:        hw:JP11,0
 - Display:            LVDS-1, framebuffer 800×1280 portrait → 1280×800 landscape
@@ -186,6 +262,8 @@ docs/                                                 | Human documentation. No 
 - CPU shielding:      MIXXX on cores 2-3, non-audio threads banished to 0-1
 - IRQ affinity:       all non-audio IRQs pinned to CPU 0
 - RT throttle:        sched_rt_runtime_us=-1 (disabled)
+- TKGL SD card:       /media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/ (mmcblk1p1, separate from main SD)
+- Primary SD card:    /media/az01-internal/mixxx (mmcblk0p7 ext4, same as /data/mixxx)
 ```
 
 ---
