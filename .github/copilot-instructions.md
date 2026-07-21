@@ -57,6 +57,13 @@
 - CHECK: `grep -rl "exec.*bin/mixxx" --include="*.sh" tkgl-bootstrap/ buildroot-customizations/ | grep -v "/data/mixxx/mixxx" | wc -l` must return 0 (no other launcher invokes `bin/mixxx` directly)
 - VIOLATION: Any .sh file outside the canonical path that invokes `./bin/mixxx` directly
 
+- RULE_ID: "RESTART-PROPER"
+- ASSERTION: When restarting MIXXX after skin/config changes, MUST use `systemctl restart engine.service` (NOT `systemctl restart mixxx-app.service` and NOT `pkill mixxx`).
+- CORRECT: `systemctl stop mixxx-app.service; systemctl restart engine.service`
+- WRONG: `systemctl restart mixxx-app.service` (TKGL module checks `is-active` and returns early if the unit is still running)
+- WRONG: `pkill mixxx; systemctl restart engine.service` (orphaned mixxx-app.service unit stays active, TKGL skips relaunch)
+- REASON: `engine.service` triggers TKGL bootstrap → `tkgl_mod_mixxx.sh` → `systemd-run --unit=mixxx-app`. The module checks if mixxx-app is already active and skips if so. You MUST stop mixxx-app.service first so TKGL recreates it.
+
 ### Constraints
 
 - CONSTRAINT_ID: "QT-KMS-ATOMIC"
