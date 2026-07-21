@@ -41,7 +41,7 @@ export QT_QPA_FONTDIR=/usr/share/fonts
 # Touchscreen on /dev/input/event0, hardware keyboard on /dev/input/event1
 export QT_QPA_GENERIC_PLUGINS="evdevtouch:/dev/input/event0 evdevkeyboard:/dev/input/event1"
 # Touch calibration: rotate matches display rotation, min/max match ILI2117 sensor bounds
-export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=/dev/input/event0:rotate=90:minX=0:maxX=1160:minY=0:maxY=800
+export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=/dev/input/event0:rotate=90:minX=0:maxX=1280:minY=0:maxY=800
 # Physical screen dimensions in mm (Prime Go 5" display)
 export QT_QPA_EGLFS_PHYSICAL_WIDTH=155
 export QT_QPA_EGLFS_PHYSICAL_HEIGHT=98
