@@ -310,9 +310,10 @@ DEVICE_IP=primego.local ./scripts/deploy-to-device.sh  # SCP to device
 
 ```bash
 cd go
-go build ./cmd/updater/      # Build the GUI firmware updater
-go build ./cmd/find_update/  # Build the CLI update finder
+go build ./cmd/updater/      # Build the GUI firmware updater (FLTK-based, requires build-fltk)
+go build ./cmd/find_update/  # Build the CLI update finder (no GUI deps)
 go test ./pkg/updater/       # Run the single Go test (XZ decompression)
+go test ./pkg/fastboot/      # Run fastboot package tests
 ```
 
 Cross-compile for Windows: `make -C go all-windows-amd64`
@@ -326,6 +327,12 @@ Cross-compile for Windows: `make -C go all-windows-amd64`
 
 Both scripts exit non-zero on failure — run before every commit.
 
+### Skin QSS build
+
+```bash
+./scripts/build-style-qss.sh     # Concatenate style_qss/_*.qss modules → style.qss
+```
+
 ### Fast iteration (device)
 
 ```bash
@@ -335,7 +342,8 @@ Both scripts exit non-zero on failure — run before every commit.
 ### Build DTS→DTB firmware images
 
 ```bash
-make PRIMEGO-4.3.4-STOCK-SSH-Update.img.dtb   # Build SSH-enabled stock firmware
+make PRIMEGO-4.3.4-STOCK-SSH-Update.img.dtb   # Build SSH-enabled stock firmware (SSH+WiFi auto-provisioned)
+make PRIMEGO-4.3.4-Update.img.dtb             # Build custom MIXXX-enabled firmware
 ```
 
 ---
@@ -394,10 +402,10 @@ MIXXX mappings live in `mixxx-bundle/mixxx-mapping/prime-go/` (canonical) and de
 ### Skin development
 
 - Skin lives in `mixxx-bundle/skins/RoundCorners/` (Tango-derived, heavily customized for 1280×800 touchscreen)
-- `style.qss` is split into 5 modules: `_base`, `_library`, `_controls`, `_buttons`, `_deck2`
-- Build QSS from modules: `./scripts/build-style-qss.sh`
+- `style.qss` is split into 5 modules in `style_qss/`: `_base.qss`, `_library.qss`, `_controls.qss`, `_buttons.qss`, `_deck2.qss`
+- Build QSS from modules: `./scripts/build-style-qss.sh` — concatenates all `_*.qss` files in order into `style.qss`
 - Resolution architecture: Physical display 1280×800 landscape, GPU framebuffer 800×1280 portrait, Qt logical screen 1280×800 (EGLFS_ROTATION=90), display HW rotates output
-- **SizeAwareStack breakpoints MUST match 800px world** — any breakpoint ≥800 triggers wrong template at native resolution
+- **SizeAwareStack breakpoints MUST match 800px world** — any breakpoint ≥800 triggers wrong template at native resolution. The skin always runs at 1280px (≥801 breakpoint → lg template)
 - **44px minimum touch targets**, 4px grid spacing
 - `print()` is silent on device — use `console.warn()` or `engine.log()` for debug output
 
@@ -418,6 +426,22 @@ systemctl stop mixxx-app.service; systemctl restart engine.service
 ```
 
 NEVER use `systemctl restart mixxx-app.service` or `pkill mixxx` — TKGL checks `is-active` and skips relaunch if the unit is still running or orphaned.
+
+### Switching between Engine OS and MIXXX (device)
+
+```bash
+# Switch from Engine OS to MIXXX
+ssh root@$DEVICE_IP switch-to-mixxx
+
+# Switch from MIXXX back to Engine OS
+ssh root@$DEVICE_IP switch-to-engine
+```
+
+These are scripts at `/usr/bin/switch-to-mixxx` and `/usr/bin/switch-to-engine` deployed by `deploy-to-device.sh`.
+
+### USB music library (sandbox bypass)
+
+MIXXX's sandbox silently blocks vfat filesystems, preventing USB drive scanning. The launcher works around this by mounting USB drives to an ext4 path (`$BUNDLE/music`). A seed database (`mixxxdb.seed`) pre-populates the `directories` table so MIXXX knows where to scan without going through the first-run wizard. Library directories live in SQLite (`mixxxdb.sqlite`, `directories` table), NOT in `mixxx.cfg`.
 
 ### WiFi connectivity
 
@@ -441,7 +465,7 @@ Kill the ping PID when done.
 | `docs/hardware-reference.md` | LED protocols, SysEx format |
 | `docs/firmware.md` | Firmware flashing notes |
 | `docs/sentry.md` | Sentry error tracking |
-| `SD-CARD.md` | SD card layout, library listing, launcher script |
-| `DEPLOY.md` | Deployment workflow, troubleshooting |
+| `SD-CARD.md` | SD card layout, library listing, launcher script, audio optimization stack |
+| `DEPLOY.md` | Deployment workflow, troubleshooting, switch-to-mixxx/engine |
 | `BROKEN_EXPERIMENTS.md` | Failed experiments — DO NOT repeat |
-| `SKIN-TODO.md` | Skin and hardware mapping pending tasks, resolution architecture |
+| `SKIN-TODO.md` | Skin and hardware mapping pending tasks, resolution architecture, critical pitfalls |
