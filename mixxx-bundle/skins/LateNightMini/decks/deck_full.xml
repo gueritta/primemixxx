@@ -1,0 +1,43 @@
+<Template>
+  <WidgetGroup>
+    <ObjectName>DeckContainer</ObjectName>
+    <Layout>horizontal</Layout>
+    <SizePolicy>me,min</SizePolicy>
+    <Children>
+
+      <WidgetGroup>
+        <ObjectName>Deck<Variable name="ChanNum"/></ObjectName>
+        <Layout>horizontal</Layout>
+        <SizePolicy>me,min</SizePolicy>
+        <Children>
+
+          <WidgetGroup>
+            <ObjectName>DeckRows12345</ObjectName>
+            <SizePolicy>me,min</SizePolicy>
+            <Layout>vertical</Layout>
+            <Children>
+
+              <Template src="skin:/decks/row_2_3_TitleArtistTime.xml" />
+
+              <WidgetGroup>
+                <SizePolicy>me,min</SizePolicy>
+                <Layout>vertical</Layout>
+                <Children>
+                  <Template src="skin:/decks/row_4_overviewSpinny.xml" />
+                </Children>
+                <Connection>
+                  <ConfigKey>[LateNightMini],show_bottom_bar</ConfigKey>
+                  <BindProperty>visible</BindProperty>
+                </Connection>
+              </WidgetGroup>
+
+            </Children>
+          </WidgetGroup><!-- DeckRows12345 -->
+
+          <!-- rate_controls.xml — stripped -->
+
+        </Children>
+      </WidgetGroup><!-- DeckN -->
+    </Children>
+  </WidgetGroup>
+</Template>

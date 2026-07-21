@@ -1,0 +1,142 @@
+<Template>
+  <SetVariable name="Group">[Channel<Variable name="ChanNum"/>]</SetVariable>
+
+  <WidgetGroup>
+    <ObjectName>Waveform</ObjectName>
+    <Layout>horizontal</Layout>
+    <SizePolicy>me,me</SizePolicy>
+    <Children>
+
+      <WidgetGroup>
+        <ObjectName>WaveformBox<Variable name="ChanNum"/></ObjectName>
+        <Layout>horizontal</Layout>
+        <Size>me,30min</Size>
+        <Children>
+          <Visual>
+            <TooltipId>waveform_display</TooltipId>
+            <Channel><Variable name="ChanNum"/></Channel>
+            <BgColor><Variable name="BgColorWaveform"/></BgColor>
+            <SignalColor><Variable name="SignalColor"/></SignalColor>
+            <SignalHighColor></SignalHighColor>
+            <SignalMidColor></SignalMidColor>
+            <SignalLowColor></SignalLowColor>
+            <SignalRGBHighColor></SignalRGBHighColor>
+            <SignalRGBMidColor></SignalRGBMidColor>
+            <SignalRGBLowColor></SignalRGBLowColor>
+            <BeatColor><Variable name="BeatColor"/></BeatColor>
+            <AxesColor><Variable name="AxesColor"/></AxesColor>
+            <BeatHighlightColor></BeatHighlightColor>
+            <PlayPosColor><Variable name="PlayPosColor"/></PlayPosColor>
+            <EndOfTrackColor><Variable name="EndOfTrackColor"/></EndOfTrackColor>
+            <SlipBorderOutlineColor><Variable name="SlipBorderOutlineColor"/></SlipBorderOutlineColor>
+            <SlipBorderTopOutlineSize>10</SlipBorderTopOutlineSize>
+            <SlipBorderBottomOutlineSize>20</SlipBorderBottomOutlineSize>
+            <PassthroughLabelColor><Variable name="PassthroughLabelColor"/></PassthroughLabelColor>
+            <DimBrightThreshold><Variable name="DimBrightThresholdWaveform"/></DimBrightThreshold>
+            <DefaultMark>
+              <Align>bottom|right</Align>
+              <Color>#FF0000</Color>
+              <TextColor>#FFFFFF</TextColor>
+              <EndIcon>skin:/classic/style/mark_jump_%1.svg</EndIcon>
+              <DisabledOpacity>0.25</DisabledOpacity>
+              <Text> %1 </Text>
+            </DefaultMark>
+            <!-- Cue -->
+            <Mark>
+              <Control>cue_point</Control>
+              <Text>CUE</Text>
+              <Align>top|right</Align>
+              <Color><Variable name="CueColor"/></Color>
+              <TextColor>#FFFFFF</TextColor>
+            </Mark>
+            <!-- Loop -->
+            <MarkRange>
+              <StartControl>loop_start_position</StartControl>
+              <EndControl>loop_end_position</EndControl>
+              <EnabledControl>loop_enabled</EnabledControl>
+              <Color><Variable name="LoopColor"/></Color>
+              <Opacity>0.8</Opacity>
+              <DisabledColor>#FFFFFF</DisabledColor>
+              <DisabledOpacity>0.5</DisabledOpacity>
+            </MarkRange>
+            <Mark>
+              <Control>loop_start_position</Control>
+              <Text>&#8635;</Text>
+              <Icon>skin:/classic/style/mark_loop.svg</Icon>
+              <Align>top|left</Align>
+              <Color><Variable name="LoopColor"/></Color>
+              <TextColor>#FFFFFF</TextColor>
+            </Mark>
+            <Mark>
+              <Control>loop_end_position</Control>
+              <Align>top|right</Align>
+              <Color><Variable name="LoopColor"/></Color>
+              <TextColor>#FFFFFF</TextColor>
+            </Mark>
+            <!-- Intro -->
+            <MarkRange>
+              <StartControl>intro_start_position</StartControl>
+              <EndControl>intro_end_position</EndControl>
+              <VisibilityControl>[Skin],show_intro_outro_cues</VisibilityControl>
+              <Color><Variable name="IntroOutroColor"/></Color>
+              <Opacity>0.1</Opacity>
+              <DurationTextColor>#ffffff</DurationTextColor>
+              <DurationTextLocation>after</DurationTextLocation>
+            </MarkRange>
+            <Mark>
+              <Control>intro_start_position</Control>
+              <Text>&#9698;</Text>
+              <Icon>skin:/classic/style/mark_intro.svg</Icon>
+              <VisibilityControl>[Skin],show_intro_outro_cues</VisibilityControl>
+              <Align>top|right</Align>
+              <Color><Variable name="IntroOutroColor"/></Color>
+              <TextColor>#FFFFFF</TextColor>
+            </Mark>
+            <Mark>
+              <Control>intro_end_position</Control>
+              <VisibilityControl>[Skin],show_intro_outro_cues</VisibilityControl>
+              <Text>&#9698;</Text>
+              <Icon>skin:/classic/style/mark_intro.svg</Icon>
+              <Align>top|left</Align>
+              <Color><Variable name="IntroOutroColor"/></Color>
+              <TextColor>#FFFFFF</TextColor>
+            </Mark>
+            <!-- Outro -->
+            <MarkRange>
+              <StartControl>outro_start_position</StartControl>
+              <EndControl>outro_end_position</EndControl>
+              <VisibilityControl>[Skin],show_intro_outro_cues</VisibilityControl>
+              <Color><Variable name="IntroOutroColor"/></Color>
+              <Opacity>0.1</Opacity>
+              <DurationTextColor>#ffffff</DurationTextColor>
+              <DurationTextLocation>before</DurationTextLocation>
+            </MarkRange>
+            <Mark>
+              <Control>outro_start_position</Control>
+              <VisibilityControl>[Skin],show_intro_outro_cues</VisibilityControl>
+              <Text>&#9699;</Text>
+              <Icon>skin:/classic/style/mark_outro.svg</Icon>
+              <Align>top|right</Align>
+              <Color><Variable name="IntroOutroColor"/></Color>
+              <TextColor>#FFFFFF</TextColor>
+            </Mark>
+            <Mark>
+              <Control>outro_end_position</Control>
+              <Text>&#9699;</Text>
+              <Icon>skin:/classic/style/mark_outro.svg</Icon>
+              <VisibilityControl>[Skin],show_intro_outro_cues</VisibilityControl>
+              <Align>top|left</Align>
+              <Color><Variable name="IntroOutroColor"/></Color>
+              <TextColor>#FFFFFF</TextColor>
+            </Mark>
+          </Visual>
+        </Children>
+        <Connection>
+          <ConfigKey persist="true"><Variable name="Highlight"/></ConfigKey>
+          <BindProperty>highlight</BindProperty>
+        </Connection>
+      </WidgetGroup>
+
+    </Children>
+  </WidgetGroup>
+</Template>

@@ -1,0 +1,30 @@
+<!--
+  Touch-friendly 2-state button for skin settings.
+  Uses _trig COs to bypass WPushButton toggle bug on Prime Go.
+Variables:
+  Width        : button width
+  Text         : label text
+  Setting      : [Group],key_trig (trigger CO, toggled by script)
+  TooltipId    : tooltip
+-->
+<Template>
+  <PushButton>
+    <TooltipId><Variable name="TooltipId"/></TooltipId>
+    <ObjectName>SkinSettingsLabelButton</ObjectName>
+    <Size><Variable name="Width"/>,40f</Size>
+    <NumberStates>2</NumberStates>
+    <State>
+      <Number>0</Number>
+      <Text> &#9744; <Variable name="Text"/></Text>
+      <Alignment>left</Alignment>
+    </State>
+    <State>
+      <Number>1</Number>
+      <Text>&#8202;&#8202;&#8202;&#10004;&#8202;&#8202;&#8202;<Variable name="Text"/></Text>
+      <Alignment>left</Alignment>
+    </State>
+    <Connection>
+      <ConfigKey persist="true"><Variable name="Setting"/></ConfigKey>
+    </Connection>
+  </PushButton>
+</Template>

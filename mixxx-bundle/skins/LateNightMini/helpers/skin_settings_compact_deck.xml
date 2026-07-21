@@ -1,0 +1,78 @@
+<!--
+Description:
+  Options for the compact deck
+-->
+<Template>
+  <WidgetGroup>
+    <ObjectName>SkinSettingsCategory</ObjectName>
+    <SizePolicy>me,min</SizePolicy>
+    <Layout>vertical</Layout>
+    <Children>
+
+      <WidgetGroup><Size>0me,18f</Size></WidgetGroup>
+
+      <!-- Loop Controls in compact decks -->
+      <Template src="skin:/helpers/skin_settings_button_2state_touch.xml">
+        <SetVariable name="TooltipId">show_loop_controls</SetVariable>
+        <SetVariable name="Text">Loop Controls</SetVariable>
+        <SetVariable name="Setting">[LateNightMini],show_loop_controls_compact_trig</SetVariable>
+      </Template>
+
+      <!-- Beatjump Controls in compact decks -->
+      <Template src="skin:/helpers/skin_settings_button_2state_touch.xml">
+        <SetVariable name="TooltipId">show_beatjump_controls</SetVariable>
+        <SetVariable name="Text">Beatjump Controls</SetVariable>
+        <SetVariable name="Setting">[LateNightMini],show_beatjump_controls_compact_trig</SetVariable>
+      </Template>
+
+      <WidgetGroup><Size>0me,5f</Size></WidgetGroup>
+
+      <!-- Rate Control -->
+      <Template src="skin:/helpers/skin_settings_button_2state_touch.xml">
+        <SetVariable name="TooltipId">rate_toggle</SetVariable>
+        <SetVariable name="Text">Rate Controls</SetVariable>
+        <SetVariable name="Setting">[LateNightMini],show_rate_controls_compact_trig</SetVariable>
+      </Template>
+
+      <!-- Sync button in compact decks -->
+      <WidgetGroup>
+        <ObjectName>SkinSettingsSubMenu</ObjectName>
+        <Layout>stacked</Layout>
+        <Size>180min,18f</Size>
+        <Children>
+          <!-- translucent cover when rate controls are hidden -->
+          <Template src="skin:/helpers/skin_settings_cover_inverted.xml">
+            <SetVariable name="Setting">[Skin],show_rate_controls_compact</SetVariable>
+          </Template>
+          <Template src="skin:/helpers/skin_settings_button_2state_touch.xml">
+            <SetVariable name="TooltipId">rate_toggle</SetVariable>
+            <SetVariable name="Text">Sync Button</SetVariable>
+            <SetVariable name="Setting">[LateNightMini],show_sync_button_compact_trig</SetVariable>
+          </Template>
+        </Children>
+      </WidgetGroup>
+
+      <!-- Level meters -->
+      <Template src="skin:/helpers/skin_settings_button_2state_touch.xml">
+        <SetVariable name="TooltipId">show_vinylcontrol</SetVariable>
+        <SetVariable name="Text">VU meters</SetVariable>
+        <SetVariable name="Setting">[LateNightMini],show_vumeters_compact_trig</SetVariable>
+      </Template>
+
+      <!-- Spinny -->
+      <Template src="skin:/helpers/skin_settings_button_2state_touch.xml">
+        <SetVariable name="TooltipId">show_spinny</SetVariable>
+        <SetVariable name="Text">Spinny</SetVariable>
+        <SetVariable name="Setting">[LateNightMini],show_spinnies_trig</SetVariable>
+      </Template>
+
+      <!-- Cover Art -->
+      <Template src="skin:/helpers/skin_settings_button_2state_touch.xml">
+        <SetVariable name="TooltipId">show_coverart</SetVariable>
+        <SetVariable name="Text">Cover Art</SetVariable>
+        <SetVariable name="Setting">[LateNightMini],show_coverart_trig</SetVariable>
+      </Template>
+
+    </Children>
+  </WidgetGroup>
+</Template>

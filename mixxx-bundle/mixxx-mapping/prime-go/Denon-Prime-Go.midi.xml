@@ -19,6 +19,7 @@
             <file filename="lodash.mixxx.js"/>
             <file filename="midi-components-0.0.js"/>
             <file filename="Denon-Prime-Go-scripts.js" functionprefix="PrimeGo"/>
+            <file filename="LateNightMini_toggle_helper.js"/>
         </scriptfiles>
         <controls>
             <!-- FX RACKS + MASTER SECTION-->

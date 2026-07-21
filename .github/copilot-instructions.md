@@ -237,6 +237,16 @@ Boot chain:
 
 ---
 
+## WIFI CONNECTIVITY — Keepalive Required
+
+- RULE_ID: "WIFI-KEEPALIVE"
+- ASSERTION: SSH to device via WiFi drops after ~30s of silence. MUST maintain continuous ping.
+- ACTION: Before any SSH session, start: `ping -i 25 $DEVICE_IP > /dev/null 2>&1 &` and note the PID.
+- ACTION: After work is complete, kill the ping process.
+- VIOLATION: No keepalive ping → SSH hangs mid-session with "No route to host" or "Connection timed out".
+
+---
+
 ## AGENT BEHAVIOR RULES
 
 ```
