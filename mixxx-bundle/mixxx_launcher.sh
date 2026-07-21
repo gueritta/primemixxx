@@ -17,17 +17,28 @@ mount_usb_music() {
 }
 mount_usb_music
 
+# Work around kernel 5.10 hidraw netlink bug — udev's hid_enumerate() hangs without NLMSG_DONE
 export LD_PRELOAD=$BUNDLE/lib/no_hid_poll.so
+# Qt 5.15.8 plugins from SD card (NOT device's Qt 5.15.2 — eglfs_emu can't take over fbcon)
 export QT_PLUGIN_PATH="$BUNDLE/qt-plugins"
+# SD Qt 5.15.8 first, device Qt 5.15.2 fallback, then system libs
 export LD_LIBRARY_PATH="$BUNDLE/lib:/usr/qt/lib:/usr/lib"
+# EGLFS full-screen compositor (no X11/Wayland on embedded display)
 export QT_QPA_PLATFORM=eglfs
+# Mali GPU integration (r1p0 DDK via /usr/lib/libmali.so.14.0 symlinks)
 export QT_QPA_EGLFS_INTEGRATION=eglfs_mali
+# Display controller rotates 800×1280 portrait framebuffer to 1280×800 landscape
 export QT_QPA_EGLFS_ROTATION=90
+# System fonts from device rootfs (not bundled on SD card)
 export QT_QPA_FONTDIR=/usr/share/fonts
+# Touchscreen on /dev/input/event0, hardware keyboard on /dev/input/event1
 export QT_QPA_GENERIC_PLUGINS="evdevtouch:/dev/input/event0 evdevkeyboard:/dev/input/event1"
+# Touch calibration: rotate matches display rotation, min/max match ILI2117 sensor bounds
 export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=/dev/input/event0:rotate=90:minX=0:maxX=1160:minY=0:maxY=800
+# Physical screen dimensions in mm (Prime Go 5" display)
 export QT_QPA_EGLFS_PHYSICAL_WIDTH=155
 export QT_QPA_EGLFS_PHYSICAL_HEIGHT=98
+# MIXXX config/cache in tmpfs (avoids SD card wear from constant writes)
 export HOME=/tmp
 export XDG_RUNTIME_DIR=/tmp
 

@@ -81,7 +81,6 @@
 | MIDI XML mappings | `mixxx-bundle/mixxx-mapping/prime-go/*.midi.xml` |
 | Launcher script | `mixxx-bundle/mixxx_launcher.sh` |
 | TKGL module entry | `tkgl-bootstrap/modules/mod_mixxx/tkgl_mod_mixxx.sh` |
-| TKGL launcher wrapper | `tkgl-bootstrap/modules/mod_mixxx/mixxx_launcher.sh` |
 | TKGL config | `tkgl-bootstrap/modules/mod_mixxx/mixxx.cfg` |
 | Entry point (internal) | `buildroot-customizations/…/data/mixxx/mixxx` |
 | Firmware launcher | `buildroot-customizations/…/usr/bin/mixxx_launcher.sh` |
@@ -114,7 +113,7 @@
 mixxx-bundle/                                         | SD card root. Contains everything deployed. Source of truth.
 mixxx-bundle/mixxx-mapping/prime-go/                  | Prime Go mappings. ALL controller JS/XML lives here.
 tkgl-bootstrap/                                       | Device-side bootstrap. Modules here. NO document copies.
-tkgl-bootstrap/modules/mod_mixxx/                     | TKGL boot path. tkgl_mod_mixxx.sh + launcher wrapper + config. NO mapping copies.
+tkgl-bootstrap/modules/mod_mixxx/                     | TKGL boot path. tkgl_mod_mixxx.sh (thin caller) + config. NO launcher or mapping copies.
 buildroot-customizations/board/inmusic/jp11/rootfs_overlay/ | Firmware overlay. Entry point + firmware launcher only.
 scripts/                                              | Build/deploy tooling. No runtime artifacts.
 docs/                                                 | Human documentation. No rules, no code.
@@ -125,26 +124,25 @@ docs/                                                 | Human documentation. No 
 ## PRE-COMMIT CHECKS — Must all pass before any commit
 
 ```
-1. No duplicate mapping files in tkgl-bootstrap:
+1. No duplicate mapping files in tkgl-bootstrap (symlinks to canonical are OK):
    for f in Denon-Prime-Go-scripts.js Denon-Prime-Go.midi.xml; do
-     if diff -q "mixxx-bundle/mixxx-mapping/prime-go/$f" \
-                "tkgl-bootstrap/modules/mod_mixxx/$f" 2>/dev/null; then
-       echo "FAIL: $f is duplicated in tkgl-bootstrap"; exit 1
+     tkgl="tkgl-bootstrap/modules/mod_mixxx/$f"
+     if [ -L "$tkgl" ]; then
+       # Symlink is correct — resolves to canonical
+       :
+     elif [ -f "$tkgl" ]; then
+       echo "FAIL: $f is a regular file duplicate in tkgl-bootstrap"; exit 1
      fi
    done
 
-2. Launcher convergence:
-   if [ -f "mixxx-bundle/mixxx_launcher.sh" ] && \
-      [ -f "tkgl-bootstrap/modules/mod_mixxx/mixxx_launcher.sh" ]; then
-     if ! diff -q "mixxx-bundle/mixxx_launcher.sh" \
-                  "tkgl-bootstrap/modules/mod_mixxx/mixxx_launcher.sh" 2>/dev/null; then
-       echo "FAIL: launchers have diverged"; exit 1
-     fi
+2. No launcher copy in tkgl-bootstrap (canonical launcher is on SD card):
+   if [ -f "tkgl-bootstrap/modules/mod_mixxx/mixxx_launcher.sh" ]; then
+     echo "FAIL: tkgl-bootstrap contains a launcher copy"; exit 1
    fi
 
 3. No plaintext secrets outside DEPLOY.md and build scripts:
    FILES=$(grep -rl "denonprime" --include="*.md" . 2>/dev/null | \
-           grep -v "DEPLOY.md" | grep -v "copilot-instructions.md" | grep -v ".git/")
+           grep -v "DEPLOY.md" | grep -v "copilot-instructions.md" | grep -v ".git/" || true)
    if [ -n "$FILES" ]; then
      echo "FAIL: password in committed .md file outside DEPLOY.md: $FILES"; exit 1
    fi
