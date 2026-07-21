@@ -1,0 +1,33 @@
+<!--
+Description:
+  One-state action button for the skin settings menu.
+Variables:
+  Text        : button text
+  Action      : click control
+  Available   : availability control used for visibility and enabled state
+  Width       : button width
+-->
+<Template>
+  <PushButton>
+    <ObjectName>SkinSettingsButton</ObjectName>
+    <Size><Variable name="Width"/>,18f</Size>
+    <NumberStates>1</NumberStates>
+    <State>
+      <Number>0</Number>
+      <Text><Variable name="Text"/></Text>
+      <Alignment>center</Alignment>
+    </State>
+    <Connection>
+      <ConfigKey><Variable name="Action"/></ConfigKey>
+      <ButtonState>LeftButton</ButtonState>
+    </Connection>
+    <Connection>
+      <ConfigKey><Variable name="Available"/></ConfigKey>
+      <BindProperty>visible</BindProperty>
+    </Connection>
+    <Connection>
+      <ConfigKey><Variable name="Available"/></ConfigKey>
+      <BindProperty>enabled</BindProperty>
+    </Connection>
+  </PushButton>
+</Template>

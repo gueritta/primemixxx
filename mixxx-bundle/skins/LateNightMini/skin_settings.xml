@@ -1,0 +1,348 @@
+<!--
+Description:
+  The skin settings menu.
+
+  Bug: qss 'qproperty-layoutAlignment' is not respected for stacked layout.
+  No way to make SkinSettings float on top of main window at the right side
+  while keeping the screen area underneath clickable.
+
+  https://github.com/mixxxdj/mixxx/issues/8859
+  On OSX this widget is drawn behind main skin instead on top of it.
+  I removed the stacked layout and placed skin settings on the right hand side of main skin.
+-->
+<Template>
+  <SetVariable name="Width">-1me</SetVariable>
+
+  <WidgetGroup>
+    <ObjectName>SkinSettingsContainer</ObjectName>
+    <Layout>horizontal</Layout>
+    <SizePolicy>min,me</SizePolicy>
+    <Children>
+
+      <WidgetGroup>
+        <ObjectName>SkinSettings</ObjectName>
+        <Layout>vertical</Layout>
+        <Size>220f,1me</Size>
+        <Children>
+
+<!-- Deck size selector -->
+          <WidgetGroup>
+            <ObjectName>DeckSizeSettings</ObjectName>
+            <Size>215me,20f</Size>
+            <Layout>horizontal</Layout>
+            <Children>
+              <WidgetGroup><Size>5f,0min</Size></WidgetGroup>
+
+              <Label>
+                <ObjectName>SkinSettingsText</ObjectName>
+                <Size>64f,18f</Size>
+                <Text>Deck Size: </Text>
+                <Alignment>left</Alignment>
+              </Label>
+
+              <!-- Deck size toggles -->
+              <WidgetGroup>
+                <Size>150f,18f</Size>
+                <Layout>stacked</Layout>
+                <Children>
+                  <!-- hide deck sizes with the expanded library -->
+                  <!-- show 'mini' label when mini decks are show above the maximized library -->
+                  <WidgetGroup>
+                    <ObjectName>DeckSizeCover</ObjectName>
+                    <Layout>horizontal</Layout>
+                    <Size>146f,18f</Size>
+                    <Children>
+                    </Children>
+                    <Connection>
+                      <ConfigKey>[Skin],show_maximized_library</ConfigKey>
+                      <BindProperty>visible</BindProperty>
+                    </Connection>
+                    <Connection>
+                      <ConfigKey>[LateNightMini],max_lib_show_decks</ConfigKey>
+                      <BindProperty>highlight</BindProperty>
+                    </Connection>
+                  </WidgetGroup>
+
+                  <!-- FULL / Compact / mini Deck -->
+                  <WidgetGroup>
+                    <ObjectName>DeckSizeToggles</ObjectName>
+                    <Size>0me,18f</Size>
+                    <Layout>horizontal</Layout>
+                    <Children>
+                      <Template src="skin:/helpers/skin_settings_deck_size_button.xml">
+                        <SetVariable name="Text">FULL</SetVariable>
+                        <SetVariable name="Size">full</SetVariable>
+                        <SetVariable name="Width">40f</SetVariable>
+                      </Template>
+                      <Template src="skin:/helpers/skin_settings_deck_size_button.xml">
+                        <SetVariable name="Text">Compact</SetVariable>
+                        <SetVariable name="Size">compact</SetVariable>
+                        <SetVariable name="Width">66f</SetVariable>
+                      </Template>
+                      <Template src="skin:/helpers/skin_settings_deck_size_button.xml">
+                        <SetVariable name="Text">mini</SetVariable>
+                        <SetVariable name="Size">mini</SetVariable>
+                        <SetVariable name="Width">40f</SetVariable>
+                      </Template>
+                      <WidgetGroup><Size>0me,0min</Size></WidgetGroup>
+                    </Children>
+                  </WidgetGroup><!-- DeckSizeToggles -->
+                </Children>
+              </WidgetGroup><!-- Deck size toggles -->
+            </Children>
+          </WidgetGroup><!-- DeckSizeSettings -->
+<!-- Deck size selectors -->
+
+<!-- Deck Options FULL / Compact / mini -->
+          <WidgetGroup>
+            <SizePolicy>me,f</SizePolicy>
+            <!-- Horizontal layout to reduce graphic glitches in the sections below
+              when switching deck size -->
+            <Layout>horizontal</Layout>
+            <Children>
+              <WidgetStack currentpage="[Skin],show_maximized_library">
+                <Children>
+              <!-- regular library -->
+                  <WidgetStack currentpage="[LateNightMini],deck_size_without_mixer" persist="true">
+                    <Layout>horizontal</Layout>
+                    <Children>
+                      <!-- minimal deck selected -->
+                      <WidgetGroup trigger="[LateNightMini],show_mini_deck">
+                        <Layout>horizontal</Layout>
+                        <Children>
+                          <Template src="skin:/helpers/skin_settings_mini_deck.xml"/>
+                        </Children>
+                      </WidgetGroup>
+                      <!-- Compact deck selected -->
+                      <WidgetGroup trigger="[LateNightMini],show_compact_deck">
+                        <Layout>horizontal</Layout>
+                        <Children>
+                          <Template src="skin:/helpers/skin_settings_compact_deck.xml"/>
+                        </Children>
+                      </WidgetGroup>
+                      <!-- Full deck selected -->
+                      <WidgetGroup trigger="[LateNightMini],show_full_deck">
+                        <Layout>horizontal</Layout>
+                        <Children>
+                          <Template src="skin:/helpers/skin_settings_full_deck.xml"/>
+                        </Children>
+                      </WidgetGroup>
+                    </Children>
+                  </WidgetStack>
+              <!-- maximized library -->
+                  <WidgetGroup trigger="[Skin],show_maximized_library" on_hide_select="0">
+                    <Layout>stacked</Layout>
+                    <Children>
+                      <!-- translucent cover when there are no decks above BIG Library-->
+                      <Template src="skin:/helpers/skin_settings_cover_inverted.xml">
+                        <SetVariable name="Setting">[LateNightMini],max_lib_show_decks</SetVariable>
+                      </Template>
+                      <Template src="skin:/helpers/skin_settings_mini_deck.xml"/>
+                    </Children>
+                  </WidgetGroup>
+                </Children>
+              </WidgetStack>
+            </Children>
+          </WidgetGroup>
+<!-- Deck Options FULL / Compact / mini -->
+
+<!-- Other skin options -->
+          <WidgetGroup>
+            <ObjectName>SkinSettingsSeparator</ObjectName>
+            <Size>1min,12f</Size>
+          </WidgetGroup>
+
+          <!--  Waveforms -->
+          <WidgetGroup>
+            <SizePolicy>me,f</SizePolicy>
+            <Layout>stacked</Layout>
+            <Children>
+              <!-- translucent cover when Library is not maximized -->
+              <Template src="skin:/helpers/skin_settings_cover.xml">
+                <SetVariable name="Setting">[Skin],show_maximized_library</SetVariable>
+              </Template>
+
+              <WidgetGroup>
+                <SizePolicy>me,min</SizePolicy>
+                <Layout>vertical</Layout>
+                <Children>
+                  <Template src="skin:/helpers/skin_settings_labelbutton_2state.xml">
+                    <SetVariable name="Text">Waveforms</SetVariable>
+                    <SetVariable name="Setting">[Skin],show_waveforms</SetVariable>
+                    <SetVariable name="TooltipId">show_waveforms</SetVariable>
+                    <SetVariable name="Width">190me</SetVariable>
+                  </Template>
+
+                  <WidgetGroup>
+                    <ObjectName>SkinSettingsCategory</ObjectName>
+                    <SizePolicy>me,f</SizePolicy>
+                    <Layout>vertical</Layout>
+                    <Children>
+
+                      <!-- Cue shift buttons in beatgrid editing section -->
+                      <WidgetGroup>
+                        <Layout>stacked</Layout>
+                        <Size>-1me,18f</Size>
+                        <Children>
+                          <!-- translucent cover when waveforms are hidden -->
+                          <Template src="skin:/helpers/skin_settings_cover_inverted.xml">
+                            <SetVariable name="Setting">[Skin],show_waveforms</SetVariable>
+                          </Template>
+                          <!-- translucent cover when beatgrid controls are hidden -->
+                          <Template src="skin:/helpers/skin_settings_cover_inverted.xml">
+                            <SetVariable name="Setting">[Skin],show_beatgrid_controls</SetVariable>
+                          </Template>
+                          <Template src="skin:/helpers/skin_settings_button_2state.xml">
+                            <SetVariable name="TooltipId">show_intro_outro_cues</SetVariable>
+                            <SetVariable name="Text">Hotcue Shift Buttons</SetVariable>
+                            <SetVariable name="Setting">[Skin],timing_shift_buttons</SetVariable>
+                          </Template>
+                        </Children>
+                      </WidgetGroup>
+
+                      <!-- Keep same height for all waveforms -->
+                      <WidgetGroup>
+                        <Layout>stacked</Layout>
+                        <Size>-1me,18f</Size>
+                        <Children>
+                          <!-- translucent cover when waveforms are hidden -->
+                          <Template src="skin:/helpers/skin_settings_cover_inverted.xml">
+                            <SetVariable name="Setting">[Skin],show_waveforms</SetVariable>
+                          </Template>
+                          <Template src="skin:/helpers/skin_settings_button_2state.xml">
+                            <SetVariable name="TooltipId">keep_consistent_waveform_heights</SetVariable>
+                            <SetVariable name="Text">Enforce equal heights</SetVariable>
+                            <SetVariable name="Setting">[Skin],keep_consistent_waveform_heights</SetVariable>
+                          </Template>
+                        </Children>
+                      </WidgetGroup>
+
+                    </Children>
+                  </WidgetGroup>
+                </Children>
+              </WidgetGroup>
+            </Children>
+          </WidgetGroup><!-- Waveforms -->
+
+          <WidgetGroup>
+            <ObjectName>SkinSettingsSeparator</ObjectName>
+            <Size>1min,12f</Size>
+          </WidgetGroup>
+
+          <!-- Effects -->
+          <WidgetGroup>
+            <ObjectName></ObjectName>
+            <SizePolicy>me,f</SizePolicy>
+            <Layout>stacked</Layout>
+            <Children>
+              <!-- translucent cover when Library is maximized -->
+              <Template src="skin:/helpers/skin_settings_cover.xml">
+                <SetVariable name="Setting">[Skin],show_maximized_library</SetVariable>
+              </Template>
+
+              <WidgetGroup>
+                <SizePolicy>me,min</SizePolicy>
+                <Layout>vertical</Layout>
+                <Children>
+                  <WidgetGroup>
+                    <Layout>horizontal</Layout>
+                    <Size>180min,1min</Size>
+                    <Children>
+                      <Template src="skin:/helpers/skin_settings_labelbutton_2state.xml">
+                        <SetVariable name="Text">Effect Units</SetVariable>
+                        <SetVariable name="Setting">[Skin],show_effectrack</SetVariable>
+                        <SetVariable name="TooltipId">show_effects</SetVariable>
+                        <SetVariable name="Width">130me</SetVariable>
+                      </Template>
+
+                      <WidgetGroup>
+                        <SizePolicy>me,f</SizePolicy>
+                        <Layout>stacked</Layout>
+                        <Children>
+                          <!-- translucent cover when effect rack is hidden -->
+                          <Template src="skin:/helpers/skin_settings_cover_inverted.xml">
+                            <SetVariable name="Setting">[Skin],show_effectrack</SetVariable>
+                          </Template>
+                        </Children>
+                      </WidgetGroup>
+
+                    </Children>
+                  </WidgetGroup>
+
+                  <WidgetGroup>
+                    <ObjectName>SkinSettingsCategory</ObjectName>
+                    <SizePolicy>me,f</SizePolicy>
+                    <Layout>stacked</Layout>
+                    <Children>
+                      <!-- translucent cover when effect rack is hidden -->
+                      <Template src="skin:/helpers/skin_settings_cover_inverted.xml">
+                        <SetVariable name="Setting">[Skin],show_effectrack</SetVariable>
+                      </Template>
+
+                      <Template src="skin:/helpers/skin_settings_button_2state.xml">
+                        <SetVariable name="Text">Super Knobs</SetVariable>
+                        <SetVariable name="Setting">[Skin],show_superknobs</SetVariable>
+                      </Template>
+                    </Children>
+                  </WidgetGroup>
+                </Children>
+              </WidgetGroup>
+            </Children>
+          </WidgetGroup><!-- /Effects -->
+
+          <WidgetGroup>
+            <ObjectName>SkinSettingsSeparator</ObjectName>
+            <Size>1min,12f</Size>
+          </WidgetGroup>
+
+          <!-- Samplers -->
+          <SingletonContainer>
+            <ObjectName>SamplerSettingsSingleton</ObjectName>
+          </SingletonContainer>
+
+          <WidgetGroup>
+            <ObjectName>SkinSettingsSeparator</ObjectName>
+            <Size>1min,12f</Size>
+          </WidgetGroup>
+
+          <!-- App actions -->
+          <WidgetGroup>
+            <SizePolicy>me,min</SizePolicy>
+            <Layout>horizontal</Layout>
+            <Children>
+              <Template src="skin:/helpers/skin_settings_action_button.xml">
+                <SetVariable name="Text">Fullscreen</SetVariable>
+                <SetVariable name="Action">[Skin],toggle_fullscreen</SetVariable>
+                <SetVariable name="Available">[Skin],toggle_fullscreen_available</SetVariable>
+                <SetVariable name="Width">82f</SetVariable>
+              </Template>
+              <WidgetGroup><Size>2f,0min</Size></WidgetGroup>
+              <Template src="skin:/helpers/skin_settings_action_button.xml">
+                <SetVariable name="Text">Prefs</SetVariable>
+                <SetVariable name="Action">[Skin],show_preferences</SetVariable>
+                <SetVariable name="Available">[Skin],show_preferences_available</SetVariable>
+                <SetVariable name="Width">43f</SetVariable>
+              </Template>
+              <WidgetGroup><Size>2f,0min</Size></WidgetGroup>
+              <Template src="skin:/helpers/skin_settings_action_button.xml">
+                <SetVariable name="Text">Quit</SetVariable>
+                <SetVariable name="Action">[Skin],quit</SetVariable>
+                <SetVariable name="Available">[Skin],quit_available</SetVariable>
+                <SetVariable name="Width">43f</SetVariable>
+              </Template>
+              <WidgetGroup><Size>0me,0min</Size></WidgetGroup>
+            </Children>
+          </WidgetGroup>
+
+          <!-- push the settings up, required with Qt6 -->
+          <WidgetGroup><Size>0me,0me</Size></WidgetGroup>
+
+        </Children>
+      </WidgetGroup><!-- /SkinSettings -->
+    </Children>
+    <Connection>
+      <ConfigKey>[Skin],show_settings</ConfigKey>
+      <BindProperty>visible</BindProperty>
+    </Connection>
+  </WidgetGroup>
+</Template>
