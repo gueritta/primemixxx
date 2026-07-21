@@ -285,6 +285,150 @@ Boot chain:
 
 ---
 
+## BUILD, TEST, AND LINT COMMANDS
+
+### Firmware build pipeline (host)
+
+```bash
+./unpack.sh              # Download and unpack original firmware
+./clone-buildroot.sh     # Clone Buildroot 2021.02.10
+./compile-buildroot.sh   # Build toolchain + packages (requires sudo)
+./pack.sh                # Pack modified images → firmware .dtb
+```
+
+Or use Makefile targets: `make unpack`, `make clone-buildroot`, etc.
+
+### MIXXX bundle pipeline
+
+```bash
+./scripts/collect-mixxx-bundle.sh    # Gather MIXXX + deps from Buildroot output into mixxx-bundle/
+./scripts/fix-device-libs.sh         # Remove system-critical libs from bundle
+DEVICE_IP=primego.local ./scripts/deploy-to-device.sh  # SCP to device
+```
+
+### Go tools (cross-platform updater)
+
+```bash
+cd go
+go build ./cmd/updater/      # Build the GUI firmware updater
+go build ./cmd/find_update/  # Build the CLI update finder
+go test ./pkg/updater/       # Run the single Go test (XZ decompression)
+```
+
+Cross-compile for Windows: `make -C go all-windows-amd64`
+
+### Pre-commit verification
+
+```bash
+./scripts/verify-launcher.sh     # Launcher integrity: single source, pidof guard, TKGL module size
+./scripts/check-duplicates.sh    # No duplicate mapping files outside canonical location
+```
+
+Both scripts exit non-zero on failure — run before every commit.
+
+### Fast iteration (device)
+
+```bash
+./scripts/quick-fix-deploy.sh    # Redeploy only changed files, skip full bundle collection
+```
+
+### Build DTS→DTB firmware images
+
+```bash
+make PRIMEGO-4.3.4-STOCK-SSH-Update.img.dtb   # Build SSH-enabled stock firmware
+```
+
+---
+
+## HIGH-LEVEL ARCHITECTURE
+
+This is a **custom firmware + MIXXX deployment** for Denon DJ Prime Go hardware (Rockchip RK3288 ARMv7, Mali-T76x GPU, PREEMPT_RT kernel). MIXXX runs from an internal SD card alongside the stock Engine OS — the two are switchable on demand.
+
+### Three layers of the project
+
+1. **Buildroot customization** (`buildroot-customizations/`): Adds SSH, MIXXX, and TKGL bootstrap to the stock Buildroot firmware. Output is a `.dtb` firmware image flashed via USB using the Go updater.
+
+2. **SD card bundle** (`mixxx-bundle/`): Contains the MIXXX binary, Qt 5.15.8, Mali GPU shims, MIDI mappings, launcher script, and settings. This is the runtime environment — deployed via SCP to `/media/az01-internal/mixxx/`.
+
+3. **TKGL bootstrap** (`tkgl-bootstrap/`): A modular boot-time framework on a separate SD card. Handles USB mounting, seed DB restoration, GPU governor, IRQ affinity, and launching MIXXX via `systemd-run`.
+
+### Boot chain
+
+```
+Power-on → U-Boot → Linux kernel → systemd → tkgl-mixxx.service
+  → TKGL bootstrap → mod_mixxx → systemd-run --unit=mixxx-app
+    → /data/mixxx/mixxx (thin delegator on internal storage)
+      → /media/az01-internal/mixxx/mixxx_launcher.sh (SD card)
+        → MIXXX binary with CPU shielding (cores 2-3, audio threads at SCHED_FIFO 98)
+```
+
+### Key architectural decisions
+
+- **Qt 5.15.8 bundled on SD card**, not device Qt 5.15.2 — device's `eglfs_emu` can't take over the display from fbcon
+- **Mali r1p0 DDK** via symlinks to device's `/usr/lib/libmali.so.14.0` — Buildroot ships incompatible r0p0
+- **PREEMPT_RT kernel** with CPU shielding — audio threads isolated on cores 2-3, everything else banished to 0-1
+- **SD card as runtime environment** — unplug to fall back to stock Engine OS, internal storage never modified at runtime
+
+### MIDI architecture
+
+All hardware controls (platters, faders, pads, buttons) are exposed as internal USB MIDI across 6 channels:
+- Channels 1-2: Mixer (PFL, EQ, fader, sweep FX)
+- Channels 3-4: Decks (transport, pads, jog, tempo)
+- Channel 5: DJ FX
+- Channel 16: Global (browse, view, shift, load)
+
+MIXXX mappings live in `mixxx-bundle/mixxx-mapping/prime-go/` (canonical) and deploy flat to device's `controllers/` directory. The mapping uses JavaScript (`Denon-Prime-Go-scripts.js`) for LED feedback (SysEx RGB), pad modes, shift layers, and jog wheel handling, plus XML (`Denon-Prime-Go.midi.xml`) for static MIDI→control bindings.
+
+---
+
+## KEY CONVENTIONS
+
+### Controller mapping workflow
+
+1. **Canonical location**: `mixxx-bundle/mixxx-mapping/prime-go/` — ALWAYS create new mappings here
+2. **Flat deployment**: Device stores mappings in `/data/mixxx/controllers/` (flat, no subdirectories)
+3. **Local symlinks**: `mixxx-bundle/controllers/` contains symlinks into `mixxx-mapping/prime-go/` to mirror the device's flat structure
+4. **TKGL symlinks**: `tkgl-bootstrap/modules/mod_mixxx/` may contain symlinks to canonical (separate SD card on device)
+5. **No regular file duplicates** — if the same file exists in two locations, one must be a symlink
+
+### Skin development
+
+- Skin lives in `mixxx-bundle/skins/RoundCorners/` (Tango-derived, heavily customized for 1280×800 touchscreen)
+- `style.qss` is split into 5 modules: `_base`, `_library`, `_controls`, `_buttons`, `_deck2`
+- Build QSS from modules: `./scripts/build-style-qss.sh`
+- Resolution architecture: Physical display 1280×800 landscape, GPU framebuffer 800×1280 portrait, Qt logical screen 1280×800 (EGLFS_ROTATION=90), display HW rotates output
+- **SizeAwareStack breakpoints MUST match 800px world** — any breakpoint ≥800 triggers wrong template at native resolution
+- **44px minimum touch targets**, 4px grid spacing
+- `print()` is silent on device — use `console.warn()` or `engine.log()` for debug output
+
+### Deployment workflow
+
+1. Collect bundle: `./scripts/collect-mixxx-bundle.sh`
+2. Fix system libs: `./scripts/fix-device-libs.sh`
+3. Deploy to device: `DEVICE_IP=... ./scripts/deploy-to-device.sh`
+4. For fast iteration (skin/mapping changes): `./scripts/quick-fix-deploy.sh`
+5. After deployment, restart MIXXX: `ssh root@$DEVICE_IP 'systemctl stop mixxx-app.service; systemctl restart engine.service'`
+6. **Always update the local repo after device-side changes** — the repo is the source of truth
+
+### Restarting MIXXX on device
+
+**ONLY correct way:**
+```bash
+systemctl stop mixxx-app.service; systemctl restart engine.service
+```
+
+NEVER use `systemctl restart mixxx-app.service` or `pkill mixxx` — TKGL checks `is-active` and skips relaunch if the unit is still running or orphaned.
+
+### WiFi connectivity
+
+SSH via WiFi drops after ~30s of silence. Before any SSH session, maintain a keepalive:
+```bash
+ping -i 25 $DEVICE_IP > /dev/null 2>&1 &
+```
+Kill the ping PID when done.
+
+---
+
 ## DOCUMENTATION INDEX
 
 | Doc | Covers |
@@ -300,3 +444,4 @@ Boot chain:
 | `SD-CARD.md` | SD card layout, library listing, launcher script |
 | `DEPLOY.md` | Deployment workflow, troubleshooting |
 | `BROKEN_EXPERIMENTS.md` | Failed experiments — DO NOT repeat |
+| `SKIN-TODO.md` | Skin and hardware mapping pending tasks, resolution architecture |
