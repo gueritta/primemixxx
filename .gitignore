@@ -32,3 +32,4 @@ artifacts/*.tar.xz
 artifacts/*.img
 /device-libs/
 extracted_run/
+sdcard-backup*
