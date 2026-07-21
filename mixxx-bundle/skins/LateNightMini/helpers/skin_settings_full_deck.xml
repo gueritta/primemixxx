@@ -14,9 +14,9 @@ Description:
         <Layout>horizontal</Layout>
         <Size>180min,18f</Size>
         <Children>
-          <Template src="skin:/helpers/skin_settings_button_2state_touch.xml">
+          <Template src="skin:/helpers/skin_settings_button_2state.xml">
             <SetVariable name="Text">Hotcues</SetVariable>
-            <SetVariable name="Setting">[LateNightMini],show_hotcues_trig</SetVariable>
+            <SetVariable name="Setting">[Skin],show_hotcues</SetVariable>
             <SetVariable name="TooltipId">hotcue_toggle</SetVariable>
             <SetVariable name="Width">77f</SetVariable>
           </Template>
@@ -58,49 +58,49 @@ Description:
       </WidgetGroup><!-- 4/8 Hotcues -->
 
       <!-- Loop Controls -->
-      <Template src="skin:/helpers/skin_settings_button_2state_touch.xml">
+      <Template src="skin:/helpers/skin_settings_button_2state.xml">
         <SetVariable name="TooltipId">show_loop_controls</SetVariable>
         <SetVariable name="Text">Loop Controls</SetVariable>
-        <SetVariable name="Setting">[LateNightMini],show_loop_controls_trig</SetVariable>
+        <SetVariable name="Setting">[Skin],show_loop_controls</SetVariable>
       </Template>
 
       <!-- Beatjump Controls -->
-      <Template src="skin:/helpers/skin_settings_button_2state_touch.xml">
+      <Template src="skin:/helpers/skin_settings_button_2state.xml">
         <SetVariable name="TooltipId">show_beatjump_controls</SetVariable>
         <SetVariable name="Text">Beatjump Controls</SetVariable>
-        <SetVariable name="Setting">[LateNightMini],show_beatjump_controls_trig</SetVariable>
+        <SetVariable name="Setting">[Skin],show_beatjump_controls</SetVariable>
       </Template>
 
       <WidgetGroup><Size>0me,5f</Size></WidgetGroup>
 
       <!-- Rate Controls -->
-      <Template src="skin:/helpers/skin_settings_button_2state_touch.xml">
+      <Template src="skin:/helpers/skin_settings_button_2state.xml">
         <SetVariable name="TooltipId">rate_toggle</SetVariable>
         <SetVariable name="Text">Rate Controls</SetVariable>
-        <SetVariable name="Setting">[LateNightMini],show_rate_controls_trig</SetVariable>
+        <SetVariable name="Setting">[Skin],show_rate_controls</SetVariable>
       </Template>
 
       <!-- Level meters -->
-      <Template src="skin:/helpers/skin_settings_button_2state_touch.xml">
+      <Template src="skin:/helpers/skin_settings_button_2state.xml">
         <SetVariable name="TooltipId">show_vinylcontrol</SetVariable>
         <SetVariable name="Text">VU meters</SetVariable>
-        <SetVariable name="Setting">[LateNightMini],show_vumeters_compact_trig</SetVariable>
+        <SetVariable name="Setting">[LateNightMini],show_vumeters_compact</SetVariable>
       </Template>
 
       <WidgetGroup><Size>0me,5f</Size></WidgetGroup>
 
       <!-- Spinny -->
-      <Template src="skin:/helpers/skin_settings_button_2state_touch.xml">
+      <Template src="skin:/helpers/skin_settings_button_2state.xml">
         <SetVariable name="TooltipId">show_spinny</SetVariable>
         <SetVariable name="Text">Spinny</SetVariable>
-        <SetVariable name="Setting">[LateNightMini],show_spinnies_trig</SetVariable>
+        <SetVariable name="Setting">[Skin],show_spinnies</SetVariable>
       </Template>
 
       <!-- Cover Art -->
-      <Template src="skin:/helpers/skin_settings_button_2state_touch.xml">
+      <Template src="skin:/helpers/skin_settings_button_2state.xml">
         <SetVariable name="TooltipId">show_coverart</SetVariable>
         <SetVariable name="Text">Cover Art</SetVariable>
-        <SetVariable name="Setting">[LateNightMini],show_coverart_trig</SetVariable>
+        <SetVariable name="Setting">[Skin],show_coverart</SetVariable>
       </Template>
 
 

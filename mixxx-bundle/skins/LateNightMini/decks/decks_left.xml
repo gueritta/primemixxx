@@ -1,0 +1,15 @@
+<Template>
+  <SetVariable name="Type">deck</SetVariable>
+  <WidgetGroup>
+    <ObjectName>DecksLeft</ObjectName>
+    <Layout>vertical</Layout>
+    <SizePolicy>me,min</SizePolicy>
+    <Children>
+
+      <SingletonContainer>
+        <ObjectName>Deck1_Src</ObjectName>
+      </SingletonContainer>
+
+    </Children>
+  </WidgetGroup>
+</Template>

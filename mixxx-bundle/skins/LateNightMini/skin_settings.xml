@@ -28,47 +28,70 @@ Description:
 <!-- Deck size selector -->
           <WidgetGroup>
             <ObjectName>DeckSizeSettings</ObjectName>
-            <Size>215me,40f</Size>
-            <Layout>vertical</Layout>
+            <Size>215me,20f</Size>
+            <Layout>horizontal</Layout>
             <Children>
+              <WidgetGroup><Size>5f,0min</Size></WidgetGroup>
 
-              <!-- FULL / Compact / mini on one row -->
-              <WidgetGroup><Size>215me,20f</Size><Layout>horizontal</Layout>
+              <Label>
+                <ObjectName>SkinSettingsText</ObjectName>
+                <Size>64f,18f</Size>
+                <Text>Deck Size: </Text>
+                <Alignment>left</Alignment>
+              </Label>
+
+              <!-- Deck size toggles -->
+              <WidgetGroup>
+                <Size>150f,18f</Size>
+                <Layout>stacked</Layout>
                 <Children>
-                  <WidgetGroup><Size>5f,0min</Size></WidgetGroup>
-                  <Template src="skin:/helpers/skin_settings_deck_size_button.xml">
-                    <SetVariable name="Text">FULL</SetVariable>
-                    <SetVariable name="Size">full</SetVariable>
-                    <SetVariable name="Width">54f</SetVariable>
-                  </Template>
-                  <Template src="skin:/helpers/skin_settings_deck_size_button.xml">
-                    <SetVariable name="Text">Compact</SetVariable>
-                    <SetVariable name="Size">compact</SetVariable>
-                    <SetVariable name="Width">74f</SetVariable>
-                  </Template>
-                  <Template src="skin:/helpers/skin_settings_deck_size_button.xml">
-                    <SetVariable name="Text">mini</SetVariable>
-                    <SetVariable name="Size">mini</SetVariable>
-                    <SetVariable name="Width">48f</SetVariable>
-                  </Template>
-                  <WidgetGroup><Size>0me,0min</Size></WidgetGroup>
-                </Children>
-              </WidgetGroup>
+                  <!-- hide deck sizes with the expanded library -->
+                  <!-- show 'mini' label when mini decks are show above the maximized library -->
+                  <WidgetGroup>
+                    <ObjectName>DeckSizeCover</ObjectName>
+                    <Layout>horizontal</Layout>
+                    <Size>146f,18f</Size>
+                    <Children>
+                    </Children>
+                    <Connection>
+                      <ConfigKey>[Skin],show_maximized_library</ConfigKey>
+                      <BindProperty>visible</BindProperty>
+                    </Connection>
+                    <Connection>
+                      <ConfigKey>[LateNightMini],max_lib_show_decks</ConfigKey>
+                      <BindProperty>highlight</BindProperty>
+                    </Connection>
+                  </WidgetGroup>
 
-              <!-- Bottom Bar -->
-              <WidgetGroup><Size>215me,20f</Size><Layout>horizontal</Layout>
-                <Children>
-                  <WidgetGroup><Size>5f,0min</Size></WidgetGroup>
-                  <Template src="skin:/helpers/skin_settings_button_2state_touch.xml">
-                    <SetVariable name="Text">Bottom Bar</SetVariable>
-                    <SetVariable name="Setting">[LateNightMini],show_bottom_bar_trig</SetVariable>
-                  </Template>
-                  <WidgetGroup><Size>0me,0min</Size></WidgetGroup>
+                  <!-- FULL / Compact / mini Deck -->
+                  <WidgetGroup>
+                    <ObjectName>DeckSizeToggles</ObjectName>
+                    <Size>0me,18f</Size>
+                    <Layout>horizontal</Layout>
+                    <Children>
+                      <Template src="skin:/helpers/skin_settings_deck_size_button.xml">
+                        <SetVariable name="Text">FULL</SetVariable>
+                        <SetVariable name="Size">full</SetVariable>
+                        <SetVariable name="Width">40f</SetVariable>
+                      </Template>
+                      <Template src="skin:/helpers/skin_settings_deck_size_button.xml">
+                        <SetVariable name="Text">Compact</SetVariable>
+                        <SetVariable name="Size">compact</SetVariable>
+                        <SetVariable name="Width">66f</SetVariable>
+                      </Template>
+                      <Template src="skin:/helpers/skin_settings_deck_size_button.xml">
+                        <SetVariable name="Text">mini</SetVariable>
+                        <SetVariable name="Size">mini</SetVariable>
+                        <SetVariable name="Width">40f</SetVariable>
+                      </Template>
+                      <WidgetGroup><Size>0me,0min</Size></WidgetGroup>
+                    </Children>
+                  </WidgetGroup><!-- DeckSizeToggles -->
                 </Children>
-              </WidgetGroup>
-
+              </WidgetGroup><!-- Deck size toggles -->
             </Children>
           </WidgetGroup><!-- DeckSizeSettings -->
+<!-- Deck size selectors -->
 
 <!-- Deck Options FULL / Compact / mini -->
           <WidgetGroup>
@@ -143,9 +166,9 @@ Description:
                 <SizePolicy>me,min</SizePolicy>
                 <Layout>vertical</Layout>
                 <Children>
-                  <Template src="skin:/helpers/skin_settings_labelbutton_2state_touch.xml">
+                  <Template src="skin:/helpers/skin_settings_labelbutton_2state.xml">
                     <SetVariable name="Text">Waveforms</SetVariable>
-                    <SetVariable name="Setting">[LateNightMini],show_waveforms_trig</SetVariable>
+                    <SetVariable name="Setting">[Skin],show_waveforms</SetVariable>
                     <SetVariable name="TooltipId">show_waveforms</SetVariable>
                     <SetVariable name="Width">190me</SetVariable>
                   </Template>
@@ -163,16 +186,16 @@ Description:
                         <Children>
                           <!-- translucent cover when waveforms are hidden -->
                           <Template src="skin:/helpers/skin_settings_cover_inverted.xml">
-                            <SetVariable name="Setting">[LateNightMini],show_waveforms</SetVariable>
+                            <SetVariable name="Setting">[Skin],show_waveforms</SetVariable>
                           </Template>
                           <!-- translucent cover when beatgrid controls are hidden -->
                           <Template src="skin:/helpers/skin_settings_cover_inverted.xml">
                             <SetVariable name="Setting">[Skin],show_beatgrid_controls</SetVariable>
                           </Template>
-                          <Template src="skin:/helpers/skin_settings_button_2state_touch.xml">
+                          <Template src="skin:/helpers/skin_settings_button_2state.xml">
                             <SetVariable name="TooltipId">show_intro_outro_cues</SetVariable>
                             <SetVariable name="Text">Hotcue Shift Buttons</SetVariable>
-                            <SetVariable name="Setting">[LateNightMini],timing_shift_buttons_trig</SetVariable>
+                            <SetVariable name="Setting">[Skin],timing_shift_buttons</SetVariable>
                           </Template>
                         </Children>
                       </WidgetGroup>
@@ -184,12 +207,12 @@ Description:
                         <Children>
                           <!-- translucent cover when waveforms are hidden -->
                           <Template src="skin:/helpers/skin_settings_cover_inverted.xml">
-                            <SetVariable name="Setting">[LateNightMini],show_waveforms</SetVariable>
+                            <SetVariable name="Setting">[Skin],show_waveforms</SetVariable>
                           </Template>
-                          <Template src="skin:/helpers/skin_settings_button_2state_touch.xml">
+                          <Template src="skin:/helpers/skin_settings_button_2state.xml">
                             <SetVariable name="TooltipId">keep_consistent_waveform_heights</SetVariable>
                             <SetVariable name="Text">Enforce equal heights</SetVariable>
-                            <SetVariable name="Setting">[LateNightMini],keep_consistent_waveform_heights_trig</SetVariable>
+                            <SetVariable name="Setting">[Skin],keep_consistent_waveform_heights</SetVariable>
                           </Template>
                         </Children>
                       </WidgetGroup>
@@ -225,9 +248,9 @@ Description:
                     <Layout>horizontal</Layout>
                     <Size>180min,1min</Size>
                     <Children>
-                      <Template src="skin:/helpers/skin_settings_labelbutton_2state_touch.xml">
+                      <Template src="skin:/helpers/skin_settings_labelbutton_2state.xml">
                         <SetVariable name="Text">Effect Units</SetVariable>
-                        <SetVariable name="Setting">[LateNightMini],show_effectrack_trig</SetVariable>
+                        <SetVariable name="Setting">[Skin],show_effectrack</SetVariable>
                         <SetVariable name="TooltipId">show_effects</SetVariable>
                         <SetVariable name="Width">130me</SetVariable>
                       </Template>
@@ -238,7 +261,7 @@ Description:
                         <Children>
                           <!-- translucent cover when effect rack is hidden -->
                           <Template src="skin:/helpers/skin_settings_cover_inverted.xml">
-                            <SetVariable name="Setting">[LateNightMini],show_effectrack</SetVariable>
+                            <SetVariable name="Setting">[Skin],show_effectrack</SetVariable>
                           </Template>
                         </Children>
                       </WidgetGroup>
@@ -253,12 +276,12 @@ Description:
                     <Children>
                       <!-- translucent cover when effect rack is hidden -->
                       <Template src="skin:/helpers/skin_settings_cover_inverted.xml">
-                        <SetVariable name="Setting">[LateNightMini],show_effectrack</SetVariable>
+                        <SetVariable name="Setting">[Skin],show_effectrack</SetVariable>
                       </Template>
 
-                      <Template src="skin:/helpers/skin_settings_button_2state_touch.xml">
+                      <Template src="skin:/helpers/skin_settings_button_2state.xml">
                         <SetVariable name="Text">Super Knobs</SetVariable>
-                        <SetVariable name="Setting">[LateNightMini],show_superknobs_trig</SetVariable>
+                        <SetVariable name="Setting">[Skin],show_superknobs</SetVariable>
                       </Template>
                     </Children>
                   </WidgetGroup>

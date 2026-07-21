@@ -39,7 +39,7 @@
     <!-- Set skin defaults -->
       <attribute config_key="[App],num_decks">2</attribute>
       <attribute config_key="[App],num_samplers">4</attribute>
-      <attribute persist="true" config_key="[LateNightMini],show_waveforms">1</attribute>
+      <attribute persist="true" config_key="[Skin],show_waveforms">1</attribute>
       <attribute persist="true" config_key="[Skin],timing_shift_buttons">0</attribute>
 
     <!-- Decks -->
@@ -72,18 +72,15 @@
 
     <!-- Effects -->
       <attribute persist="true" config_key="[Skin],show_effectrack">0</attribute>
-      <attribute persist="true" config_key="[LateNightMini],show_effectrack">0</attribute>
       <attribute persist="true" config_key="[Skin],show_superknobs">0</attribute>
     <!-- Samplers -->
       <attribute persist="true" config_key="[Skin],show_samplers">0</attribute>
-      <attribute persist="true" config_key="[LateNightMini],show_samplers">0</attribute>
       <attribute persist="true" config_key="[LateNightMini],sampler_rows">1</attribute>
       <attribute persist="true" config_key="[LateNightMini],expand_samplers_1-4">0</attribute>
       <attribute persist="true" config_key="[LateNightMini],expand_samplers_1-8">0</attribute>
       <attribute persist="true" config_key="[LateNightMini],expand_samplers_9-16">0</attribute>
     <!-- Skin settings -->
-      <attribute persist="true" config_key="[LateNightMini],show_bottom_bar">1</attribute>
-      <attribute config_key="[LateNightMini],show_settings">0</attribute>
+      <attribute config_key="[Skin],show_settings">0</attribute>
     <!-- Library -->
       <attribute config_key="[Skin],show_maximized_library">0</attribute>
       <attribute persist="true" config_key="[LateNightMini],max_lib_show_decks">1</attribute>
@@ -415,9 +412,9 @@
                   <ObjectName>WaveformSplitter</ObjectName>
                   <Orientation>vertical</Orientation>
                   <SizePolicy>me,min</SizePolicy>
-                  <SplitSizes>500,0</SplitSizes>
+                  <SplitSizes>100,550</SplitSizes>
                   <SplitSizesConfigKey>[Skin],stackedWaveforms_splitSize</SplitSizesConfigKey>
-                  <Collapsible>0,1</Collapsible>
+                  <Collapsible>0,0</Collapsible>
                   <Children>
 
                     <WidgetGroup>
@@ -427,7 +424,7 @@
                         <Template src="skin:/waveforms_container.xml"/>
                       </Children>
                       <Connection>
-                        <ConfigKey persist="true">[LateNightMini],show_waveforms</ConfigKey>
+                        <ConfigKey persist="true">[Skin],show_waveforms</ConfigKey>
                         <BindProperty>visible</BindProperty>
                       </Connection>
                     </WidgetGroup>
@@ -440,7 +437,7 @@
                         <WidgetGroup><!-- Top spacer when waveforms are hidden -->
                           <ObjectName>ToolbarDeckSpacer</ObjectName>
                           <Connection>
-                            <ConfigKey persist="true">[LateNightMini],show_waveforms</ConfigKey>
+                            <ConfigKey persist="true">[Skin],show_waveforms</ConfigKey>
                             <Transform><Not/></Transform>
                             <BindProperty>visible</BindProperty>
                           </Connection>

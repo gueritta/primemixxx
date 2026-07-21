@@ -1,0 +1,45 @@
+<Template>
+
+  <WidgetGroup>
+    <ObjectName>SamplerContainer</ObjectName>
+    <Layout>horizontal</Layout>
+    <SizePolicy>me,max</SizePolicy>
+    <Children>
+
+      <!-- Select between big or small samplers -->
+      <WidgetStack currentpage="[LateNightMini],expand_samplers_1-4">
+        <Children>
+
+          <!-- 4 small Samplers -->
+          <WidgetGroup>
+            <ObjectName>SamplerRow</ObjectName>
+		        <Layout>horizontal</Layout>
+		        <SizePolicy>min,min</SizePolicy>
+		        <Children>
+
+              <SingletonContainer>
+                <ObjectName>SamplerMini1_Singleton</ObjectName>
+              </SingletonContainer>
+
+              <SingletonContainer>
+                <ObjectName>SamplerMini2_Singleton</ObjectName>
+              </SingletonContainer>
+
+              <SingletonContainer>
+                <ObjectName>SamplerMini3_Singleton</ObjectName>
+              </SingletonContainer>
+
+              <SingletonContainer>
+                <ObjectName>SamplerMini4_Singleton</ObjectName>
+              </SingletonContainer>
+
+            </Children>
+          </WidgetGroup>
+          <!-- /4 small Samplers -->
+
+        </Children>
+      </WidgetStack>
+
+    </Children>
+  </WidgetGroup>
+</Template>

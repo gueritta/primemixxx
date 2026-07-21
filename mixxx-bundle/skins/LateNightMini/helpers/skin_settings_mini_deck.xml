@@ -12,24 +12,24 @@ Description:
       <WidgetGroup><Size>0me,154f</Size></WidgetGroup>
 
       <!-- Level meters -->
-      <Template src="skin:/helpers/skin_settings_button_2state_touch.xml">
+      <Template src="skin:/helpers/skin_settings_button_2state.xml">
         <SetVariable name="TooltipId">show_vinylcontrol</SetVariable>
         <SetVariable name="Text">VU meters</SetVariable>
-        <SetVariable name="Setting">[LateNightMini],show_vumeters_compact_trig</SetVariable>
+        <SetVariable name="Setting">[LateNightMini],show_vumeters_compact</SetVariable>
       </Template>
 
       <!-- Spinny -->
-      <Template src="skin:/helpers/skin_settings_button_2state_touch.xml">
+      <Template src="skin:/helpers/skin_settings_button_2state.xml">
         <SetVariable name="TooltipId">show_spinny</SetVariable>
         <SetVariable name="Text">Spinny</SetVariable>
-        <SetVariable name="Setting">[LateNightMini],show_spinnies_trig</SetVariable>
+        <SetVariable name="Setting">[Skin],show_spinnies</SetVariable>
       </Template>
 
       <!-- Cover Art -->
-      <Template src="skin:/helpers/skin_settings_button_2state_touch.xml">
+      <Template src="skin:/helpers/skin_settings_button_2state.xml">
         <SetVariable name="TooltipId">show_coverart</SetVariable>
         <SetVariable name="Text">Cover Art</SetVariable>
-        <SetVariable name="Setting">[LateNightMini],show_coverart_trig</SetVariable>
+        <SetVariable name="Setting">[Skin],show_coverart</SetVariable>
       </Template>
 
       <WidgetGroup><Size>0me,18f</Size></WidgetGroup>

@@ -13,10 +13,10 @@
       <Template src="skin:/controls/button_2state.xml">
         <SetVariable name="TooltipId">maximize_library</SetVariable>
         <SetVariable name="ObjectName">GuiToggleButton</SetVariable>
-        <SetVariable name="Size">80f,56f</SetVariable>
+        <SetVariable name="Size">80f,40f</SetVariable>
         <SetVariable name="state_0_text">LIBRARY</SetVariable>
         <SetVariable name="state_1_text">BACK</SetVariable>
-        <SetVariable name="ConfigKey">[LateNightMini],maximize_library_trig</SetVariable>
+        <SetVariable name="ConfigKey">[Skin],show_maximized_library</SetVariable>
       </Template>
 
       <WidgetGroup>
@@ -33,10 +33,10 @@
           <Template src="skin:/controls/button_2state.xml">
             <SetVariable name="TooltipId">show_waveforms</SetVariable>
             <SetVariable name="ObjectName">GuiToggleButton</SetVariable>
-            <SetVariable name="Size">80f,56f</SetVariable>
+            <SetVariable name="Size">80f,40f</SetVariable>
             <SetVariable name="state_0_text">WAVEFORMS</SetVariable>
             <SetVariable name="state_1_text">WAVEFORMS</SetVariable>
-            <SetVariable name="ConfigKey">[LateNightMini],show_waveforms_trig</SetVariable>
+            <SetVariable name="ConfigKey">[Skin],show_waveforms</SetVariable>
           </Template>
 
         <WidgetGroup>
@@ -44,27 +44,27 @@
             <Size>12f,9min</Size>
         </WidgetGroup>
 
-          <Template src="skin:/controls/button_2state.xml">
+          <Template src="skin:/controls/button_2state_persist.xml">
             <SetVariable name="TooltipId">show_effects</SetVariable>
             <SetVariable name="ObjectName">GuiToggleButton</SetVariable>
-            <SetVariable name="Size">80f,56f</SetVariable>
+            <SetVariable name="Size">59f,40f</SetVariable>
             <SetVariable name="state_0_text">EFFECTS</SetVariable>
             <SetVariable name="state_1_text">EFFECTS</SetVariable>
-            <SetVariable name="ConfigKey">[LateNightMini],show_effectrack_trig</SetVariable>
+            <SetVariable name="ConfigKey">[Skin],show_effectrack</SetVariable>
           </Template>
 
-          <Template src="skin:/controls/button_2state.xml">
+          <Template src="skin:/controls/button_2state_persist.xml">
             <SetVariable name="TooltipId">show_samplers</SetVariable>
             <SetVariable name="ObjectName">GuiToggleButton</SetVariable>
-            <SetVariable name="Size">80f,56f</SetVariable>
+            <SetVariable name="Size">71f,40f</SetVariable>
             <SetVariable name="state_0_text">SAMPLERS</SetVariable>
             <SetVariable name="state_1_text">SAMPLERS</SetVariable>
-            <SetVariable name="ConfigKey">[LateNightMini],show_samplers_trig</SetVariable>
+            <SetVariable name="ConfigKey">[Skin],show_samplers</SetVariable>
           </Template>
 
         </Children>
         <Connection>
-          <ConfigKey>[Master],maximize_library</ConfigKey>
+          <ConfigKey>[Skin],show_maximized_library</ConfigKey>
           <Transform><Not/></Transform>
           <BindProperty>visible</BindProperty>
         </Connection>
@@ -79,15 +79,15 @@
           <Template src="skin:/controls/button_2state.xml">
             <SetVariable name="TooltipId">show_waveforms</SetVariable>
             <SetVariable name="ObjectName">GuiToggleButton</SetVariable>
-            <SetVariable name="Size">80f,56f</SetVariable>
+            <SetVariable name="Size">80f,40f</SetVariable>
             <SetVariable name="state_0_text">DECKS</SetVariable>
             <SetVariable name="state_1_text">DECKS</SetVariable>
-            <SetVariable name="ConfigKey">[LateNightMini],max_lib_show_decks_trig</SetVariable>
+            <SetVariable name="ConfigKey">[LateNightMini],max_lib_show_decks</SetVariable>
           </Template>
 
         </Children>
         <Connection>
-          <ConfigKey>[Master],maximize_library</ConfigKey>
+          <ConfigKey>[Skin],show_maximized_library</ConfigKey>
           <BindProperty>visible</BindProperty>
         </Connection>
       </WidgetGroup><!-- GUI toggles with maximized library -->
@@ -116,7 +116,7 @@
       <WidgetGroup><!-- Recording button & recording duration label -->
         <ObjectName>RecBox</ObjectName>
         <Layout>stacked</Layout>
-        <Size>72f,56f</Size>
+        <Size>72f,40f</Size>
         <!-- minus 1px border
             = 70x18 available for text -->
         <Children>
@@ -124,13 +124,13 @@
           <Template src="skin:/controls/button_2state.xml">
             <SetVariable name="ObjectName">RecButton</SetVariable>
             <SetVariable name="TooltipId">toggle_recording</SetVariable>
-            <SetVariable name="Size">72f,56f</SetVariable>
+            <SetVariable name="Size">72f,40f</SetVariable>
             <SetVariable name="ConfigKey">[Recording],toggle_recording</SetVariable>
           </Template>
 
           <WidgetGroup><!-- Rec dot + RecDuration -->
             <Layout>horizontal</Layout>
-            <Size>72f,56f</Size>
+            <Size>72f,40f</Size>
             <Children>
               <Label>
                 <ObjectName>RecDot</ObjectName>
@@ -157,7 +157,7 @@
           <!-- Rec feedback color -->
             <Template src="skin:/controls/button_3state_display.xml">
             <SetVariable name="ObjectName">RecFeedback</SetVariable>
-            <SetVariable name="Size">72f,56f</SetVariable>
+            <SetVariable name="Size">72f,40f</SetVariable>
             <SetVariable name="ConfigKey">[Recording],toggle_recording</SetVariable>
             <SetVariable name="ConfigKeyDisp">[Recording],status</SetVariable>
           </Template>
@@ -251,8 +251,7 @@
           <PushButton>
             <TooltipId>skin_settings</TooltipId>
             <ObjectName>SkinSettingsToggle</ObjectName>
-            
-            <Size>48f,48f</Size>
+            <Size>36f,36f</Size>
             <NumberStates>2</NumberStates>
             <State>
               <Number>0</Number>
@@ -261,7 +260,7 @@
               <Number>1</Number>
             </State>
             <Connection>
-              <ConfigKey>[LateNightMini],show_settings_trig</ConfigKey>
+              <ConfigKey>[Skin],show_settings</ConfigKey>
             </Connection>
           </PushButton>
           <WidgetGroup><Size>1min,2f</Size></WidgetGroup>
@@ -288,7 +287,7 @@
 
     </Children>
     <Connection>
-      <ConfigKey>[EffectRack1],show</ConfigKey>
+      <ConfigKey>[Skin],show_waveforms</ConfigKey>
       <BindProperty>highlight</BindProperty>
     </Connection>
   </WidgetGroup>

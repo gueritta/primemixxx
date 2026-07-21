@@ -21,10 +21,10 @@ Description:
           <Layout>horizontal</Layout>
           <Size>180min,1min</Size>
           <Children>
-            <Template src="skin:/helpers/skin_settings_labelbutton_2state_touch.xml">
+            <Template src="skin:/helpers/skin_settings_labelbutton_2state.xml">
               <SetVariable name="TooltipId">show_samplers</SetVariable>
               <SetVariable name="Text">Samplers </SetVariable>
-              <SetVariable name="Setting">[LateNightMini],show_samplers_section_trig</SetVariable>
+              <SetVariable name="Setting">[Skin],show_samplers</SetVariable>
               <SetVariable name="Width">115f</SetVariable>
             </Template>
 

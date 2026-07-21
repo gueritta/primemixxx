@@ -1,9 +1,6 @@
 /* LateNightMini 2.3 // PaleMoon theme
 
-* Prime Go: disable EGLFS yellow focus rectangle */
-* { outline: none; }
-
-/* containers
+* containers
   * colors, borders, background tiles
   * layout spacing
 

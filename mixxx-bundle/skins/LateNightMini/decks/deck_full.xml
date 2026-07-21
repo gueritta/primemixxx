@@ -17,25 +17,44 @@
             <Layout>vertical</Layout>
             <Children>
 
-              <Template src="skin:/decks/row_2_3_TitleArtistTime.xml" />
+              <Template src="skin:/decks/row_1_keyVinylFx.xml"/>
 
               <WidgetGroup>
+                <ObjectName>DeckRows234</ObjectName>
                 <SizePolicy>me,min</SizePolicy>
-                <Layout>vertical</Layout>
+                <Layout>horizontal</Layout>
                 <Children>
-                  <Template src="skin:/decks/row_4_overviewSpinny.xml" />
+
+                  <WidgetGroup>
+                    <SizePolicy>me,min</SizePolicy>
+                    <Layout>vertical</Layout>
+                    <Children>
+                      <Template src="skin:/decks/row_2_3_TitleArtistTime.xml" />
+                      <Template src="skin:/decks/row_4_overviewSpinny.xml" />
+                    </Children>
+                  </WidgetGroup>
+
                 </Children>
-                <Connection>
-                  <ConfigKey>[LateNightMini],show_bottom_bar</ConfigKey>
-                  <BindProperty>visible</BindProperty>
-                </Connection>
-              </WidgetGroup>
+              </WidgetGroup><!-- DeckRows234 -->
+
+              <Template src="skin:/decks/row_5_transportLoopJump.xml" />
 
             </Children>
           </WidgetGroup><!-- DeckRows12345 -->
 
-          <!-- rate_controls.xml — stripped -->
+          <WidgetGroup>
+            <ObjectName>DeckRateSpacer</ObjectName>
+            <SizePolicy>min,min</SizePolicy>
+            <Children/>
+            <!-- this is sized and styled in css -->
+            <Connection>
+              <ConfigKey persist="true">[Skin],show_rate_controls</ConfigKey>
+              <Transform><Not/></Transform>
+              <BindProperty>visible</BindProperty>
+            </Connection>
+          </WidgetGroup>
 
+          <Template src="skin:/decks/rate_controls.xml"/>
         </Children>
       </WidgetGroup><!-- DeckN -->
     </Children>
