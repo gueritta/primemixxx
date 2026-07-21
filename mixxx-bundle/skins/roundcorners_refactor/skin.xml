@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<skin>
+    <manifest>
+        <title>RoundCorners Refactor</title>
+        <author>22degrees / Custom</author>
+        <version>1.0</version>
+        <language>en</language>
+    </manifest>
+    
+    <style>style.qss</style>
+
+    <WidgetGroup>
+        <ObjectName>MainScreen</ObjectName>
+        <Layout>vertical</Layout>
+        <SizePolicy>me,me</SizePolicy>
+        <Children>
+
+            <!-- 1. Top Header Bar (36px) -->
+            <WidgetGroup>
+                <ObjectName>TopBar</ObjectName>
+                <Layout>horizontal</Layout>
+                <SizePolicy>me,fixed</SizePolicy>
+                <MinimumSize>-1,36</MinimumSize>
+                <MaximumSize>-1,36</MaximumSize>
+                <Children>
+                    <PushButton>
+                        <ObjectName>MenuButton</ObjectName>
+                        <NumberStates>1</NumberStates>
+                        <State>
+                            <Number>0</Number>
+                            <Text>SETTINGS</Text>
+                        </State>
+                        <Connection>
+                            <ConfigKey>[Master],show_settings</ConfigKey>
+                        </Connection>
+                    </PushButton>
+                </Children>
+            </WidgetGroup>
+
+            <!-- 2. Stacked Waveforms Container (140px) -->
+            <WidgetGroup>
+                <ObjectName>WaveformContainer</ObjectName>
+                <Layout>vertical</Layout>
+                <SizePolicy>me,fixed</SizePolicy>
+                <MinimumSize>-1,140</MinimumSize>
+                <MaximumSize>-1,140</MaximumSize>
+                <Children>
+                    <Visual>
+                        <Number>1</Number>
+                    </Visual>
+                    <Visual>
+                        <Number>2</Number>
+                    </Visual>
+                </Children>
+            </WidgetGroup>
+
+            <!-- 3. Dual Compact Deck Strips (140px) -->
+            <WidgetGroup>
+                <ObjectName>DecksStrip</ObjectName>
+                <Layout>horizontal</Layout>
+                <SizePolicy>me,fixed</SizePolicy>
+                <MinimumSize>-1,140</MinimumSize>
+                <MaximumSize>-1,140</MaximumSize>
+                <Children>
+
+                    <!-- DECK 1 -->
+                    <WidgetGroup>
+                        <ObjectName>Deck1</ObjectName>
+                        <Layout>vertical</Layout>
+                        <Children>
+                            <Text>
+                                <ObjectName>TrackTitle1</ObjectName>
+                                <Group>[Channel1]</Group>
+                                <Key>title</Key>
+                            </Text>
+                            <WidgetGroup>
+                                <Layout>horizontal</Layout>
+                                <Children>
+                                    <PushButton>
+                                        <ObjectName>Play1</ObjectName>
+                                        <NumberStates>2</NumberStates>
+                                        <State><Number>0</Number><Text>PLAY</Text></State>
+                                        <State><Number>1</Number><Text>PAUSE</Text></State>
+                                        <Connection><ConfigKey>[Channel1],play</ConfigKey></Connection>
+                                    </PushButton>
+                                    <PushButton>
+                                        <ObjectName>Cue1</ObjectName>
+                                        <NumberStates>1</NumberStates>
+                                        <State><Number>0</Number><Text>CUE</Text></State>
+                                        <Connection><ConfigKey>[Channel1],cue_default</ConfigKey></Connection>
+                                    </PushButton>
+                                    <PushButton>
+                                        <ObjectName>Sync1</ObjectName>
+                                        <NumberStates>1</NumberStates>
+                                        <State><Number>0</Number><Text>SYNC</Text></State>
+                                        <Connection><ConfigKey>[Channel1],beatsync</ConfigKey></Connection>
+                                    </PushButton>
+                                </Children>
+                            </WidgetGroup>
+                        </Children>
+                    </WidgetGroup>
+
+                    <!-- DECK 2 -->
+                    <WidgetGroup>
+                        <ObjectName>Deck2</ObjectName>
+                        <Layout>vertical</Layout>
+                        <Children>
+                            <Text>
+                                <ObjectName>TrackTitle2</ObjectName>
+                                <Group>[Channel2]</Group>
+                                <Key>title</Key>
+                            </Text>
+                            <WidgetGroup>
+                                <Layout>horizontal</Layout>
+                                <Children>
+                                    <PushButton>
+                                        <ObjectName>Play2</ObjectName>
+                                        <NumberStates>2</NumberStates>
+                                        <State><Number>0</Number><Text>PLAY</Text></State>
+                                        <State><Number>1</Number><Text>PAUSE</Text></State>
+                                        <Connection><ConfigKey>[Channel2],play</ConfigKey></Connection>
+                                    </PushButton>
+                                    <PushButton>
+                                        <ObjectName>Cue2</ObjectName>
+                                        <NumberStates>1</NumberStates>
+                                        <State><Number>0</Number><Text>CUE</Text></State>
+                                        <Connection><ConfigKey>[Channel2],cue_default</ConfigKey></Connection>
+                                    </PushButton>
+                                    <PushButton>
+                                        <ObjectName>Sync2</ObjectName>
+                                        <NumberStates>1</NumberStates>
+                                        <State><Number>0</Number><Text>SYNC</Text></State>
+                                        <Connection><ConfigKey>[Channel2],beatsync</ConfigKey></Connection>
+                                    </PushButton>
+                                </Children>
+                            </WidgetGroup>
+                        </Children>
+                    </WidgetGroup>
+
+                </Children>
+            </WidgetGroup>
+
+            <!-- 4. Expanded Library (Fills Remaining ~484px) -->
+            <Library>
+                <SizePolicy>me,expanding</SizePolicy>
+            </Library>
+
+        </Children>
+    </WidgetGroup>
+</skin>
