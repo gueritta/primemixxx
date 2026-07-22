@@ -1,22 +1,62 @@
-Fix library focus on EGLFS when QApplication::focusWindow() is null.
+Fix library focus on EGLFS when QApplication::focusWindow() is null
+or reports stale/hidden popup windows.
 
-On EGLFS embedded platforms (Mali GPU, no window manager), 
-focusWindow() can be null at startup and after QComboBox popups 
-close. This prevents MIDI controller browse encoders from scrolling 
-the library.
+On EGLFS embedded platforms (Mali GPU, no window manager),
+focusWindow() can be null at startup and after QComboBox popups
+close. A hidden/closed popup may still be reported as focusWindow(),
+permanently locking focus to ContextMenu.
 
-Two changes:
+Four changes:
 1. setLibraryFocus: Instead of bailing out when focusWindow() is null,
    try requestActivate() but proceed with widget focus regardless.
 2. emitKeyEvent: Instead of bailing out when focusWindow() is null,
-   fall through to send key events directly to the library view when 
+   fall through to send key events directly to the library view when
    no focus widget is available.
+3. getFocusedWidget: When focusWindow() is null, check if any library
+   widget has focus before returning None. When focusWindow() is Popup
+   but hidden, return None instead of ContextMenu.
+4. slotMoveVertical: ContextMenu and None cases close popups and reclaim
+   library focus, falling through to scroll the library instead of
+   navigating the popup or returning early.
 
-This is safe on EGLFS because MIXXX is the only application.
+This is safe on EGLFS because MIXXX is the only application; the
+browse encoder should always scroll the library.
 
 --- a/src/library/librarycontrol.cpp
 +++ b/src/library/librarycontrol.cpp
-@@ -911,10 +911,16 @@ void LibraryControl::slotFocusedWidgetChanged(QWidget* oldW, QWidget* newW) {
+@@ -870,7 +870,18 @@ void LibraryControl::slotFocusedWidgetChanged(QWidget* oldW, QWidget* newW) {
+ 
+ FocusWidget LibraryControl::getFocusedWidget() {
+     auto* focusWindow = QApplication::focusWindow();
+-    if (!focusWindow) {
++    if (!focusWindow && !QApplication::focusWidget()) {
+         return FocusWidget::None;
+     }
++    if (!focusWindow) {
++        // On EGLFS, focusWindow() may be null but widget focus may work.
++        if (m_pSearchbox && m_pSearchbox->hasFocus()) {
++            return FocusWidget::Searchbar;
++        } else if (m_pSidebarWidget && m_pSidebarWidget->hasFocus()) {
++            return FocusWidget::Sidebar;
++        } else if (m_pLibraryWidget && m_pLibraryWidget->getActiveView()->hasFocus()) {
++            return FocusWidget::TracksTable;
++        }
++        return FocusWidget::None;
++    }
+ 
+     // Any QMenu is focusWindow() but NOT focusWidget() before any menu item
+@@ -891,6 +902,11 @@ FocusWidget LibraryControl::getFocusedWidget() {
+         // QComboBoxPrivateContainerClassWindow
+         //    = QComboBoxListView of WEffectSelector, WSearchLineEdit, ...
++        // On EGLFS, a hidden popup may still be reported as focusWindow().
++        // Check visibility to avoid permanently locking focus to ContextMenu.
++        if (focusWindow->visibility() == QWindow::Hidden) {
++            return FocusWidget::None;
++        }
+         return FocusWidget::ContextMenu;
+     } else if (focusWindow->type() == Qt::Dialog) {
+         // DlgPreferencesDlgWindow
+@@ -911,10 +927,16 @@ void LibraryControl::slotFocusedWidgetChanged(QWidget* oldW, QWidget* newW) {
  void LibraryControl::setLibraryFocus(FocusWidget newFocusWidget) {
      if (!QApplication::focusWindow()) {
 -        qInfo() << "No Mixxx window, popup or menu has focus."
@@ -36,7 +76,7 @@ This is safe on EGLFS because MIXXX is the only application.
      }
  
      // ignore no-op
-@@ -844,13 +850,9 @@ void LibraryControl::slotMoveTrack(double v) {
+@@ -844,13 +907,9 @@ void LibraryControl::slotMoveTrack(double v) {
  void LibraryControl::emitKeyEvent(QKeyEvent&& event) {
 -    if (!QApplication::focusWindow()) {
 -        qInfo() << "No Mixxx window, popup or menu has focus."
@@ -51,16 +91,13 @@ This is safe on EGLFS because MIXXX is the only application.
 +        // when focusWindow() is null, so try sending the event anyway.
      }
  
-@@ -861,4 +863,17 @@ void LibraryControl::emitKeyEvent(QKeyEvent&& event) {
+@@ -861,4 +920,17 @@ void LibraryControl::emitKeyEvent(QKeyEvent&& event) {
              QApplication::sendEvent(focusWidget, &event);
          }
 +        return;
      }
 +
 +    // No focused widget — send directly to the library view.
-+    // On EGLFS embedded platforms, focusWidget() may be null at startup
-+    // or after QComboBox popups close, but the library view still needs
-+    // to receive scroll events from MIDI controllers.
 +    if (m_pLibraryWidget) {
 +        auto* view = m_pLibraryWidget->getCurrentTrackTableView();
 +        if (view) {
@@ -70,3 +107,35 @@ This is safe on EGLFS because MIXXX is the only application.
 +        }
 +    }
  }
++
++--- a/src/library/librarycontrol.cpp
+++++ b/src/library/librarycontrol.cpp
++@@ -722,22 +722,21 @@ void LibraryControl::slotMoveVertical(double v) {
++     case FocusWidget::ContextMenu: {
++-        // To navigate menus (and activate menus that were just opened) send the
++-        // keyEvent to focusWindow() (not focusWidget() like emitKeyEvent() does)
++-        const auto key = (v < 0) ? Qt::Key_Up : Qt::Key_Down;
++-        const auto times = static_cast<unsigned short>(std::abs(v));
++-        QKeyEvent event = QKeyEvent{
++-                QEvent::KeyPress, key, Qt::NoModifier, QString(), false, times};
++-        QApplication::sendEvent(QApplication::focusWindow(), &event);
++-        return;
+++        // On embedded EGLFS platforms, the browse encoder should always
+++        // scroll the library, never navigate popups/dropdowns.
+++        // Close the popup, reclaim focus, and scroll.
+++        QKeyEvent escapeEvent = QKeyEvent{
+++                QEvent::KeyPress, Qt::Key_Escape, Qt::NoModifier};
+++        QApplication::sendEvent(QApplication::focusWindow(), &escapeEvent);
+++        setLibraryFocus(FocusWidget::TracksTable);
+++        break;
++     }
++     case FocusWidget::Searchbar:
++         break;
++     case FocusWidget::None:
++     case FocusWidget::Unknown:
++     default:
++         setLibraryFocus(FocusWidget::TracksTable);
++-        return;
+++        break;
++     }
++     const auto key = (v < 0) ? Qt::Key_Up : Qt::Key_Down;
