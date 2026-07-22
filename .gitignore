@@ -33,3 +33,14 @@ artifacts/*.img
 /device-libs/
 extracted_run/
 sdcard-backup*
+
+# Only Prime Go controller mappings and shared utility libs are tracked; everything else is local-only
+mixxx-bundle/controllers/*
+!mixxx-bundle/controllers/Denon-Prime-Go*
+!mixxx-bundle/controllers/lodash.mixxx.js
+!mixxx-bundle/controllers/midi-components-0.0.js
+
+# Only LateNightMini skin is tracked; everything else is local-only
+mixxx-bundle/skins/*
+!mixxx-bundle/skins/LateNightMini/
+!mixxx-bundle/skins/*.qss
