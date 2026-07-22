@@ -1,7 +1,11 @@
 # Denon Prime 4 — Agent Constitution
 
-> Rules, assertions, invariants, paths, and version constraints only.
-> Zero prose. Zero background. See `docs/ONBOARDING.md` for context.
+> Rules, assertions, invariants, paths, and version constraints.
+> For full architecture context and rationale, see `docs/ONBOARDING.md`.
+
+## WHAT THIS PROJECT IS
+
+Custom firmware + MIXXX deployment for **Denon DJ Prime Go** hardware (Rockchip RK3288 ARMv7, Mali-T76x GPU, PREEMPT_RT kernel). MIXXX (open-source DJ software) runs from an internal SD card alongside the stock Engine OS — the two are switchable on demand. Three layers: **Buildroot firmware customization**, **SD card runtime bundle**, and **TKGL boot-time framework** on a separate SD card.
 
 ---
 
@@ -450,6 +454,15 @@ SSH via WiFi drops after ~30s of silence. Before any SSH session, maintain a kee
 ping -i 25 $DEVICE_IP > /dev/null 2>&1 &
 ```
 Kill the ping PID when done.
+
+### Debugging on device
+
+- `print()` is **silent** on Buildroot Qt5 EGLFS — use `console.warn()` or `engine.log()` instead
+- Check boot logs: `journalctl -u tkgl-mixxx` or `ls /var/log/tkgl/mixxx*.log`
+- Verify MIXXX running: `ps | grep mixxx`, `systemctl status mixxx-app.service`
+- Verify USB mount: `mount | grep "az01-internal/mixxx/music"`
+- Verify library DB: `sqlite3 /media/az01-internal/mixxx/settings/mixxxdb.sqlite "SELECT directory FROM directories;"`
+- MIXXX segfaults: check system libs exclusion, Mali DDK symlinks, and binary symlink targets (see CRITICAL RULES)
 
 ---
 
