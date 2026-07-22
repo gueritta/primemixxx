@@ -37,8 +37,8 @@
 
 > ⚠ **Device kernel caveat:** The buildroot config targets 6.1.78, but the device runs
 > stock 6.1.111-inmusic-2024-09-19-rt41. The device's actual kernel config is unknown
-> and may differ. Verify on-device: `zcat /proc/config.gz \| grep -E "FTRACE\|SCHED_DEBUG\|SCHEDSTATS\|PSI"`
-> or check at runtime: `ls /proc/schedstat /proc/sched_debug /proc/pressure/cpu /sys/kernel/debug/tracing/ 2>&1`
+> **Verified 2026-07-22:** Device kernel config is identical to buildroot for these flags.
+> `/proc/config.gz` IS available. `ls /proc/schedstat /proc/sched_debug /proc/pressure/cpu 2>&1` → all absent.
 
 ---
 
@@ -156,7 +156,7 @@ No profiling tools exist on device. Built from `/proc`/`/sys` primitives:
 - `/proc/schedstat` — Scheduler run_delay, cpu_time, pcount per CPU (⚠ needs CONFIG_SCHEDSTATS, not set in buildroot)
 - `/proc/sched_debug` — Full scheduler state dump (⚠ needs CONFIG_SCHED_DEBUG, not set in buildroot)
 - `/proc/$PID/status` — voluntary/involuntary context switches
-- `/proc/$PID/sched` — Scheduler policy, prio, nr_migrations, exec_start (**always available**, no CONFIG_ dependency)
+- `/proc/$PID/sched` — Scheduler policy, prio, nr_migrations, exec_start (⚠ needs CONFIG_SCHED_DEBUG, **not available on device**)
 - `/proc/$PID/stat` — utime, stime, num_threads, rt_priority
 - `/proc/asound/card*/pcm*p/sub*/status` — ALSA xrun counters (always available)
 - `/proc/pressure/cpu,io,memory` — PSI stall info (⚠ needs CONFIG_PSI, unknown status)
@@ -258,7 +258,7 @@ need correction for this project:
 | Kconfig interface | `make linux-menuconfig` | Correct — standard Buildroot kernel config target |
 | `/proc/schedstat` | Listed as verification target | Requires `CONFIG_SCHEDSTATS=y` (not `CONFIG_SCHED_DEBUG`) |
 | `/proc/sched_debug` | Not mentioned | Requires `CONFIG_SCHED_DEBUG=y` |
-| `/proc/<PID>/sched` | Not mentioned | Always available — no config dependency |
+| `/proc/<PID>/sched` | Not mentioned | Requires `CONFIG_SCHED_DEBUG=y` — **verified absent on device 2026-07-22** |
 
 **Correct rebuild sequence for this project:**
 
@@ -460,24 +460,40 @@ else (RT patch, config extraction, toolchain) is solvable once the source is ava
 
 ### First check: what's already on the device?
 
-Before chasing a kernel rebuild, verify what the device kernel actually exposes.
-This tells us whether `CONFIG_FTRACE` might already be enabled in the stock kernel
-(different from our buildroot config):
+**Device verified 2026-07-22 (SSH primego.local).** Kernel is 6.1.111-inmusic-2024-09-19-rt41
+built with Buildroot 2023.02.11 GCC 12.3.0. Full config available via `/proc/config.gz`.
 
-```bash
-# 1. Can we get the running config?
-ssh root@192.168.42.1 'zcat /proc/config.gz 2>/dev/null | head -20 || echo "IKCONFIG_PROC not enabled"'
+| Interface | Available? | Config flag | Notes |
+|---|---|---|---|
+| `/proc/config.gz` | ✅ YES | `IKCONFIG_PROC=y` | Full running kernel config |
+| `/sys/kernel/debug/` | ✅ YES | `DEBUG_FS=y` + `ALLOW_ALL=y` | `asoc`, `clk`, `dri`, `gpio`, `dma_buf`, `devfreq` populated |
+| `/sys/kernel/debug/tracing/` | ❌ NO | `FTRACE is not set` | Empty — ftrace not compiled in |
+| `/proc/schedstat` | ❌ NO | `SCHEDSTATS is not set` | — |
+| `/proc/sched_debug` | ❌ NO | `SCHED_DEBUG is not set` | — |
+| `/proc/PID/sched` | ❌ NO | Controlled by `SCHED_DEBUG` | NOT always available (incorrect earlier) |
+| `/proc/pressure` | ❌ NO | `PSI is not set` | No pressure stall info |
+| eBPF / BPF syscall | ❌ NO | `BPF_SYSCALL is not set` | BPF compiled in but no userspace API |
+| `/proc/interrupts` | ✅ YES | Always | 4 CPUs, IRQs visible |
+| `/proc/timer_list` | ✅ YES | Always | HRTIMER with 1ns resolution |
+| `kernel.sched_rt_runtime_us` | ✅ `-1` | Sysctl | RT throttling disabled |
 
-# 2. Does debugfs already have tracing?
-ssh root@192.168.42.1 'mount -t debugfs none /sys/kernel/debug 2>/dev/null; ls /sys/kernel/debug/tracing/ 2>/dev/null || echo "ftrace not available"'
+**Good news (already enabled):**
+- `CONFIG_PREEMPT_RT=y` — full real-time preemption
+- `CONFIG_HZ=1000` — 1ms tick for low-latency scheduling
+- `CONFIG_CPU_ISOLATION=y` — `isolcpus=1-3` on kernel cmdline
+- `CONFIG_IRQ_FORCED_THREADING=y` — IRQs as threads, can be prioritized
+- `CONFIG_RCU_BOOST=y` with 500ms delay — RCU priority boosting
+- `CONFIG_HIGH_RES_TIMERS=y` — hrtimers with nanosecond resolution
+- `CONFIG_RCU_TRACE=y` — basic RCU tracing (but no ftrace to consume it)
 
-# 3. What scheduler interfaces exist?
-ssh root@192.168.42.1 'ls /proc/schedstat /proc/sched_debug /proc/pressure 2>&1'
+**Bad news (all disabled):**
+- No ftrace → no function graph, no tracepoints, no wakeup latency tracer
+- No sched debug → no per-task scheduler stats, no `/proc/PID/sched`
+- No PSI → no pressure stall monitoring
+- No eBPF syscall → no user-space BPF tools
+- No `NO_HZ_FULL` → scheduler tick still fires on isolated CPUs 1-3
+- No `IRQ_TIME_ACCOUNTING` → can't attribute CPU time to IRQ handlers
 
-# 4. What's the kernel command line? (may reveal nohz_full, rcu_nocbs, etc.)
-ssh root@192.168.42.1 'cat /proc/cmdline'
-```
-
-If `IKCONFIG_PROC=y` on the device kernel, we can get the exact config and check
-whether `CONFIG_FTRACE`, `CONFIG_NO_HZ_FULL`, etc. are already set — without any
-rebuild at all.
+**Bottom line:** ftrace, sched debug, PSI, and eBPF all require a kernel rebuild.
+The device config is **identical to our buildroot's `linux.config`** in what's disabled
+— inMusic built it from essentially the same config source. No surprises.
