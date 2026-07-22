@@ -321,11 +321,13 @@ vary by network. Use `DEVICE_IP` env var in all deployment scripts — never har
 
 ### Active Issues
 
-1. **Two MIXXX binaries** — only `lib/bin/mixxx` works. `mixxx.real` crashes with EGLFS error.
-2. **Mali DDK mismatch** — Buildroot bundles r0p0; device is r1p0. Workaround: symlink to device's native `libmali.so.14.0`.
-3. **WiFi power save** — must disable with `iw dev wlan0 set power_save off` (not persistent).
-4. **Kernel limitations** — `CONFIG_NO_HZ_FULL` not set, `CONFIG_HZ=1000`, no `rcu_nocbs`. Causes ~0.1-0.2% CPU steal on audio cores. Unfixable without kernel rebuild.
-5. **USB MP3 library** — MIXXX sandbox blocks vfat; workaround mounts USB to ext4 path.
+1. **Missing `.midi.xml` = skin fails to render** — The controller mapping file (`Denon-Prime-Go.midi.xml`) is **critical** for proper skin rendering on the EGLFS display. Without it, MIXXX loads the skin but **skips controller initialization entirely**, and the skin only shows the toolbar (decks/waveforms/library hidden). This file must exist at the path referenced in `mixxx.cfg`'s `[ControllerPreset]` section (e.g. `/data/mixxx/settings/controllers/Denon-Prime-Go.midi.xml`). Never delete `.midi.xml` files during cleanup. See [2026-07-22 incident] for full details.
+
+2. **Two MIXXX binaries** — only `lib/bin/mixxx` works. `mixxx.real` crashes with EGLFS error.
+3. **Mali DDK mismatch** — Buildroot bundles r0p0; device is r1p0. Workaround: symlink to device's native `libmali.so.14.0`.
+4. **WiFi power save** — must disable with `iw dev wlan0 set power_save off` (not persistent).
+5. **Kernel limitations** — `CONFIG_NO_HZ_FULL` not set, `CONFIG_HZ=1000`, no `rcu_nocbs`. Causes ~0.1-0.2% CPU steal on audio cores. Unfixable without kernel rebuild.
+6. **USB MP3 library** — MIXXX sandbox blocks vfat; workaround mounts USB to ext4 path.
 
 ### Failed Experiments (from `BROKEN_EXPERIMENTS.md`)
 
