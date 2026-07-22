@@ -31,8 +31,14 @@
 | `CONFIG_NO_HZ_FULL` | Not in kernel config | Tick fires on ALL cores including isolated 2-3. Needs kernel rebuild. |
 | `CONFIG_HZ=1000` | 1kHz scheduler tick | ~0.1-0.2% CPU steal on audio cores. Tolerable with RT, but `nohz_full` would eliminate. |
 | `rcu_nocbs` | Not set | RCU callbacks can land on audio cores. Needs kernel rebuild. |
-| `CONFIG_PSI` | Unknown if enabled | `/proc/pressure/` may not exist. Useful for stall detection. |
-| `ftrace` | debugfs may not be mounted | `/sys/kernel/debug/tracing/` for function_graph tracing. |
+| `CONFIG_FTRACE` | **Not set in buildroot config** | See §9 below for what's needed. `/sys/kernel/debug/tracing/` will be empty. |
+| `CONFIG_SCHED_DEBUG` | Not set | `/proc/sched_debug` not available. |
+| `CONFIG_SCHEDSTATS` | Not set | `/proc/schedstat` not available. |
+
+> ⚠ **Device kernel caveat:** The buildroot config targets 6.1.78, but the device runs
+> stock 6.1.111-inmusic-2024-09-19-rt41. The device's actual kernel config is unknown
+> and may differ. Verify on-device: `zcat /proc/config.gz \| grep -E "FTRACE\|SCHED_DEBUG\|SCHEDSTATS\|PSI"`
+> or check at runtime: `ls /proc/schedstat /proc/sched_debug /proc/pressure/cpu /sys/kernel/debug/tracing/ 2>&1`
 
 ---
 
@@ -92,7 +98,7 @@
 |---|---|---|---|
 | T-R1 | HIGH | CPU governor → performance | Currently only GPU governor is set. Add CPU governor to TKGL module before launch. |
 | T-R2 | HIGH | THP off | Add to TKGL before systemd-run. |
-| T-R3 | MED | debugfs mount for ftrace | `mount -t debugfs none /sys/kernel/debug` for on-demand tracing. |
+| T-R3 | LOW | debugfs mount for driver debugging | `mount -t debugfs none /sys/kernel/debug` — exposes clock tree, DMA, GPIO, GPU stats. Useful for driver-level debugging. Does NOT expose ftrace (CONFIG_FTRACE not set). |
 
 ---
 
@@ -147,13 +153,15 @@ No profiling tools exist on device. Built from `/proc`/`/sys` primitives:
 
 - `/proc/interrupts` — IRQ counts per CPU
 - `/proc/stat` — CPU time breakdown (user, sys, irq, softirq, steal, idle)
-- `/proc/schedstat` — Scheduler run_delay, cpu_time, pcount per CPU
+- `/proc/schedstat` — Scheduler run_delay, cpu_time, pcount per CPU (⚠ needs CONFIG_SCHEDSTATS, not set in buildroot)
+- `/proc/sched_debug` — Full scheduler state dump (⚠ needs CONFIG_SCHED_DEBUG, not set in buildroot)
 - `/proc/$PID/status` — voluntary/involuntary context switches
-- `/proc/$PID/sched` — Scheduler policy, prio, nr_migrations, exec_start
+- `/proc/$PID/sched` — Scheduler policy, prio, nr_migrations, exec_start (always available)
 - `/proc/$PID/stat` — utime, stime, num_threads, rt_priority
-- `/proc/asound/card*/pcm*p/sub*/status` — ALSA xrun counters
-- `/proc/pressure/cpu,io,memory` — PSI stall info (if CONFIG_PSI=y)
-- `/sys/kernel/debug/tracing/` — ftrace (if debugfs mounted)
+- `/proc/asound/card*/pcm*p/sub*/status` — ALSA xrun counters (always available)
+- `/proc/pressure/cpu,io,memory` — PSI stall info (⚠ needs CONFIG_PSI, unknown status)
+- `/sys/kernel/debug/tracing/` — ftrace (⚠ needs CONFIG_FTRACE, **not set** — see §9)
+- `/sys/kernel/debug/` — other debug nodes: clk/, dmaengine/, gpio, driver stats (mountable, CONFIG_DEBUG_FS=y)
 
 ---
 
@@ -168,3 +176,78 @@ No profiling tools exist on device. Built from `/proc`/`/sys` primitives:
 7. **Remaining items** in order of priority above
 
 Each optimization must be measured before and after using the profiler harness.
+
+---
+
+## 9. ENABLING FTRACE — What's Missing
+
+The stock kernel config (`buildroot-customizations/board/inmusic/common/linux.config`)
+has `CONFIG_DEBUG_FS=y` (debugfs is mountable) but **`CONFIG_FTRACE` is not set**.
+
+### Current state
+
+| Config option | Status | Effect |
+|---|---|---|
+| `CONFIG_DEBUG_FS` | **y** | `mount -t debugfs none /sys/kernel/debug` works |
+| `CONFIG_DEBUG_FS_ALLOW_ALL` | **y** | No mount restrictions |
+| `CONFIG_FTRACE` | **not set** | `/sys/kernel/debug/tracing/` directory is empty |
+| `CONFIG_FUNCTION_TRACER` | **not set** | No `function_graph` tracer |
+| `CONFIG_DYNAMIC_FTRACE` | **not set** | No tracepoint or kprobe infrastructure |
+| `CONFIG_SCHED_DEBUG` | **not set** | No `/proc/sched_debug` |
+| `CONFIG_SCHEDSTATS` | **not set** | No `/proc/schedstat` |
+
+### What ftrace would give us (if enabled)
+
+| Tracer | What it measures | Relevance to audio |
+|---|---|---|
+| `function_graph` | Call graph with per-function latency | Identify which kernel functions cause >100µs stalls |
+| `hwlat` | Hardware latency detector (SMI/BIOS stalls) | Detect firmware interrupts stealing CPU from audio |
+| `irqsoff` | Max time spent with IRQs disabled | Find IRQ handlers that block audio DMA completion |
+| `preemptoff` | Max time preemption was disabled | Verify PREEMPT_RT isn't blocking scheduler |
+| `wakeup` | Max wakeup latency | Measure how fast audio threads get CPU after signal |
+| `wakeup_rt` | Max RT task wakeup latency | Specific to SCHED_FIFO threads (our audio engine) |
+| `sched_switch` tracepoint | Per-sched-event timeline | Correlate xruns with scheduler decisions |
+
+### What needs to change in linux.config
+
+```diff
+-# CONFIG_FTRACE is not set
++CONFIG_FTRACE=y
++CONFIG_FUNCTION_TRACER=y
++CONFIG_FUNCTION_GRAPH_TRACER=y
++CONFIG_DYNAMIC_FTRACE=y
++CONFIG_IRQSOFF_TRACER=y
++CONFIG_PREEMPT_TRACER=y
++CONFIG_SCHED_TRACER=y
++CONFIG_HWLAT_TRACER=y
++CONFIG_STACK_TRACER=y
++CONFIG_TRACER_SNAPSHOT=y
+
+-# CONFIG_SCHED_DEBUG is not set
++CONFIG_SCHED_DEBUG=y
+
+-# CONFIG_SCHEDSTATS is not set
++CONFIG_SCHEDSTATS=y
+```
+
+### Runtime cost
+
+ftrace has near-zero overhead when **not** actively tracing (it's all `NOP`-patched dynamic
+tracepoints and static key branches). Overhead kicks in only when a tracer is enabled via
+the `tracing_on` knob. For production use, keep tracing off and enable it only during
+debugging sessions.
+
+### Alternative: eBPF
+
+If the kernel has `CONFIG_BPF=y` and `CONFIG_BPF_SYSCALL=y`, eBPF-based tools (bpftrace)
+could provide similar tracing without ftrace. Check the device kernel config for BPF support.
+eBPF is lighter-weight than ftrace and more flexible for targeted probing, but requires
+cross-compiling bpftrace or using `bpftool` on-device.
+
+### ⚠ Device kernel caveat
+
+The buildroot config targets 6.1.78, but the device boots stock 6.1.111-inmusic-2024-09-19-rt41.
+The device kernel's `.config` is unknown. Verify on-device with:
+```bash
+ssh root@192.168.42.1 'zcat /proc/config.gz 2>/dev/null | grep -E "FTRACE|SCHED_DEBUG|SCHEDSTATS|BPF" || echo "config.gz not available — kernel built without /proc/config.gz"'
+```
