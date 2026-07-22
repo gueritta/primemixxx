@@ -4,7 +4,8 @@ or reports stale/hidden popup windows.
 On EGLFS embedded platforms (Mali GPU, no window manager),
 focusWindow() can be null at startup and after QComboBox popups
 close. A hidden/closed popup may still be reported as focusWindow(),
-permanently locking focus to ContextMenu.
+permanently locking focus to ContextMenu. Re-opening a cached
+popup may resist Escape key on EGLFS.
 
 Four changes:
 1. setLibraryFocus: Instead of bailing out when focusWindow() is null,
@@ -15,9 +16,10 @@ Four changes:
 3. getFocusedWidget: When focusWindow() is null, check if any library
    widget has focus before returning None. When focusWindow() is Popup
    but hidden, return None instead of ContextMenu.
-4. slotMoveVertical: ContextMenu and None cases close popups and reclaim
-   library focus, falling through to scroll the library instead of
-   navigating the popup or returning early.
+4. slotMoveVertical: ContextMenu case sends Escape then force-closes
+   via activePopupWidget() (for cached/re-opened popups on EGLFS),
+   reclaims library focus, and falls through to scroll. None case
+   also falls through to scroll instead of returning early.
 
 This is safe on EGLFS because MIXXX is the only application; the
 browse encoder should always scroll the library.
@@ -110,7 +112,7 @@ browse encoder should always scroll the library.
 +
 +--- a/src/library/librarycontrol.cpp
 ++++ b/src/library/librarycontrol.cpp
-+@@ -722,22 +722,21 @@ void LibraryControl::slotMoveVertical(double v) {
++@@ -722,22 +722,30 @@ void LibraryControl::slotMoveVertical(double v) {
 +     case FocusWidget::ContextMenu: {
 +-        // To navigate menus (and activate menus that were just opened) send the
 +-        // keyEvent to focusWindow() (not focusWidget() like emitKeyEvent() does)
@@ -122,10 +124,15 @@ browse encoder should always scroll the library.
 +-        return;
 ++        // On embedded EGLFS platforms, the browse encoder should always
 ++        // scroll the library, never navigate popups/dropdowns.
-++        // Close the popup, reclaim focus, and scroll.
+++        // Send Escape first for clean close (works for fresh popups).
 ++        QKeyEvent escapeEvent = QKeyEvent{
 ++                QEvent::KeyPress, Qt::Key_Escape, Qt::NoModifier};
 ++        QApplication::sendEvent(QApplication::focusWindow(), &escapeEvent);
+++        // Cached/re-opened popups may resist Escape on EGLFS.
+++        // Force-close any still-active popup widget directly.
+++        if (QWidget* popup = QApplication::activePopupWidget()) {
+++            popup->close();
+++        }
 ++        setLibraryFocus(FocusWidget::TracksTable);
 ++        break;
 +     }
