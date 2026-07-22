@@ -24,7 +24,7 @@ This guide covers deploying MIXXX to a Denon Prime Go **without stripping** the 
 # 1. Collect MIXXX + dependencies from Buildroot output
 ./scripts/collect-mixxx-bundle.sh
 
-# 2. Deploy to device (backs up SD card first, copies bundle, installs service)
+# 2. Deploy to device (backs up SD card first, copies bundle, installs services)
 DEVICE_IP=primego.local ./scripts/deploy-to-device.sh
 
 # 3. Switch to MIXXX
@@ -33,6 +33,24 @@ ssh root@primego.local switch-to-mixxx
 # 4. Switch back to Engine
 ssh root@primego.local switch-to-engine
 ```
+
+## Device Services
+
+`scripts/install-device-services.sh` installs all system-level services. Run it standalone
+to fix/reinstall services without re-deploying the full MIXXX bundle:
+
+```bash
+DEVICE_IP=primego.local ./scripts/install-device-services.sh
+```
+
+| Service | Purpose | Auto-start |
+|---|---|---|
+| `mixxx.service` | MIXXX launcher via SD card | No (explicit switch-to-mixxx) |
+| `usb-gadget-eth.service` | USB Ethernet gadget (RNDIS) | Yes (boot) |
+| `fix-mdns.service` | Fixes mDNS to `primego.local` | Yes (boot, oneshot) |
+| `powerbutton-monitor.service` | Graceful shutdown on power button | No (only during MIXXX sessions) |
+| `99-usb-automount.rules` | Auto-mount USB drives for music library | Yes (udev) |
+| `99-wifi-power-save.rules` | Disable WiFi power save (prevents SSH drops) | Yes (udev) |
 
 ## What Gets Deployed
 

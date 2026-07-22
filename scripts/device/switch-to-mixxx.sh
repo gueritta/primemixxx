@@ -19,4 +19,8 @@ chmod +x /media/az01-internal/mixxx/mixxx_launcher.sh
 # Start MIXXX
 echo "Starting mixxx.service..."
 systemctl start mixxx.service
+
+# Start power button monitor (only needed for MIXXX, not Engine DJ)
+systemctl start powerbutton-monitor.service 2>/dev/null || true
+
 echo "MIXXX is now running. Use 'switch-to-engine' to go back."

@@ -85,58 +85,16 @@ tar cf - -C "$BUNDLE_DIR" . | sshpass -p "$SSH_PASS" ssh -o StrictHostKeyCheckin
 }
 echo "Bundle copied successfully."
 
-# ── Step 4: Install systemd service ──────────────────────────────────────────
+# ── Step 4: Install device services (systemd, udev, switchers, etc.) ────────
 echo ""
-echo "--- Installing mixxx.service on device ---"
+echo "--- Installing device services ---"
+bash "$SCRIPT_DIR/install-device-services.sh" || {
+  echo "ERROR: Device service installation failed." >&2
+  exit 1
+}
+echo "Device services installed successfully."
 
-# Copy from local source of truth (not heredoc)
-cat "$REPO_ROOT/scripts/device/mixxx.service" | sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$SSH_TARGET" "cat > /etc/systemd/system/mixxx.service"
-sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$SSH_TARGET" "sed -i 's|ExecStart=.*|ExecStart=$DEVICE_MIXXX_DIR/mixxx_launcher.sh|' /etc/systemd/system/mixxx.service"
-
-# Do NOT enable by default — user switches explicitly
-sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$SSH_TARGET" "systemctl daemon-reload"
-
-# ── Step 4b: Install USB automount udev rule ─────────────────────────────────
-echo ""
-echo "--- Installing USB automount udev rule ---"
-cat "$REPO_ROOT/scripts/device/99-usb-automount.rules" | sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$SSH_TARGET" "cat > /etc/udev/rules.d/99-usb-automount.rules"
-
-sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$SSH_TARGET" "udevadm control --reload-rules && echo 'Udev rules reloaded'"
-
-# ── Step 5: Install switcher scripts ─────────────────────────────────────────
-echo ""
-echo "--- Installing switcher scripts on device ---"
-
-# switch-to-mixxx.sh
-cat "$REPO_ROOT/scripts/device/switch-to-mixxx.sh" | sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$SSH_TARGET" "cat > /usr/bin/switch-to-mixxx"
-eval $SSH_CMD "$SSH_TARGET" "chmod +x /usr/bin/switch-to-mixxx"
-
-# switch-to-engine.sh
-cat "$REPO_ROOT/scripts/device/switch-to-engine.sh" | sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$SSH_TARGET" "cat > /usr/bin/switch-to-engine"
-eval $SSH_CMD "$SSH_TARGET" "chmod +x /usr/bin/switch-to-engine"
-
-# ── Step 5b: Install USB Ethernet gadget + WiFi power save fix ────────────
-echo ""
-echo "--- Installing USB Ethernet gadget + WiFi power save fix ---"
-
-cat "$REPO_ROOT/scripts/device/usb-gadget-eth.sh" | sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$SSH_TARGET" "cat > /usr/sbin/usb-gadget-eth.sh"
-eval $SSH_CMD "$SSH_TARGET" "chmod +x /usr/sbin/usb-gadget-eth.sh"
-
-cat "$REPO_ROOT/scripts/device/usb-gadget-eth.service" | sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$SSH_TARGET" "cat > /etc/systemd/system/usb-gadget-eth.service"
-eval $SSH_CMD "$SSH_TARGET" "systemctl daemon-reload && systemctl enable usb-gadget-eth.service && echo 'USB Ethernet gadget installed and enabled'"
-
-# WiFi power save disable — prevents SSH disconnections after ~30s idle
-cat "$REPO_ROOT/scripts/device/99-wifi-power-save.rules" | sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$SSH_TARGET" "cat > /etc/udev/rules.d/99-wifi-power-save.rules"
-eval $SSH_CMD "$SSH_TARGET" "udevadm control --reload-rules && echo 'WiFi power save udev rule installed'"
-
-# ── Step 6: Install power button shutdown service ─────────────────────────
-echo ""
-echo "--- Installing power button shutdown service ---"
-
-# Copy from local source of truth
-echo "Power button monitor installed and started."
-
-# ── Step 7: Verify deployment ────────────────────────────────────────────────
+# ── Step 5: Verify deployment ────────────────────────────────────────────────
 echo ""
 echo "--- Verifying deployment ---"
 sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$SSH_TARGET" "ls -la '$DEVICE_MIXXX_DIR/bin/mixxx' && echo 'MIXXX binary: OK'"
@@ -153,16 +111,4 @@ echo "  SD card backup:      $BACKUP_DIR"
 echo ""
 echo "NOTE: The device will still boot into Engine DJ by default."
 echo "      MIXXX must be started manually via the switcher."
-
-# ── Step 8: Clean stale settings/controllers copies and fix config ─────
-# MIXXX config may point to settings/controllers/ — fix to use controllers/
-echo ""
-echo "--- Cleaning stale settings/controllers/ and fixing config ---"
-sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$SSH_TARGET" '
-CTRL_DIR="/media/az01-internal/mixxx/controllers"
-SETTINGS_DIR="/media/az01-internal/mixxx/settings/controllers"
-rm -f "$SETTINGS_DIR"/Denon-Prime-Go-scripts.js "$SETTINGS_DIR"/Denon-Prime-Go.midi.xml "$SETTINGS_DIR"/Denon-Prime-Go-jog-wheel-scripts.js "$SETTINGS_DIR"/Denon-Prime-Go-Jog-Wheels.midi.xml "$SETTINGS_DIR"/midi-components-0.0.js
-# Fix MIXXX config to point to controllers/ (not settings/controllers/)
-sed -i "s|/media/az01-internal/mixxx/settings/controllers/Denon-Prime-Go.midi.xml|/media/az01-internal/mixxx/controllers/Denon-Prime-Go.midi.xml|" /media/az01-internal/mixxx/settings/mixxx.cfg
-echo "Stale copies removed, config path fixed."
 '

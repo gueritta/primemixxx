@@ -8,6 +8,9 @@ echo "Switching to Engine DJ..."
 # Stop MIXXX
 echo "Stopping mixxx.service..."
 systemctl stop mixxx.service 2>/dev/null || true
+
+# Stop power button monitor (Engine DJ has its own shutdown handler)
+systemctl stop powerbutton-monitor.service 2>/dev/null || true
 sleep 1
 
 # Start Engine

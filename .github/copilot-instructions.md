@@ -68,6 +68,32 @@ Custom firmware + MIXXX deployment for **Denon DJ Prime Go** hardware (Rockchip 
 - WRONG: `pkill mixxx; systemctl restart engine.service` (orphaned mixxx-app.service unit stays active, TKGL skips relaunch)
 - REASON: `engine.service` triggers TKGL bootstrap → `tkgl_mod_mixxx.sh` → `systemd-run --unit=mixxx-app`. The module checks if mixxx-app is already active and skips if so. You MUST stop mixxx-app.service first so TKGL recreates it.
 
+- RULE_ID: "SHEBANG-SH-ONLY"
+- ASSERTION: ALL shell scripts deployed to the device MUST use `#!/bin/sh`, NEVER `#!/bin/bash`.
+- CHECK: `head -1 scripts/device/*.sh` must show only `#!/bin/sh`.
+- VIOLATION: `#!/bin/bash` shebang → "not found" error on device (Buildroot has no bash, only ash/sh).
+- REASON: Buildroot 2021.02.10 ships only BusyBox ash. `/bin/bash` does not exist on the device.
+
+- RULE_ID: "EVAL-NO-REDIRECT"
+- ASSERTION: NEVER use `eval $SSH_CMD` (or any `eval` wrapper) for commands containing `>`, `>>`, `<`, `<<`, or `|`.
+- CHECK: `grep 'eval.*|.*ssh' scripts/deploy-to-device.sh` must return nothing if the eval'd string contains redirect/pipes.
+- VIOLATION: `eval` interprets `>` as LOCAL file redirection (writes to host filesystem, not device). `eval` interprets `|` as LOCAL pipe (pipes on host, not device). Both break silently with confusing "Permission denied" or "not found" errors.
+- CORRECT PATTERN: `cat localfile | sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$SSH_TARGET" "cat > /remote/path"`
+- ACCEPTABLE: Simple `eval $SSH_CMD "$SSH_TARGET" "command"` without `>`, `<`, `|`, or `<<` is OK.
+- REASON: `eval` strips one level of quoting and re-parses the string. Shell metacharacters (`>`, `|`, `<<`) that were quoted inside the eval'd argument become unquoted during re-parsing and get interpreted by the LOCAL shell.
+
+- RULE_ID: "HEREDOC-FORBIDDEN-DEPLOY"
+- ASSERTION: deploy-to-device.sh MUST NOT contain heredocs (`<<`). All device files must exist as local source-of-truth files in `scripts/device/`.
+- CHECK: `grep -c '<< ' scripts/deploy-to-device.sh` must return 0.
+- VIOLATION: Heredocs in deploy scripts are fragile — they require `eval` (see EVAL-NO-REDIRECT) and duplicate content that should live in version-controlled files.
+- CORRECT: Create `scripts/device/<filename>` then deploy with `cat scripts/device/<filename> | sshpass ssh "cat > /dest/path"`.
+
+- RULE_ID: "MDNS-PRIMEGO"
+- ASSERTION: Avahi mDNS MUST advertise `primego.local`, NOT `buildroot.local`.
+- CHECK: `ssh root@$DEVICE_IP "ps | grep avahi-daemon | grep primego"` must find a match.
+- FIX: `DEVICE_IP=... bash scripts/install-device-services.sh` — this deploys `fix-mdns.sh` + `fix-mdns.service` which run at boot and are idempotent.
+- VIOLATION: Avahi defaults to `buildroot.local` → mDNS doesn't resolve `primego.local`.
+
 ### Constraints
 
 - CONSTRAINT_ID: "QT-KMS-ATOMIC"

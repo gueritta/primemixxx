@@ -1,0 +1,120 @@
+#!/bin/sh
+# install-device-services.sh — Install all device system files to a Denon Prime Go
+# via SSH. One-stop script for services, udev rules, switchers, and power button.
+#
+# Usage:
+#   DEVICE_IP=192.168.42.1 ./scripts/install-device-services.sh
+#   (defaults to primego.local)
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_ROOT="$(dirname "$SCRIPT_DIR")"
+DEVICE_DIR="$SCRIPT_DIR/device"
+
+DEVICE_IP="${DEVICE_IP:-primego.local}"
+SSH_USER="${SSH_USER:-root}"
+SSH_PASS="${SSH_PASS:-denonprime4}"
+SSH_TARGET="${SSH_USER}@${DEVICE_IP}"
+DEVICE_MIXXX_DIR="/media/az01-internal/mixxx"
+
+ssh_cmd() {
+    sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$SSH_TARGET" "$@"
+}
+
+deploy_file() {
+    local src="$1"
+    local dest="$2"
+    local chmod_val="${3:-}"
+    echo "  Installing: $dest"
+    cat "$DEVICE_DIR/$src" | ssh_cmd "cat > $dest"
+    if [ -n "$chmod_val" ]; then
+        ssh_cmd "chmod $chmod_val $dest"
+    fi
+}
+
+echo "=== Installing device services ==="
+echo "Device: $SSH_TARGET"
+echo ""
+
+# ── 1. Verify SSH ──────────────────────────────────────────────────────────
+echo "--- Testing SSH ---"
+if ! ssh_cmd "echo SSH_OK" 2>/dev/null; then
+    echo "ERROR: Cannot SSH to device. Check DEVICE_IP."
+    exit 1
+fi
+
+# ── 2. Remount / rw ────────────────────────────────────────────────────────
+echo "--- Remounting / as rw ---"
+ssh_cmd "mount -o remount,rw /" || { echo "WARN: remount failed, continuing..."; }
+
+# ── 3. mixxx.service ───────────────────────────────────────────────────────
+echo ""
+echo "--- Installing mixxx.service ---"
+deploy_file "mixxx.service" "/etc/systemd/system/mixxx.service"
+ssh_cmd "sed -i 's|ExecStart=.*|ExecStart=$DEVICE_MIXXX_DIR/mixxx_launcher.sh|' /etc/systemd/system/mixxx.service"
+
+# ── 4. USB automount udev rule ─────────────────────────────────────────────
+echo ""
+echo "--- Installing USB automount udev rule ---"
+deploy_file "99-usb-automount.rules" "/etc/udev/rules.d/99-usb-automount.rules"
+ssh_cmd "udevadm control --reload-rules"
+
+# ── 5. Switcher scripts ────────────────────────────────────────────────────
+echo ""
+echo "--- Installing switcher scripts ---"
+deploy_file "switch-to-mixxx.sh" "/usr/bin/switch-to-mixxx" "+x"
+deploy_file "switch-to-engine.sh" "/usr/bin/switch-to-engine" "+x"
+
+# ── 6. USB Ethernet gadget ─────────────────────────────────────────────────
+echo ""
+echo "--- Installing USB Ethernet gadget ---"
+deploy_file "usb-gadget-eth.sh" "/usr/sbin/usb-gadget-eth.sh" "+x"
+deploy_file "usb-gadget-eth.service" "/etc/systemd/system/usb-gadget-eth.service"
+ssh_cmd "systemctl daemon-reload"
+ssh_cmd "systemctl enable usb-gadget-eth.service && systemctl start usb-gadget-eth.service"
+echo "  USB Ethernet gadget: enabled and started"
+
+# ── 7. WiFi power save udev rule ───────────────────────────────────────────
+echo ""
+echo "--- Installing WiFi power save udev rule ---"
+deploy_file "99-wifi-power-save.rules" "/etc/udev/rules.d/99-wifi-power-save.rules"
+ssh_cmd "udevadm control --reload-rules"
+
+# ── 8. Power button shutdown service ───────────────────────────────────────
+echo ""
+echo "--- Installing power button shutdown service ---"
+deploy_file "powerbutton-monitor" "/usr/sbin/powerbutton-monitor" "+x"
+deploy_file "powerbutton-monitor.service" "/etc/systemd/system/powerbutton-monitor.service"
+# Do NOT enable by default — only active during MIXXX sessions (started by switch-to-mixxx)
+echo "  Power button monitor: installed (started only when MIXXX is active)"
+
+# ── 9. mDNS fix (primego.local) ─────────────────────────────────────────────
+echo ""
+echo "--- Installing mDNS fix (primego.local) ---"
+deploy_file "fix-mdns.sh" "/usr/sbin/fix-mdns.sh" "+x"
+deploy_file "fix-mdns.service" "/etc/systemd/system/fix-mdns.service"
+ssh_cmd "systemctl daemon-reload"
+ssh_cmd "systemctl enable fix-mdns.service"
+# Run it now too
+ssh_cmd "/usr/sbin/fix-mdns.sh"
+echo "  mDNS fix: enabled (advertises primego.local)"
+
+# ── 9. Fix stale settings/controllers ──────────────────────────────────────
+echo ""
+echo "--- Cleaning stale paths ---"
+ssh_cmd "
+rm -f /media/az01-internal/mixxx/settings/controllers/*.js \
+      /media/az01-internal/mixxx/settings/controllers/*.xml
+sed -i 's|/media/az01-internal/mixxx/settings/controllers/Denon-Prime-Go.midi.xml|/media/az01-internal/mixxx/controllers/Denon-Prime-Go.midi.xml|' \
+  /media/az01-internal/mixxx/settings/mixxx.cfg 2>/dev/null || true
+"
+
+echo ""
+echo "=== Device services installed successfully ==="
+echo ""
+echo "  mixxx.service:            installed (disabled — use switch-to-mixxx)"
+echo "  usb-gadget-eth.service:   enabled (boots on USB connect)"
+echo "  powerbutton-monitor:      enabled (graceful shutdown on power button)"
+echo "  switch-to-mixxx/engine:   installed in /usr/bin/"
+echo "  udev rules:               USB automount + WiFi power save active"
