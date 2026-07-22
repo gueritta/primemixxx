@@ -118,3 +118,4 @@ PRIME_GO_Control_Surface (JavaScript)
 8. **`--resourcePath` is `$BUNDLE` (root)**, NOT `$BUNDLE/bin`.
 9. **`print()` is silent on device** — use `console.warn()` or `engine.log()` for debug output.
 10. **SizeAwareStack breakpoints must match 800px world** — any breakpoint ≥800 triggers wrong template at native resolution.
+11. **Startup "60% stall" is Mali GPU paint, not code**: MIXXX startup takes ~10s total. The progress bar stalls at ~60% for ~5 seconds with zero log output — this is the Mali-T76x GPU compositing/painting all widgets to the EGLFS framebuffer. It's NOT XML parsing, NOT JS, NOT controllers, NOT DB queries. Skin XML is ~9300 lines and the legacy skin parser + QPainter rendering on ARM Cortex-A17 is the bottleneck. Verified 2026-07-22 by removing controller mapping entirely (same stall) and replacing PlayButton widgets (zero warnings, same timing). Only a QML skin rewrite or MIXXX source-level rendering optimization would speed this up.
