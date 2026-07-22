@@ -607,8 +607,10 @@ PrimeGo.init = function(_id, _debug) {
     };
 
     // FX Time encoder: turn browses params (hold FX Select) or adjusts value, push toggles button
+    // Capacitive touch on FX Time knob switches the browse encoder to FX preset mode
+    PrimeGo.fxTimeTouched = false;
     PrimeGo.fxTimeTouch = function(channel, control, value, status) {
-        // no-op
+        PrimeGo.fxTimeTouched = (value === 0x7F);
     };
 
     PrimeGo.fxTimeTurn = function(channel, control, value, status) {
@@ -691,31 +693,36 @@ PrimeGo.init = function(_id, _debug) {
             engine.getValue("[EffectRack1_EffectUnit1]", key) > 0 ? 0 : 1);
     };
 
-    // Browse encoder push: hold to switch to UI scroll mode, release to library scroll.
-    // UI mode: encoder sends [Library],MoveUp/Down which MIXXX's slotMoveVertical
-    // auto-routes to popups/menus/dialogs when focused_widget == ContextMenu (4) or Dialog (5).
-    // Library mode: encoder scrolls the tracks table.
-    PrimeGo.encoderUIMode = false;
-
+    // Browse encoder push — loads selected track
     PrimeGo.encoderLoad = new components.Button({
         midi: [0x9F, 0x06],
         group: "[Library]",
         key: "GoToItem",
-        input: function(channel, control, value, status) {
-            if (this.isPress(channel, control, value, status)) {
-                PrimeGo.encoderUIMode = true;
-                engine.setValue("[Library]", "GoToItem", 1);
-            } else {
-                // Release: back to library scroll
-                PrimeGo.encoderUIMode = false;
-            }
-        }
     });
 
-    // Browse encoder with shift acceleration — dynamically routes to library or UI
+    // Browse encoder with shift acceleration.
+    // Normal mode: scrolls library, reclaiming focus if a popup orphaned it.
+    // FX mode: when FX Time capacitive is touched, navigates the effect
+    // chain preset selector instead of library scroll.
     PrimeGo.browseEncoder = function(channel, control, value, status, group) {
         // value: 0x01 = clockwise (down), 0x7F = counter-clockwise (up)
         var step = PrimeGo.shift ? 20 : 1;
+
+        if (PrimeGo.fxTimeTouched) {
+            // FX Time capacitive held: browse encoder = chain preset navigator
+            var dir = (value === 0x01) ? 1 : -1;
+            for (var i = 0; i < step; i++) {
+                engine.setValue("[EffectRack1_EffectUnit1]", "chain_selector", dir);
+            }
+            return;
+        }
+
+        // Library mode: reclaim focus if popup orphaned it
+        var fw = engine.getValue("[Library]", "focused_widget");
+        if (fw === 0 || fw === 4) {  // None or ContextMenu
+            engine.setValue("[Library]", "focused_widget", 3);  // TracksTable
+        }
+
         if (value === 0x01) {
             for (var i = 0; i < step; i++) {
                 engine.setValue("[Library]", "MoveDown", 1);
