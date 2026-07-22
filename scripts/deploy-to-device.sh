@@ -246,19 +246,7 @@ ACTION==\"add\", SUBSYSTEM==\"net\", KERNEL==\"wlan*\", RUN+=\"/usr/sbin/iw dev 
 WIFIRULE"
 eval $SSH_CMD "$SSH_TARGET" "udevadm control --reload-rules && echo 'WiFi power save udev rule installed'"
 
-# ── Step 6: Deploy RoundCorners skin ─────────────────────────────────────────
-echo ""
-echo "--- Building style.qss from modules ---"
-"$SCRIPT_DIR/build-style-qss.sh"
-echo "--- Deploying RoundCorners skin ---"
-eval $SSH_CMD "$SSH_TARGET" "mkdir -p '$DEVICE_MIXXX_DIR/settings/skins/RoundCorners'"
-eval $SCP_CMD "$BUNDLE_DIR/skins/roundcorners/." "$SSH_TARGET:$DEVICE_MIXXX_DIR/settings/skins/RoundCorners/" || {
-  echo "ERROR: Failed to copy RoundCorners skin to device." >&2
-  exit 1
-}
-echo "RoundCorners skin deployed successfully."
-
-# ── Step 6b: Install power button shutdown service ─────────────────────────
+# ── Step 6: Install power button shutdown service ─────────────────────────
 echo ""
 echo "--- Installing power button shutdown service ---"
 
@@ -416,7 +404,6 @@ echo "--- Verifying deployment ---"
 eval $SSH_CMD "$SSH_TARGET" "ls -la '$DEVICE_MIXXX_DIR/bin/mixxx' && echo 'MIXXX binary: OK'"
 eval $SSH_CMD "$SSH_TARGET" "ls '$DEVICE_MIXXX_DIR/lib/' | wc -l | xargs echo 'Library count:'"
 eval $SSH_CMD "$SSH_TARGET" "ls -la /usr/bin/switch-to-mixxx /usr/bin/switch-to-engine && echo 'Switcher scripts: OK'"
-eval $SSH_CMD "$SSH_TARGET" "ls -la '$DEVICE_MIXXX_DIR/settings/skins/RoundCorners' && echo 'RoundCorners skin: OK'"
 eval $SSH_CMD "$SSH_TARGET" "systemctl status mixxx.service --no-pager -l 2>&1 | head -5"
 
 echo ""

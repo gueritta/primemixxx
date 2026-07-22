@@ -301,7 +301,7 @@ scp $DEV:$BUNDLE/controllers/Denon-Prime-Go-jog-wheel-scripts.js mixxx-bundle/mi
 scp $DEV:$BUNDLE/controllers/LateNightMini_toggle_helper.js mixxx-bundle/mixxx-mapping/prime-go/
 scp $DEV:$BUNDLE/controllers/common-*.js mixxx-bundle/mixxx-mapping/prime-go/
 
-# 2. Skin files (LateNightMini is canonical — NOT RoundCorners)
+# 2. Skin files (LateNightMini is canonical)
 scp -r $DEV:$BUNDLE/skins/LateNightMini /tmp/device-LateNightMini
 diff -rq mixxx-bundle/skins/LateNightMini /tmp/device-LateNightMini | grep -v "\.bak"
 # Merge any differences into mixxx-bundle/skins/LateNightMini/
@@ -338,7 +338,7 @@ grep "settings/controllers" mixxx-bundle/settings/mixxx.cfg && echo "FAIL: wrong
 ./scripts/check-duplicates.sh
 ```
 
-**Canonical skin is LateNightMini** (`mixxx-bundle/skins/LateNightMini/`). RoundCorners (`mixxx-bundle/skins/roundcorners/`) is a legacy deployment target — all new skin work goes into LateNightMini. The deploy scripts deploy RoundCorners to device `skins/roundcorners/`; if you edit skins at runtime, map changes back to the correct LateNightMini source file.
+**Canonical skin is LateNightMini** (`mixxx-bundle/skins/LateNightMini/`). RoundCorners (`mixxx-bundle/skins/roundcorners/`) is a legacy reference kept locally for history but never deployed to device. All skin work goes into LateNightMini.
 
 **Files that MUST be committed together**: controller mappings + skin + launcher + runtime configs form a single deployable unit. Never commit one without verifying the others are in sync.
 
@@ -492,7 +492,7 @@ MIXXX mappings live in `mixxx-bundle/mixxx-mapping/prime-go/` (canonical) and de
 
 ### Skin development
 
-- Skin lives in `mixxx-bundle/skins/RoundCorners/` (Tango-derived, heavily customized for 1280×800 touchscreen)
+- Skin lives in `mixxx-bundle/skins/LateNightMini/` (Tango-derived, heavily customized for 1280×800 touchscreen)
 - `style.qss` is split into 5 modules in `style_qss/`: `_base.qss`, `_library.qss`, `_controls.qss`, `_buttons.qss`, `_deck2.qss`
 - Build QSS from modules: `./scripts/build-style-qss.sh` — concatenates all `_*.qss` files in order into `style.qss`
 - Resolution architecture: Physical display 1280×800 landscape, GPU framebuffer 800×1280 portrait, Qt logical screen 1280×800 (EGLFS_ROTATION=90), display HW rotates output
