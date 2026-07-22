@@ -1,0 +1,117 @@
+name: Release SD Card Bundle
+
+# Triggered when a GitHub Release is published.
+# Downloads the pre-built MIXXX binary artifact (from a previous build-binary run
+# or a release asset), assembles the complete SD card bundle, and attaches it
+# to the release.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      binary_artifact_run_id:
+        description: 'Run ID of the build-binary workflow to download artifacts from'
+        required: false
+      binary_release_tag:
+        description: 'Release tag containing mixxx-binary tar.gz as an asset'
+        required: false
+        default: 'mixxx-binaries-latest'
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Determine binary source
+        id: binary_source
+        run: |
+          echo "source=artifact" >> "$GITHUB_OUTPUT"
+          echo "run_id=${{ github.event.inputs.binary_artifact_run_id || '' }}" >> "$GITHUB_OUTPUT"
+          echo "release_tag=${{ github.event.inputs.binary_release_tag || 'mixxx-binaries-latest' }}" >> "$GITHUB_OUTPUT"
+
+      - name: Download binary from workflow artifact
+        if: steps.binary_source.outputs.source == 'artifact' && steps.binary_source.outputs.run_id != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: mixxx-binary
+          path: /tmp/binary-artifact
+          run-id: ${{ github.event.inputs.binary_artifact_run_id }}
+
+      - name: Download binary from release asset
+        if: steps.binary_source.outputs.source == 'artifact' && steps.binary_source.outputs.run_id == ''
+        run: |
+          TAG="${{ steps.binary_source.outputs.release_tag }}"
+          echo "Downloading binary from release: $TAG"
+          gh release download "$TAG" \
+            --pattern 'mixxx-binary-*.tar.gz' \
+            --dir /tmp/binary-artifact \
+            --repo "$GITHUB_REPOSITORY" \
+            --clobber
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Extract binary into mixxx-bundle
+        run: |
+          if ls /tmp/binary-artifact/mixxx-binary-*.tar.gz 2>/dev/null; then
+            echo "Extracting pre-built binary into mixxx-bundle/"
+            tar xzf /tmp/binary-artifact/mixxx-binary-*.tar.gz -C mixxx-bundle/
+            echo "Binary extracted successfully"
+          elif [ -f mixxx-bundle/bin/mixxx ] || [ -f mixxx-bundle/lib/bin/mixxx ]; then
+            echo "Using existing binary in repository"
+          else
+            echo "ERROR: No binary found. Run the build-binary workflow first,"
+            echo "or provide --binary_artifact_run_id / --binary_release_tag."
+            exit 1
+          fi
+
+      - name: Verify binary
+        run: |
+          if [ -L mixxx-bundle/bin/mixxx ]; then
+            REAL=$(readlink -f mixxx-bundle/bin/mixxx)
+          else
+            REAL=mixxx-bundle/bin/mixxx
+          fi
+          echo "Binary: $(file "$REAL")"
+          echo "Size: $(stat -c%s "$REAL") bytes"
+          if [ ! -x "$REAL" ] || [ "$(stat -c%s "$REAL")" -lt 5000000 ]; then
+            echo "ERROR: Binary is invalid"
+            exit 1
+          fi
+
+      - name: Create SD card bundle
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          ./scripts/create-sdcard-bundle.sh --version "$VERSION" \
+            --output "artifacts/primego-sdcard-mixxx-${VERSION}.tar.gz"
+
+      - name: Upload bundle to release
+        run: |
+          gh release upload "$GITHUB_REF_NAME" \
+            "artifacts/primego-sdcard-mixxx-${GITHUB_REF_NAME#v}.tar.gz" \
+            --clobber \
+            --repo "$GITHUB_REPOSITORY"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Generate checksums
+        run: |
+          cd artifacts
+          sha256sum "primego-sdcard-mixxx-${GITHUB_REF_NAME#v}.tar.gz" \
+            > "primego-sdcard-mixxx-${GITHUB_REF_NAME#v}.tar.gz.sha256"
+
+      - name: Upload checksum to release
+        run: |
+          gh release upload "$GITHUB_REF_NAME" \
+            "artifacts/primego-sdcard-mixxx-${GITHUB_REF_NAME#v}.tar.gz.sha256" \
+            --clobber \
+            --repo "$GITHUB_REPOSITORY"
+        env:
+          GH_TOKEN: ${{ github.token }}

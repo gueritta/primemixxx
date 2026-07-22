@@ -1,6 +1,20 @@
-# Deploying MIXXX via SSH (No-Strip Approach)
+# Deploying MIXXX on the Denon Prime Go
 
-This guide covers deploying MIXXX to a Denon Prime Go **without stripping** the original Engine OS firmware. MIXXX lives on the internal SD card and is switchable on demand via SSH.
+## End User Quickstart (No Compiling)
+
+If you just want MIXXX on your Prime Go without building anything:
+
+1. **Download the SSH firmware** from [icedream/denon-prime4 Releases](https://github.com/icedream/denon-prime4/releases/latest) — file `PRIMEGO-4.3.4-STOCK-SSH-Update.img`
+2. **Download the SD card bundle** from [gueritta/denon-prime4 Releases](https://github.com/gueritta/denon-prime4/releases/latest) — file `primego-sdcard-mixxx-*.tar.gz`
+3. **Flash the firmware** via USB (put device in update mode, use the Go updater)
+4. **Extract the bundle** to a microSD card formatted as ext4 (label `TKGL_BOOTSTRAP`)
+5. **Insert the SD card** and power on — MIXXX auto-launches
+
+See the [README Quick Start](README.md#quick-start-end-users) for detailed step-by-step instructions.
+
+---
+
+## Developer Deployment (via SSH)
 
 ## Prerequisites
 

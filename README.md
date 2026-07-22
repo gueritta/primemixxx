@@ -1,17 +1,71 @@
-# Denon Prime 4 — Custom Firmware + MIXXX
+# Denon Prime Go — MIXXX on SD Card
 
-Custom firmware for Denon DJ Prime 4 / Prime Go hardware that deploys
-[MIXXX](https://mixxx.org) (open-source DJ software) alongside or instead of
-the stock Engine OS. MIXXX runs from an internal SD card — the two are
-switchable on demand without stripping the original firmware.
+Run [MIXXX](https://mixxx.org) (open-source DJ software) on your Denon DJ Prime Go
+alongside the stock Engine OS — switchable on demand. **No compiling required.**
 
-## Getting Started
+## Quick Start (End Users)
 
-**New to the project?** Start here: [`docs/ONBOARDING.md`](docs/ONBOARDING.md)
+You need: a Denon Prime Go, a microSD card (≥ 2 GB), and a computer.
 
-### Prebuilt Firmware
+### 1. Download the files
 
-Download the latest firmware from [GitHub Releases](https://github.com/icedream/denon-prime4/releases/latest).
+| File | Where | Size |
+|---|---|---|
+| **SSH-enabled firmware** | [icedream/denon-prime4 Releases](https://github.com/icedream/denon-prime4/releases/latest) → `PRIMEGO-4.3.4-STOCK-SSH-Update.img` | ~168 MB |
+| **SD card bundle** | [gueritta/denon-prime4 Releases](https://github.com/gueritta/denon-prime4/releases/latest) → `primego-sdcard-mixxx-*.tar.gz` | ~25 MB |
+
+### 2. Flash the firmware
+
+```bash
+# Put device in update mode (hold BACK + power on, or SSH in and run:)
+ssh root@primego.local reboot loader
+
+# Flash via USB using the Go updater:
+cd go && go run ./cmd/updater/ --firmware ../PRIMEGO-4.3.4-STOCK-SSH-Update.img
+```
+
+This installs stock Engine OS 4.3.4 **plus SSH and WiFi** — your device stays
+fully functional as a Prime Go, just with remote access added.
+
+### 3. Prepare the SD card
+
+```bash
+# Format SD card as ext4 with label TKGL_BOOTSTRAP (replace sdX with your card)
+sudo mkfs.ext4 -L TKGL_BOOTSTRAP /dev/sdX1
+
+# Mount it
+sudo mount /dev/sdX1 /mnt/sdcard
+
+# Extract the bundle
+sudo tar xzf primego-sdcard-mixxx-*.tar.gz -C /mnt/sdcard --strip-components=1
+
+# Unmount
+sudo umount /mnt/sdcard
+```
+
+### 4. Insert & boot
+
+Insert the SD card into the Prime Go and power on. The device boots into
+Engine OS first (for hardware init), then **TKGL auto-launches MIXXX** from
+the SD card.
+
+To switch between Engine OS and MIXXX:
+```bash
+ssh root@primego.local switch-to-mixxx   # Engine → MIXXX
+ssh root@primego.local switch-to-engine  # MIXXX → Engine
+```
+
+### USB music library
+
+Plug a USB drive with MP3s into the Prime Go. It auto-mounts and MIXXX
+scans it on startup.
+
+---
+
+## For Developers
+
+<details>
+<summary>Building from source (click to expand)</summary>
 
 ### Build from Source
 
@@ -32,14 +86,17 @@ Prerequisites: u-boot tools, 7-zip, QEMU ARM emulation with binfmt, base develop
 DEVICE_IP=primego.local ./scripts/deploy-to-device.sh  # SCP to device
 ```
 
+### Create SD card bundle (for distribution)
+
+```bash
+./scripts/create-sdcard-bundle.sh    # Assemble complete SD card tarball
+```
+
 ### Device Services (Install/Repair)
 
 ```bash
-# Install/reinstall all system services without re-deploying the full bundle
 DEVICE_IP=primego.local ./scripts/install-device-services.sh
 ```
-
-Installs: `mixxx.service`, `usb-gadget-eth.service` (USB SSH), `fix-mdns.service` (primego.local), `powerbutton-monitor.service`, switcher scripts, and udev rules.
 
 ### Flash Firmware
 
@@ -51,6 +108,8 @@ Installs: `mixxx.service`, `usb-gadget-eth.service` (USB SSH), `fix-mdns.service
 cd go && go run ./cmd/updater/ --firmware ../PRIMEGO-4.3.4-STOCK-SSH-Update.img
 ```
 
+</details>
+
 ## Documentation
 
 | Document | What's in it |
@@ -60,6 +119,6 @@ cd go && go run ./cmd/updater/ --firmware ../PRIMEGO-4.3.4-STOCK-SSH-Update.img
 | [`docs/display.md`](docs/display.md) | Mali GPU, DDK mismatch, EGLFS configuration |
 | [`docs/audio.md`](docs/audio.md) | ALSA routing, XMOS/AKM hardware chain |
 | [`docs/midi.md`](docs/midi.md) | Full MIDI control table |
-| [`SD-CARD.md`](SD-CARD.md) | SD card layout, library listing |
-| [`DEPLOY.md`](DEPLOY.md) | Deployment workflow, troubleshooting |
+| [`SD-CARD.md`](SD-CARD.md) | SD card layout, library listing, launcher reference |
+| [`DEPLOY.md`](DEPLOY.md) | Deployment workflow, troubleshooting, end-user quickstart |
 | [`BROKEN_EXPERIMENTS.md`](BROKEN_EXPERIMENTS.md) | Failed experiments — do not repeat |

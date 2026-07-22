@@ -1,0 +1,77 @@
+name: Build MIXXX Binary
+
+# Manual workflow to compile MIXXX + dependencies from Buildroot.
+# This takes 2-4 hours and produces a tarball of the binary + Qt libs
+# that the release workflow uses to assemble the SD card bundle.
+#
+# Run this when you need to update the MIXXX binary (e.g., new MIXXX version,
+# updated dependencies, or Buildroot toolchain refresh).
+
+on:
+  workflow_dispatch:
+    inputs:
+      buildroot_version:
+        description: 'Buildroot version tag'
+        required: true
+        default: '2023.02.11'
+      buildroot_branch:
+        description: 'Buildroot branch (for the submodule)'
+        required: false
+        default: 'mixxx'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360  # 6 hours — Buildroot compilation takes a while
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install Buildroot dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential file rsync bc cpio \
+            unzip p7zip-full wget xz-utils \
+            libncurses5-dev bison flex texinfo \
+            perl python3
+
+      - name: Clone Buildroot
+        run: |
+          ./clone-buildroot.sh "${{ github.event.inputs.buildroot_version }}"
+
+      - name: Configure Buildroot
+        run: |
+          ./configure-buildroot.sh
+        env:
+          BUILDROOT_VERSION: ${{ github.event.inputs.buildroot_version }}
+
+      - name: Build Buildroot (toolchain + MIXXX)
+        run: |
+          ./compile-buildroot.sh
+        env:
+          BUILDROOT_VERSION: ${{ github.event.inputs.buildroot_version }}
+
+      - name: Collect MIXXX bundle (binary + libs only)
+        run: |
+          BUILDROOT_VERSION="${{ github.event.inputs.buildroot_version }}"
+          ./scripts/collect-mixxx-bundle.sh
+        env:
+          BUILDROOT_VERSION: ${{ github.event.inputs.buildroot_version }}
+
+      - name: Package binary artifacts
+        run: |
+          cd mixxx-bundle
+          tar czf ../mixxx-binary-$(date +%Y%m%d).tar.gz \
+            bin/ lib/ qt-plugins/ translations/ effects/ keyboard/
+          echo "Binary artifact created: $(ls -lh ../mixxx-binary-*.tar.gz | awk '{print $5}')"
+
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mixxx-binary
+          path: mixxx-binary-*.tar.gz
+          retention-days: 90

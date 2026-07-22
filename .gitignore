@@ -49,3 +49,10 @@ mixxx-bundle/controllers/*
 mixxx-bundle/skins/*
 !mixxx-bundle/skins/LateNightMini/
 !mixxx-bundle/skins/*.qss
+
+# Device-specific Qt plugins (not built by Buildroot, copied from device-libs/)
+!mixxx-bundle/qt-plugins/egldeviceintegrations/libqeglfs-mali-integration.so
+!mixxx-bundle/qt-plugins/imageformats/libqgif.so
+!mixxx-bundle/qt-plugins/imageformats/libqjpeg.so
+!mixxx-bundle/qt-plugins/imageformats/libqtiff.so
+!mixxx-bundle/qt-plugins/imageformats/libqwebp.so
