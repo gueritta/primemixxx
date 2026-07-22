@@ -497,3 +497,51 @@ built with Buildroot 2023.02.11 GCC 12.3.0. Full config available via `/proc/con
 **Bottom line:** ftrace, sched debug, PSI, and eBPF all require a kernel rebuild.
 The device config is **identical to our buildroot's `linux.config`** in what's disabled
 — inMusic built it from essentially the same config source. No surprises.
+
+### What Engine Prime's own profiler uses
+
+Engine Prime (`/usr/Engine/Engine`) has a sophisticated built-in profiler
+(`airFreezeDetector`, `JobController`, Planck performance properties). It uses
+**exclusively `/proc` and `/sys`** — no ftrace, no eBPF, no kernel debug features.
+This validates our profiling approach.
+
+**Engine's data sources (extracted via `strings /usr/Engine/Engine`):**
+
+| Metric | Engine source | Our equivalent |
+|---|---|---|
+| Per-CPU time (user/sys/idle/irq/softirq) | `/proc/stat` | `profiler.sh cpu` |
+| CPU model, features, BogoMIPS | `/proc/cpuinfo` | Not yet covered |
+| System load | `/proc/loadavg` | `profiler.sh all` |
+| Memory (total/free/cached) | `/proc/meminfo` | `profiler.sh all` |
+| GPU frequency | `/sys/…/ffa30000.gpu/…/cur_freq` | Not yet covered |
+| Audio xruns | Planck property `/Client/AudioXrun` (internal ALSA callback) | `xrun-monitor.sh` (`/proc/asound`) |
+| Audio callback load % | Planck property `/Client/AudioPercentage` | Not available (internal to audio thread) |
+| Audio callback duration ms | Planck property `/Client/AudioDuration` | Not available |
+| Per-process stats (PID, CPU, prio) | `/proc/%d/stat` | `profiler.sh threads` |
+| Process memory maps | `/proc/self/maps` | Not yet covered |
+| IRQ thread PIDs | Parsed from `/proc/*/stat` | `profiler.sh irq` |
+| SD card wear level | `/sys/class/mmc_host/…/life_time` | Not yet covered |
+
+**Engine's freeze detector (`airFreezeDetector`):**
+- `JobProbe`: Schedules a job, measures if it completes within deadline → detects main thread hangs
+- `TimerProbe`: Periodic timer-based heartbeat check
+- `ThreadPoolProbe`: Monitors worker thread pool (8 threads) for stalls
+- `FreezeChecker`: Dedicated thread running freeze detection probes
+- Configurable: `CrashOnFreeze` setting generates core dump on detected freeze
+- Same concept we can replicate with `profiler.sh` + shell-based probe jobs
+
+**Key Engine scripts and their profiling/tuning:**
+
+| Script | What it does |
+|---|---|
+| `setup-prerequisites.sh` | IRQ pinning (audio→CPU3, GPU→CPU1, USB→CPU1, serial→CPU0), GPU governor=performance, MIDI buffer=524287, vsync off, dmesg→crit |
+| `set-irq-affinity.sh` | Parses `/proc/interrupts` by device name, sets `smp_affinity_list` |
+| `runInspection.sh` | Runs external inspection script from media |
+| `Reporter` | Qt5 app for core dump + crash reporting with stack traces (libunwind, abseil) |
+
+**What we should add to profiler.sh based on this:**
+1. GPU frequency reading from `/sys/devices/platform/ffa30000.gpu/misc/mali0/device/devfreq/ffa30000.gpu/cur_freq`
+2. Per-CPU time breakdown (user/sys/idle/iowait/irq/softirq) from `/proc/stat` — already partially covered
+3. GPU governor status from `/sys/devices/platform/ffa30000.gpu/devfreq/ffa30000.gpu/governor`
+4. SD card wear from `/sys/class/mmc_host/mmc*/mmc*:*/life_time`
+5. Freeze probe concept: schedule timer and measure completion latency
