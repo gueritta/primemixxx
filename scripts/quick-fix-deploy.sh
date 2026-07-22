@@ -57,3 +57,14 @@ echo "  Stale copies removed, config fixed"
 
 echo ""
 echo "Run on device: cd /media/az01-internal/mixxx && ./mixxx_launcher.sh"
+
+# Step 5: Deploy profiling/measurement tools
+echo ""
+echo "--- Deploying profiling tools ---"
+DEVICE_SCRIPTS_DIR="$(cd "$(dirname "$0")/device" && pwd)"
+for f in profiler.sh cpu-latency.sh xrun-monitor.sh bench-harness.sh; do
+    if [ -f "$DEVICE_SCRIPTS_DIR/$f" ]; then
+        cat "$DEVICE_SCRIPTS_DIR/$f" | $SSH_CMD "cat > /data/$f && chmod +x /data/$f" && echo "  $f deployed to /data/"
+    fi
+done
+echo "  Done."
