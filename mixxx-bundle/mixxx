@@ -1,0 +1,3 @@
+#!/bin/sh
+# TKGL entry point - delegates to SD card launcher
+exec /media/az01-internal/mixxx/mixxx_launcher.sh "$@"

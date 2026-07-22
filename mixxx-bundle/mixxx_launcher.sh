@@ -58,7 +58,7 @@ echo -1 > /proc/sys/kernel/sched_rt_runtime_us
 # We do NOT set RT priority on the main process — that would cause ALL
 # 44+ child threads to inherit SCHED_FIFO and compete with audio.
 # Instead, we selectively boost only the critical audio threads.
-taskset -c 2,3 $BUNDLE/bin/mixxx -platform eglfs --settingsPath $BUNDLE/settings --resourcePath $BUNDLE "$@" &
+taskset -c 2,3 $BUNDLE/bin/mixxx --controllerDebug -platform eglfs --settingsPath $BUNDLE/settings --resourcePath $BUNDLE "$@" &
 MIXPID=$!
 
 # Audio-critical threads that get SCHED_FIFO and stay on cores 2-3:

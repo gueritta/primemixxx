@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
-<SoundManagerConfig>
-  <SoundDevice name="JP11: PCM inmusic,jp11-audio-codec-0 (hw:1,0)" api="ALSA">
-    <output_channels>4</output_channels>
-    <sample_rate>44100</sample_rate>
-  </SoundDevice>
+<!DOCTYPE SoundManagerConfig>
+<SoundManagerConfig sync_buffers="2" deck_count="2" api="ALSA" latency="4" force_network_clock="0" samplerate="44100">
+ <SoundDevice name="JP11: PCM inmusic,jp11-audio-codec-0" portAudioIndex="0" alsaHwDevice="hw:1,0">
+  <output index="0" type="Headphones" channel="2" channel_count="2"/>
+  <output index="0" type="Master" channel="0" channel_count="2"/>
+ </SoundDevice>
 </SoundManagerConfig>

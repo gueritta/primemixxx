@@ -508,17 +508,6 @@ PrimeGo.init = function(_id, _debug) {
         PrimeGo.effectBank[i].init();
     }
 
-    // ===== FX VIEW TOGGLE (ON button) =====
-    PrimeGo.fxViewToggle = new components.Button({
-        midi: [0x96, 0x09],
-        group: "[EffectRack1]",
-        key: "show",
-        type: components.Button.prototype.types.toggle,
-        outConnect: true,
-        on: 0x7F,
-        off: 0x00,
-    });
-
     // ===== FX PARAMETER FOCUS =====
     // Pre-seed COs (must exist before skin XML references them)
     for (var e = 1; e <= 3; e++) {
@@ -674,13 +663,12 @@ PrimeGo.init = function(_id, _debug) {
         }
     };
 
+    // ON button (0x94 0x06): minimize/expand FX unit → toggles [EffectRack1_EffectUnit1],show_parameters
     PrimeGo.fxActivate = function(channel, control, value, status) {
         if (value !== 0x7F) return;
-        if (PrimeGo.fxFocus.effect > 0) {
-            var key = "group_[Channel1]_enable";
-            engine.setValue("[EffectRack1_EffectUnit1]", key,
-                engine.getValue("[EffectRack1_EffectUnit1]", key) > 0 ? 0 : 1);
-        }
+        var group = "[EffectRack1_EffectUnit1]";
+        engine.setValue(group, "show_parameters",
+            engine.getValue(group, "show_parameters") > 0 ? 0 : 1);
     };
 
     PrimeGo.fxWetDry = function(channel, control, value, status) {

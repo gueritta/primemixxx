@@ -56,7 +56,7 @@
 
     </Children>
     <Connection>
-      <ConfigKey>[Skin],show_effectrack</ConfigKey>
+      <ConfigKey>[LateNightMini],show_effectrack</ConfigKey>
       <BindProperty>visible</BindProperty>
     </Connection>
   </WidgetGroup>
