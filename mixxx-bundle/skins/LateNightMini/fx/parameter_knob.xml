@@ -20,6 +20,16 @@
     <SizePolicy>me,min</SizePolicy>
     <Children>
       <WidgetGroup>
+        <ObjectName>FxParameterFocusBg</ObjectName>
+        <Size>0me,3f</Size>
+        <SizePolicy>me,f</SizePolicy>
+        <Connection>
+          <ConfigKey>[Skin],fx_param_knob_focus_<Variable name="FxNum"/></ConfigKey>
+          <Transform><IsEqual><Variable name="FxParameter"/></IsEqual></Transform>
+          <BindProperty>visible</BindProperty>
+        </Connection>
+      </WidgetGroup>
+      <WidgetGroup>
         <ObjectName>FxParameterKnob</ObjectName>
         <Layout>horizontal</Layout>
         <Size>26me,26f</Size>

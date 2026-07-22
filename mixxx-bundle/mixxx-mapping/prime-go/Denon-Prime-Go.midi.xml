@@ -1206,26 +1206,6 @@
                 <Script-Binding/>
               </options>
             </control>
-            <control> <!-- Deck A - Cue Button ON (ch5 alt) -->
-              <group>[Channel1]</group>
-              <key>PrimeGo.leftDeck.cueButton.input</key>
-              <description>Deck A - Cue Button (ch5)</description>
-              <status>0x94</status>
-              <midino>0x09</midino>
-              <options>
-                <Script-Binding/>
-              </options>
-            </control>
-            <control> <!-- Deck A - Cue Button OFF (ch5 alt) -->
-              <group>[Channel1]</group>
-              <key>PrimeGo.leftDeck.cueButton.input</key>
-              <description>Deck A - Cue Button (ch5)</description>
-              <status>0x84</status>
-              <midino>0x09</midino>
-              <options>
-                <Script-Binding/>
-              </options>
-            </control>
             <control> <!-- Deck A - Play/Stop Button / Stutter Button -->
               <group>[Channel1]</group>
               <key>PrimeGo.leftDeck.playButton.input</key>
@@ -1241,26 +1221,6 @@
               <key>PrimeGo.leftDeck.playButton.input</key>
               <description>Deck A - Play/Stop Button</description>
               <status>0x82</status>
-              <midino>0x0A</midino>
-              <options>
-                <Script-Binding/>
-              </options>
-            </control>
-            <control> <!-- Deck A - Play/Stop Button (ch5 alt) -->
-              <group>[Channel1]</group>
-              <key>PrimeGo.leftDeck.playButton.input</key>
-              <description>Deck A - Play/Stop Button (ch5)</description>
-              <status>0x94</status>
-              <midino>0x0A</midino>
-              <options>
-                <Script-Binding/>
-              </options>
-            </control>
-            <control> <!-- Deck A - Play/Stop Button OFF (ch5 alt) -->
-              <group>[Channel1]</group>
-              <key>PrimeGo.leftDeck.playButton.input</key>
-              <description>Deck A - Play/Stop Button (ch5)</description>
-              <status>0x84</status>
               <midino>0x0A</midino>
               <options>
                 <Script-Binding/>
@@ -1493,26 +1453,6 @@
               <key>PrimeGo.leftDeck.vinylButton.input</key>
               <description>Vinyl Mode</description>
               <status>0x92</status>
-              <midino>0x23</midino>
-              <options>
-                <Script-Binding/>
-              </options>
-            </control>
-            <control> <!-- Deck A - Vinyl Button (ch5 alt) -->
-              <group>[Channel1]</group>
-              <key>PrimeGo.leftDeck.vinylButton.input</key>
-              <description>Vinyl Mode (ch5)</description>
-              <status>0x94</status>
-              <midino>0x23</midino>
-              <options>
-                <Script-Binding/>
-              </options>
-            </control>
-            <control> <!-- Deck A - Vinyl Button (ch5 alt off) -->
-              <group>[Channel1]</group>
-              <key>PrimeGo.leftDeck.vinylButton.input</key>
-              <description>Vinyl Mode (ch5)</description>
-              <status>0x84</status>
               <midino>0x23</midino>
               <options>
                 <Script-Binding/>
@@ -2508,6 +2448,185 @@
               <description>Hotcue 8</description>
               <status>0x83</status>
               <midino>0x16</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+
+            <!-- === DJ FX Channel 5 (0x94) — Effect Unit 1 === -->
+
+            <control> <!-- FX Select Push (note 7) — Toggle focused effect on/off -->
+              <group></group>
+              <key>PrimeGo.fxSelectPush</key>
+              <description>FX Select Push</description>
+              <status>0x94</status>
+              <midino>0x07</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+            <control> <!-- FX Select Push OFF -->
+              <group></group>
+              <key>PrimeGo.fxSelectPush</key>
+              <description>FX Select Push (off)</description>
+              <status>0x84</status>
+              <midino>0x07</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+            <control> <!-- FX Select Touch (note 9) — Cycle focus Effect1→Effect2→Effect3 -->
+              <group></group>
+              <key>PrimeGo.fxSelectTouch</key>
+              <description>FX Select Touch</description>
+              <status>0x94</status>
+              <midino>0x09</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+            <control> <!-- FX Select Touch OFF -->
+              <group></group>
+              <key>PrimeGo.fxSelectTouch</key>
+              <description>FX Select Touch (off)</description>
+              <status>0x84</status>
+              <midino>0x09</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+            <control> <!-- FX Select Turn (CC 33 / 0x21) — Adjust focused param -->
+              <group></group>
+              <key>PrimeGo.fxSelectTurn</key>
+              <description>FX Select Turn</description>
+              <status>0xB4</status>
+              <midino>0x21</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+
+            <control> <!-- FX Wet/Dry (CC 4 / 0x04) — Adjust focused parameter value -->
+              <group></group>
+              <key>PrimeGo.fxWetDry</key>
+              <description>FX Wet/Dry</description>
+              <status>0xB4</status>
+              <midino>0x04</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+
+            <control> <!-- FX Time Touch (note 0x0A) — Cycle parameter focus -->
+              <group></group>
+              <key>PrimeGo.fxTimeTouch</key>
+              <description>FX Time Touch</description>
+              <status>0x94</status>
+              <midino>0x0A</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+            <control> <!-- FX Time Touch OFF -->
+              <group></group>
+              <key>PrimeGo.fxTimeTouch</key>
+              <description>FX Time Touch (off)</description>
+              <status>0x84</status>
+              <midino>0x0A</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+
+            <control> <!-- FX Time Push (note 8) — Trigger button_param -->
+              <group></group>
+              <key>PrimeGo.fxTimePush</key>
+              <description>FX Time Push</description>
+              <status>0x94</status>
+              <midino>0x08</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+            <control> <!-- FX Time Push OFF -->
+              <group></group>
+              <key>PrimeGo.fxTimePush</key>
+              <description>FX Time Push (off)</description>
+              <status>0x84</status>
+              <midino>0x08</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+            <control> <!-- FX Time Turn (CC 34 / 0x22) — Cycle parameter -->
+              <group></group>
+              <key>PrimeGo.fxTimeTurn</key>
+              <description>FX Time Turn</description>
+              <status>0xB4</status>
+              <midino>0x22</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+
+            <control> <!-- FX Activate (note 6) — Toggle effect unit -->
+              <group></group>
+              <key>PrimeGo.fxActivate</key>
+              <description>FX Activate</description>
+              <status>0x94</status>
+              <midino>0x06</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+            <control> <!-- FX Activate OFF -->
+              <group></group>
+              <key>PrimeGo.fxActivate</key>
+              <description>FX Activate (off)</description>
+              <status>0x84</status>
+              <midino>0x06</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+
+            <control> <!-- FX Assign 1 (note 11) — Route to Channel 1 -->
+              <group></group>
+              <key>PrimeGo.fxAssign1</key>
+              <description>FX Assign Channel 1</description>
+              <status>0x94</status>
+              <midino>0x0B</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+            <control> <!-- FX Assign 1 OFF -->
+              <group></group>
+              <key>PrimeGo.fxAssign1</key>
+              <description>FX Assign Channel 1 (off)</description>
+              <status>0x84</status>
+              <midino>0x0B</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+
+            <control> <!-- FX Assign 2 (note 12) — Route to Channel 2 -->
+              <group></group>
+              <key>PrimeGo.fxAssign2</key>
+              <description>FX Assign Channel 2</description>
+              <status>0x94</status>
+              <midino>0x0C</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+            <control> <!-- FX Assign 2 OFF -->
+              <group></group>
+              <key>PrimeGo.fxAssign2</key>
+              <description>FX Assign Channel 2 (off)</description>
+              <status>0x84</status>
+              <midino>0x0C</midino>
               <options>
                 <Script-Binding/>
               </options>

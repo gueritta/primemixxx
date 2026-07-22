@@ -508,6 +508,160 @@ PrimeGo.init = function(_id, _debug) {
         PrimeGo.effectBank[i].init();
     }
 
+    // ===== FX PARAMETER FOCUS =====
+    // Pre-seed COs (must exist before skin XML references them)
+    for (var e = 1; e <= 3; e++) {
+        engine.setValue("[Skin]", "fx_param_knob_focus_" + e, 0);
+        engine.setValue("[Skin]", "fx_param_button_focus_" + e, 0);
+    }
+
+    PrimeGo.fxFocus = {
+        effect: 1,
+        paramIndex: 0,
+        selectRevealed: false,
+        timeRevealed: false
+    };
+
+    PrimeGo.fxParamNames = [
+        "parameter1", "parameter2", "parameter3", "parameter4",
+        "parameter5", "parameter6", "parameter7", "parameter8"
+    ];
+
+    PrimeGo.fxUpdateDisplay = function() {
+        var eff = PrimeGo.fxFocus.effect;
+        var idx = PrimeGo.fxFocus.paramIndex;
+        for (var e = 1; e <= 3; e++) {
+            engine.setValue("[Skin]", "fx_param_knob_focus_" + e, 0);
+            engine.setValue("[Skin]", "fx_param_button_focus_" + e, 0);
+        }
+        if (eff > 0) {
+            engine.setValue("[EffectRack1_EffectUnit1]", "focused_effect", eff);
+            engine.setValue("[Skin]", "fx_param_knob_focus_" + eff, idx);
+            engine.setValue("[Skin]", "fx_param_button_focus_" + eff, idx);
+        } else {
+            engine.setValue("[EffectRack1_EffectUnit1]", "focused_effect", 0);
+        }
+    };
+
+    PrimeGo.fxCycleParam = function(direction) {
+        var eff = PrimeGo.fxFocus.effect;
+        if (eff === 0) return;
+        var group = "[EffectRack1_EffectUnit" + (eff <= 2 ? "1" : "2");
+        group += "_Effect" + eff + "]";
+        var loaded = [];
+        for (var p = 0; p < 8; p++) {
+            if (engine.getValue(group, PrimeGo.fxParamNames[p] + "_loaded") > 0) {
+                loaded.push(p + 1);
+            }
+        }
+        if (loaded.length === 0) {
+            PrimeGo.fxFocus.paramIndex = 0;
+            PrimeGo.fxUpdateDisplay();
+            return;
+        }
+        var cur = loaded.indexOf(PrimeGo.fxFocus.paramIndex);
+        if (cur === -1) {
+            PrimeGo.fxFocus.paramIndex = loaded[0];
+        } else {
+            cur += direction;
+            if (cur < 0) cur = loaded.length - 1;
+            if (cur >= loaded.length) cur = 0;
+            PrimeGo.fxFocus.paramIndex = loaded[cur];
+        }
+        PrimeGo.fxUpdateDisplay();
+    };
+
+    // FX Select encoder: touch to reveal, turn to cycle effect slots (ch5 note 0x09, CC 0x21)
+    PrimeGo.fxSelectTouch = function(channel, control, value, status) {
+        if (value === 0x7F) {
+            PrimeGo.fxFocus.selectRevealed = true;
+            PrimeGo.fxFocus.timeRevealed = true;
+            if (PrimeGo.fxFocus.effect === 0) PrimeGo.fxFocus.effect = 1;
+            PrimeGo.fxFocus.paramIndex = 1;
+            PrimeGo.fxUpdateDisplay();
+        } else {
+            PrimeGo.fxFocus.selectRevealed = false;
+        }
+    };
+
+    PrimeGo.fxSelectTurn = function(channel, control, value, status) {
+        var dir = (value === 0x7F) ? -1 : 1;
+        var eff = PrimeGo.fxFocus.effect + dir;
+        if (eff > 3) eff = 1;
+        if (eff < 1) eff = 3;
+        PrimeGo.fxFocus.effect = eff;
+        PrimeGo.fxFocus.paramIndex = 1;
+        PrimeGo.fxUpdateDisplay();
+    };
+
+    // FX Time encoder: touch to cycle param, turn to cycle param (ch5 note 0x0A, CC 0x22)
+    PrimeGo.fxTimeTouch = function(channel, control, value, status) {
+        if (value !== 0x7F) return;
+        if (!PrimeGo.fxFocus.timeRevealed && PrimeGo.fxFocus.effect > 0) {
+            PrimeGo.fxFocus.timeRevealed = true;
+            PrimeGo.fxCycleParam(0);
+        } else {
+            PrimeGo.fxCycleParam(1);
+        }
+    };
+
+    PrimeGo.fxTimeTurn = function(channel, control, value, status) {
+        var dir = (value === 0x01) ? 1 : -1;
+        PrimeGo.fxCycleParam(dir);
+    };
+
+    // Stubs for remaining FX handlers (bound in .midi.xml, fully implemented later)
+    PrimeGo.fxSelectPush = function(channel, control, value, status) {
+        if (value !== 0x7F) return;
+        var eff = PrimeGo.fxFocus.effect;
+        if (eff > 0) {
+            var unit = eff <= 2 ? 1 : 2;
+            var eNum = eff <= 2 ? eff : eff - 2;
+            var key = "group_[EffectRack1_EffectUnit" + unit + "_Effect" + eNum + "],enabled";
+            engine.setValue("[EffectRack1_EffectUnit" + unit + "_Effect" + eNum + "]", "enabled",
+                engine.getValue("[EffectRack1_EffectUnit" + unit + "_Effect" + eNum + "]", "enabled") > 0 ? 0 : 1);
+        }
+    };
+
+    PrimeGo.fxTimePush = function(channel, control, value, status) {
+        if (value !== 0x7F) return;
+        var eff = PrimeGo.fxFocus.effect;
+        var idx = PrimeGo.fxFocus.paramIndex;
+        if (eff > 0 && idx > 0) {
+            var unit = eff <= 2 ? 1 : 2;
+            var eNum = eff <= 2 ? eff : eff - 2;
+            var group = "[EffectRack1_EffectUnit" + unit + "_Effect" + eNum + "]";
+            engine.setValue(group, "button_parameter" + idx,
+                engine.getValue(group, "button_parameter" + idx) > 0 ? 0 : 1);
+        }
+    };
+
+    PrimeGo.fxActivate = function(channel, control, value, status) {
+        if (value !== 0x7F) return;
+        var eff = PrimeGo.fxFocus.effect;
+        if (eff > 0) {
+            var unit = eff <= 2 ? 1 : 2;
+            engine.setValue("[EffectRack1_EffectUnit" + unit + "]", "group_[Channel1]_enable",
+                engine.getValue("[EffectRack1_EffectUnit" + unit + "]", "group_[Channel1]_enable") > 0 ? 0 : 1);
+        }
+    };
+
+    PrimeGo.fxWetDry = function(channel, control, value, status) {
+        var eff = PrimeGo.fxFocus.effect;
+        if (eff > 0) {
+            var unit = eff <= 2 ? 1 : 2;
+            engine.setValue("[EffectRack1_EffectUnit" + unit + "]", "mix", value / 127);
+        }
+    };
+
+    PrimeGo.fxAssign1 = function(channel, control, value, status) {
+        if (value !== 0x7F) return;
+    };
+
+    PrimeGo.fxAssign2 = function(channel, control, value, status) {
+        if (value !== 0x7F) return;
+    };
+
     // Press down on the library encoder, acts as 'Enter' key in Mixxx library
     PrimeGo.encoderLoad = new components.Button({
         midi: [0x9F, 0x06],
