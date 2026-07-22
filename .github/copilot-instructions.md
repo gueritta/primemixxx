@@ -308,6 +308,13 @@ Or use Makefile targets: `make unpack`, `make clone-buildroot`, etc.
 ./scripts/collect-mixxx-bundle.sh    # Gather MIXXX + deps from Buildroot output into mixxx-bundle/
 ./scripts/fix-device-libs.sh         # Remove system-critical libs from bundle
 DEVICE_IP=primego.local ./scripts/deploy-to-device.sh  # SCP to device
+./scripts/quick-fix-deploy.sh        # Fast iteration: redeploy only changed files
+```
+
+### Skin QSS build
+
+```bash
+./scripts/build-style-qss.sh     # Concatenate style_qss/_*.qss modules → style.qss
 ```
 
 ### Go tools (cross-platform updater)

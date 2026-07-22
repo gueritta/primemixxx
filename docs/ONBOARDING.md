@@ -15,7 +15,7 @@ the two are switchable on demand.
 |---|---|
 | **SoC** | Rockchip RK3288 ARMv7 (Cortex-A17, 4 cores) |
 | **GPU** | Mali-T76x (4 cores, r1p0 0x0750) |
-| **Kernel** | `5.10.109-inmusic-rt64` with `PREEMPT_RT` |
+| **Kernel** | `6.1.111-inmusic-2024-09-19-rt41` with `PREEMPT_RT` |
 | **OS** | Stripped-down Buildroot Linux — no X11, no Wayland |
 | **Display** | 7-inch touchscreen, LVDS-1, portrait framebuffer 800×1280 rotated to 1280×800 landscape by display controller |
 | **Touchscreen** | ILI2117 on `/dev/input/event0` |

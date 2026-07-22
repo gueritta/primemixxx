@@ -200,7 +200,7 @@ if [ -d "$MAPPINGS_SRC" ]; then
 fi
 
 # ── Step 6: Copy LD_PRELOAD workaround library ────────────────────────────────
-# Kernel 5.10.109-inmusic-rt64 never sends NLMSG_DONE for hidraw netlink dumps.
+# Kernel 6.1.111-inmusic-2024-09-19-rt41 never sends NLMSG_DONE for hidraw netlink dumps.
 # This .so skips hidraw udev scans and caps infinite poll() timeouts.
 echo ""
 echo "--- Copying no_hid_poll.so workaround ---"
