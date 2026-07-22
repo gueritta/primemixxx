@@ -10,6 +10,10 @@
 #   profiler.sh threads <pid> [interval_s] [samples]  — Per-thread stats
 #   profiler.sh xruns [interval_s] [samples]   — ALSA xrun counts
 #   profiler.sh pressure [interval_s] [samples] — PSI pressure stalls
+#   profiler.sh gpu [interval_s] [samples]     — Mali GPU freq, mem, governor
+#   profiler.sh flash [interval_s] [samples]   — SD card wear, block stats
+#   profiler.sh temp [interval_s] [samples]    — Thermal zone temperatures
+#   profiler.sh jitter [interval_s] [samples]  — Timer jitter (approximates frame budget variance)
 #   profiler.sh all [interval_s] [samples]     — All of the above
 
 set -e
@@ -21,13 +25,17 @@ CSV_MODE=0
 
 usage() {
     echo "Usage: profiler.sh <mode> [interval_s] [samples] [pid]"
-    echo "Modes: cpu | irq | sched | threads | xruns | pressure | all"
+    echo "Modes: cpu | irq | sched | threads | xruns | pressure | gpu | flash | temp | jitter | all"
     echo "  cpu         CPU utilization per core (%)"
     echo "  irq         IRQ rate per interrupt per CPU (irqs/s)"
     echo "  sched       Scheduler run_delay per CPU (ns)"
     echo "  threads     Per-thread context-switch rate for PID"
     echo "  xruns       ALSA xrun/underrun counts"
     echo "  pressure    PSI pressure stall information"
+    echo "  gpu         Mali GPU frequency, memory, governor"
+    echo "  flash       SD card wear level, block I/O stats"
+    echo "  temp        Thermal zone temperatures"
+    echo "  jitter      Timer jitter (approximates frame budget variance)"
     echo "  all         All of the above"
     exit 1
 }
@@ -289,7 +297,224 @@ profile_xruns() {
     done
 }
 
-# --- PSI pressure profiler ---
+# --- GPU profiler (Mali) ---
+profile_gpu() {
+    [ "$CSV_MODE" = 1 ] && csv_hdr "gpu_freq_mhz,gpu_mem_mb,gpu_governor,gpu_util_pct,vsync_on_pan"
+
+    local i=0
+    while [ $i -lt "$SAMPLES" ]; do
+        local ts_now=$(ts)
+
+        # Mali GPU frequency (multiple possible paths)
+        local gpu_freq="N/A"
+        for p in /sys/class/devfreq/*gpu*/cur_freq /sys/bus/platform/devices/*gpu*/devfreq/*/cur_freq /sys/kernel/debug/mali/clock 2>/dev/null; do
+            [ -f "$p" ] && { gpu_freq=$(cat "$p" 2>/dev/null); break; }
+        done
+        # Convert to MHz if in Hz (values > 1000000)
+        if [ "$gpu_freq" != "N/A" ] && [ "$gpu_freq" -gt 1000000 ] 2>/dev/null; then
+            gpu_freq=$((gpu_freq / 1000000))
+        fi
+
+        # GPU governor
+        local gpu_gov="N/A"
+        for p in /sys/class/devfreq/*gpu*/governor /sys/bus/platform/devices/*gpu*/devfreq/*/governor 2>/dev/null; do
+            [ -f "$p" ] && { gpu_gov=$(cat "$p" 2>/dev/null); break; }
+        done
+
+        # GPU utilization (load)
+        local gpu_load="N/A"
+        for p in /sys/class/devfreq/*gpu*/load /sys/bus/platform/devices/*gpu*/devfreq/*/load 2>/dev/null; do
+            [ -f "$p" ] && { gpu_load=$(cat "$p" 2>/dev/null | awk '{print $1}'); break; }
+        done
+
+        # Mali GPU memory (from debug or sysfs)
+        local gpu_mem="N/A"
+        for p in /sys/kernel/debug/mali/memory_usage /sys/class/misc/mali*/device/mem 2>/dev/null; do
+            [ -f "$p" ] && { gpu_mem=$(cat "$p" 2>/dev/null | head -1 | awk '{print $1}'); break; }
+        done
+
+        # Vsync state (fb0 vsync_on_pan)
+        local vsync="N/A"
+        [ -f "/sys/class/graphics/fb0/vsync_on_pan" ] && vsync=$(cat "/sys/class/graphics/fb0/vsync_on_pan" 2>/dev/null)
+
+        if [ "$CSV_MODE" = 1 ]; then
+            csv_row "$ts_now" "$gpu_freq,$gpu_mem,$gpu_gov,$gpu_load,$vsync"
+        else
+            printf "[gpu] freq=%-8s MHz  mem=%-12s gov=%-12s load=%-6s vsync=%s\n" \
+                "$gpu_freq" "$gpu_mem" "$gpu_gov" "$gpu_load" "$vsync"
+        fi
+
+        [ "$SAMPLES" -gt 1 ] && sleep "$INTERVAL"
+        i=$((i + 1))
+    done
+}
+
+# --- Flash wear profiler ---
+profile_flash() {
+    [ "$CSV_MODE" = 1 ] && csv_hdr "device,size_mb,read_mb,write_mb,slc_life_pct,mlc_life_pct,iostats"
+
+    local i=0
+    while [ $i -lt "$SAMPLES" ]; do
+        local ts_now=$(ts)
+
+        # Find mmcblk devices with lifetime info (eMMC/SD only)
+        for dev in /sys/block/mmcblk*/device/life_time; do
+            [ -f "$dev" ] || continue
+            local blkdev=$(echo "$dev" | sed 's|/sys/block/\([^/]*\)/.*|\1|')
+            local lta=$(awk '{print $1}' "$dev" 2>/dev/null)
+            local ltb=$(awk '{print $2}' "$dev" 2>/dev/null)
+
+            # SLC: life_time A, MLC: life_time B. Values 0x01-0x0B = 10%-100% in 10% steps
+            local slc_pct="N/A"
+            local mlc_pct="N/A"
+            if [ -n "$lta" ] && [ "$lta" != "0x00" ]; then
+                slc_pct=$(( ($(printf "%d" "$lta") * 10) ))
+                [ "$slc_pct" -gt 100 ] 2>/dev/null && slc_pct="raw:$lta"
+            fi
+            if [ -n "$ltb" ] && [ "$ltb" != "0x00" ]; then
+                mlc_pct=$(( ($(printf "%d" "$ltb") * 10) ))
+                [ "$mlc_pct" -gt 100 ] 2>/dev/null && mlc_pct="raw:$ltb"
+            fi
+
+            # Block device size
+            local size_sectors=$(cat "/sys/block/$blkdev/size" 2>/dev/null)
+            local size_mb=0
+            [ -n "$size_sectors" ] && size_mb=$((size_sectors * 512 / 1048576))
+
+            # I/O stats (sectors read/written, converted to MB)
+            local rd_sectors=$(awk '{print $3}' "/sys/block/$blkdev/stat" 2>/dev/null)
+            local wr_sectors=$(awk '{print $7}' "/sys/block/$blkdev/stat" 2>/dev/null)
+            local rd_mb=0 wr_mb=0
+            [ -n "$rd_sectors" ] && rd_mb=$((rd_sectors * 512 / 1048576))
+            [ -n "$wr_sectors" ] && wr_mb=$((wr_sectors * 512 / 1048576))
+
+            # Additional I/O stats: iops-in-progress, avg queue
+            local iops_ip=$(awk '{print $9}' "/sys/block/$blkdev/stat" 2>/dev/null)
+            local io_ticks=$(awk '{print $10}' "/sys/block/$blkdev/stat" 2>/dev/null)
+            local io_weighted=$(awk '{print $11}' "/sys/block/$blkdev/stat" 2>/dev/null)
+
+            if [ "$CSV_MODE" = 1 ]; then
+                csv_row "$ts_now" "$blkdev,$size_mb,$rd_mb,$wr_mb,$slc_pct,$mlc_pct,$io_weighted"
+            else
+                printf "[flash] %-8s size=%6d MB  read=%6d MB  write=%6d MB  SLC_wear=%3s%%  MLC_wear=%3s%%  io_wtd=%s\n" \
+                    "$blkdev" "$size_mb" "$rd_mb" "$wr_mb" "$slc_pct" "$mlc_pct" "$io_weighted"
+            fi
+        done
+
+        [ "$SAMPLES" -gt 1 ] && sleep "$INTERVAL"
+        i=$((i + 1))
+    done
+}
+
+# --- Temperature profiler ---
+profile_temp() {
+    [ "$CSV_MODE" = 1 ] && csv_hdr "zone,type,temp_c"
+
+    local i=0
+    local found=0
+    while [ $i -lt "$SAMPLES" ]; do
+        local ts_now=$(ts)
+
+        for zone in /sys/class/thermal/thermal_zone*; do
+            [ -d "$zone" ] || continue
+            local zname=$(basename "$zone")
+            local ztype=$(cat "$zone/type" 2>/dev/null || echo "?")
+            local temp_raw=$(cat "$zone/temp" 2>/dev/null || echo "0")
+            # temp is in millidegrees C
+            local temp_c=$((temp_raw / 1000))
+
+            # CPU throttling state
+            local throttle=""
+            [ -f "$zone/throttle" ] && throttle="throttle=$(cat "$zone/throttle" 2>/dev/null)"
+
+            if [ "$temp_c" -gt 0 ] 2>/dev/null || [ "$CSV_MODE" = 1 ]; then
+                found=1
+                if [ "$CSV_MODE" = 1 ]; then
+                    csv_row "$ts_now" "$zname,$ztype,$temp_c"
+                else
+                    printf "[temp] %s type=%-20s temp=%4d°C  %s\n" "$zname" "$ztype" "$temp_c" "$throttle"
+                fi
+            fi
+        done
+
+        [ "$found" = 0 ] && { echo "No thermal zones found"; break; }
+
+        [ "$SAMPLES" -gt 1 ] && sleep "$INTERVAL"
+        i=$((i + 1))
+    done
+}
+
+# --- Timer jitter profiler ---
+# Approximates frame-budget variance by measuring sleep timer precision.
+# High jitter → potential audio buffer underruns / frame drops.
+profile_jitter() {
+    [ "$CSV_MODE" = 1 ] && csv_hdr "target_us,actual_us,error_us,error_pct"
+
+    # Use a target close to audio buffer period: 1024 frames @ 44100 Hz = 23.2 ms
+    # But BusyBox sleep only handles seconds, so we use read -t for sub-second waits
+    local target_us=${JITTER_TARGET:-23200}  # 23.2ms default (one audio period)
+    local target_s=$((target_us / 1000000))
+    local target_remainder=$((target_us % 1000000))
+
+    local i=0
+    local max_error=0 min_error=999999999 total_error=0
+
+    echo "# Target: ${target_us} us (audio buffer period at 1024/44100)"
+    echo "#"
+
+    while [ $i -lt "$SAMPLES" ]; do
+        local t0=$(ts)
+
+        # Sub-second sleep using read -t (microsecond-ish precision on RT kernel)
+        if command -v usleep >/dev/null 2>&1; then
+            usleep "$target_us"
+        elif command -v read >/dev/null 2>&1 && [ "$target_remainder" -gt 0 ] 2>/dev/null; then
+            sleep "$target_s" 2>/dev/null || true
+            read -t "$(awk "BEGIN {printf \"%.6f\", $target_remainder / 1000000}")" dummy </dev/zero 2>/dev/null || true
+        else
+            sleep "$INTERVAL"
+        fi
+
+        local t1=$(ts)
+        # Calculate actual elapsed in microseconds
+        local actual_us=$(awk "BEGIN {printf \"%d\", ($t1 - $t0) * 1000000}" 2>/dev/null)
+        local error_us=0 error_pct=0
+        if [ -n "$actual_us" ] && [ "$actual_us" -gt 0 ] 2>/dev/null; then
+            error_us=$((actual_us - target_us))
+            [ "$error_us" -lt 0 ] 2>/dev/null && error_us=$((-error_us))
+            error_pct=$(awk "BEGIN {printf \"%.1f\", ($error_us / $target_us) * 100}" 2>/dev/null)
+
+            # Track min/max/total
+            [ "$error_us" -gt "$max_error" ] 2>/dev/null && max_error=$error_us
+            [ "$error_us" -lt "$min_error" ] 2>/dev/null && min_error=$error_us
+            total_error=$((total_error + error_us))
+        fi
+
+        if [ "$CSV_MODE" = 1 ]; then
+            csv_row "$t0" "$target_us,$actual_us,$error_us,$error_pct"
+        else
+            printf "[jitter] target=%-6d us  actual=%-8s us  error=%-6d us (%-5s%%)\n" \
+                "$target_us" "${actual_us:-N/A}" "${error_us:-0}" "${error_pct:-0.0}"
+        fi
+
+        i=$((i + 1))
+    done
+
+    # Summary
+    if [ "$SAMPLES" -gt 1 ]; then
+        local avg_err=$((total_error / SAMPLES))
+        echo ""
+        echo "# Summary (${SAMPLES} samples, target=${target_us} us):"
+        echo "#   avg_error=${avg_err} us  min_error=${min_error} us  max_error=${max_error} us"
+        # max_error as % of audio period
+        local max_pct=$(awk "BEGIN {printf \"%.1f\", ($max_error / $target_us) * 100}" 2>/dev/null)
+        echo "#   max_error=${max_pct}% of audio buffer period"
+        # Rule of thumb: if max_error > 20% of buffer period, audio glitches likely
+        if [ "$max_error" -gt 4640 ] 2>/dev/null; then  # 20% of 23.2ms
+            echo "#   WARNING: jitter exceeds 20% of audio buffer period — underruns likely"
+        fi
+    fi
+}
 profile_pressure() {
     [ "$CSV_MODE" = 1 ] && csv_hdr "resource,avg10,avg60,avg300,total"
 
@@ -326,6 +551,15 @@ profile_pressure() {
 
 # --- RUN ALL ---
 profile_all() {
+    echo "=== GPU / Mali ==="
+    CSV_MODE=0 profile_gpu
+    echo ""
+    echo "=== Temperature ==="
+    profile_temp
+    echo ""
+    echo "=== Flash Storage ==="
+    profile_flash
+    echo ""
     echo "=== CPU Utilization ==="
     CSV_MODE=0 profile_cpu "$INTERVAL" "$SAMPLES"
     echo ""
@@ -340,6 +574,9 @@ profile_all() {
         profile_threads "$INTERVAL" "$SAMPLES"
         echo ""
     fi
+    echo "=== Timer Jitter ==="
+    profile_jitter "$INTERVAL" "$SAMPLES"
+    echo ""
     echo "=== ALSA Xruns ==="
     profile_xruns "$INTERVAL" "$SAMPLES"
     echo ""
@@ -369,6 +606,10 @@ case "$MODE" in
     threads)   profile_threads ;;
     xruns)     profile_xruns ;;
     pressure)  profile_pressure ;;
+    gpu)       profile_gpu ;;
+    flash)     profile_flash ;;
+    temp)      profile_temp ;;
+    jitter)    profile_jitter ;;
     all)       profile_all ;;
     *)         usage ;;
 esac
