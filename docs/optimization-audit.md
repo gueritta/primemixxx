@@ -156,7 +156,7 @@ No profiling tools exist on device. Built from `/proc`/`/sys` primitives:
 - `/proc/schedstat` — Scheduler run_delay, cpu_time, pcount per CPU (⚠ needs CONFIG_SCHEDSTATS, not set in buildroot)
 - `/proc/sched_debug` — Full scheduler state dump (⚠ needs CONFIG_SCHED_DEBUG, not set in buildroot)
 - `/proc/$PID/status` — voluntary/involuntary context switches
-- `/proc/$PID/sched` — Scheduler policy, prio, nr_migrations, exec_start (always available)
+- `/proc/$PID/sched` — Scheduler policy, prio, nr_migrations, exec_start (**always available**, no CONFIG_ dependency)
 - `/proc/$PID/stat` — utime, stime, num_threads, rt_priority
 - `/proc/asound/card*/pcm*p/sub*/status` — ALSA xrun counters (always available)
 - `/proc/pressure/cpu,io,memory` — PSI stall info (⚠ needs CONFIG_PSI, unknown status)
@@ -243,6 +243,20 @@ If the kernel has `CONFIG_BPF=y` and `CONFIG_BPF_SYSCALL=y`, eBPF-based tools (b
 could provide similar tracing without ftrace. Check the device kernel config for BPF support.
 eBPF is lighter-weight than ftrace and more flexible for targeted probing, but requires
 cross-compiling bpftrace or using `bpftool` on-device.
+
+### Buildroot version note
+
+This project uses **Buildroot 2021.02.10** (not 2023.02.x). The `buildroot/2023.02.11/`
+directory present in the repo is a separate unused clone. The kernel config lives at
+`buildroot-customizations/board/inmusic/common/linux.config` and targets 6.1.78 with
+PREEMPT_RT patch `patches-6.1.77-rt24`.
+
+### GPL kernel source
+
+The device's actual stock kernel (6.1.111-inmusic-2024-09-19-rt41) has a different
+and unknown config. InMusic is legally required to provide the modified kernel source
+under the GPL. Obtaining it would allow rebuilding with ftrace + sched debug + nohz_full.
+Contact: inMusic GPL compliance at https://inmusicbrands.com/gpl/
 
 ### ⚠ Device kernel caveat
 
