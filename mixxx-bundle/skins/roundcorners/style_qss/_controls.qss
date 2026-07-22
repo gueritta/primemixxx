@@ -228,6 +228,7 @@ QScrollBar::sub-page:vertical {
 #EffectKnobLabel,
 #EqualizerEffectKnobLabel {
     color: #ffffff;
+    background-color: #ff0000;
     font-size: 18px;
     line-height: 13px;
     qproperty-alignment: 'AlignCenter';
@@ -243,6 +244,20 @@ QScrollBar::sub-page:vertical {
     margin: 0 0 1px 0;
     font-size: 14px;
     line-height: 16px;
+}
+
+#FxParamSlot {
+    qproperty-layoutAlignment: 'AlignCenter | AlignTop';
+}
+
+#EffectKnobLabelFocused {
+    color: #ffffff;
+    background-color: #ff0000;
+    border-radius: 4px;
+    font-size: 18px;
+    line-height: 13px;
+    qproperty-alignment: 'AlignCenter';
+    text-transform: uppercase;
 }
 
 

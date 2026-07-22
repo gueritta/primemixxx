@@ -251,7 +251,8 @@ WSearchLineEdit {
 }
 
 #FxParameterFocusBg {
-  background-color: #39ff14;
+  background: transparent;
+  border: 2px solid #39ff14;
 }
 
 #VuMainCover {

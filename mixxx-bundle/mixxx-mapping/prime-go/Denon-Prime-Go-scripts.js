@@ -508,6 +508,17 @@ PrimeGo.init = function(_id, _debug) {
         PrimeGo.effectBank[i].init();
     }
 
+    // ===== FX VIEW TOGGLE (ON button) =====
+    PrimeGo.fxViewToggle = new components.Button({
+        midi: [0x96, 0x09],
+        group: "[EffectRack1]",
+        key: "show",
+        type: components.Button.prototype.types.toggle,
+        outConnect: true,
+        on: 0x7F,
+        off: 0x00,
+    });
+
     // ===== FX PARAMETER FOCUS =====
     // Pre-seed COs (must exist before skin XML references them)
     for (var e = 1; e <= 3; e++) {
@@ -515,9 +526,11 @@ PrimeGo.init = function(_id, _debug) {
         engine.setValue("[Skin]", "fx_param_button_focus_" + e, 0);
     }
 
+    // paramType: 'knob' or 'button' — so cycle iterates all params interleaved
     PrimeGo.fxFocus = {
         effect: 1,
-        paramIndex: 0
+        paramIndex: 0,
+        paramType: 'knob'
     };
 
     PrimeGo.fxParamNames = [
@@ -528,50 +541,69 @@ PrimeGo.init = function(_id, _debug) {
     PrimeGo.fxUpdateDisplay = function() {
         var eff = PrimeGo.fxFocus.effect;
         var idx = PrimeGo.fxFocus.paramIndex;
+        var type = PrimeGo.fxFocus.paramType;
+        // Clear all per-parameter highlight COs (effect 1-3, param 1-8)
         for (var e = 1; e <= 3; e++) {
-            engine.setValue("[Skin]", "fx_param_knob_focus_" + e, 0);
-            engine.setValue("[Skin]", "fx_param_button_focus_" + e, 0);
+            for (var p = 1; p <= 8; p++) {
+                engine.setValue("[Skin]", "fx_param_focus_" + e + "_" + p, 0);
+            }
         }
         if (eff > 0 && idx > 0) {
             engine.setValue("[EffectRack1_EffectUnit1]", "focused_effect", eff);
-            engine.setValue("[Skin]", "fx_param_knob_focus_" + eff, idx);
+            engine.setValue("[Skin]", "fx_param_focus_" + eff + "_" + idx, 1);
         } else {
             engine.setValue("[EffectRack1_EffectUnit1]", "focused_effect", 0);
         }
     };
 
+    // Cycles through ALL parameters (knobs + buttons) interleaved, type-agnostic.
+    // Combined order: knob1, btn1, knob2, btn2, ... knob8, btn8
     PrimeGo.fxCycleParam = function(direction) {
         var eff = PrimeGo.fxFocus.effect;
         if (eff === 0) return;
-        var group = "[EffectRack1_EffectUnit" + (eff <= 2 ? "1" : "2");
-        group += "_Effect" + eff + "]";
+        var group = "[EffectRack1_EffectUnit1_Effect" + eff + "]";
         var loaded = [];
         for (var p = 0; p < 8; p++) {
-            if (engine.getValue(group, PrimeGo.fxParamNames[p] + "_loaded") > 0) {
-                loaded.push(p + 1);
+            if (engine.getValue(group, "parameter" + (p + 1) + "_loaded") > 0) {
+                loaded.push({ index: p + 1, type: 'knob' });
+            }
+            if (engine.getValue(group, "button_parameter" + (p + 1) + "_loaded") > 0) {
+                loaded.push({ index: p + 1, type: 'button' });
             }
         }
         if (loaded.length === 0) {
             PrimeGo.fxFocus.paramIndex = 0;
+            PrimeGo.fxFocus.paramType = 'knob';
             PrimeGo.fxUpdateDisplay();
             return;
         }
-        var cur = loaded.indexOf(PrimeGo.fxFocus.paramIndex);
+        var cur = -1;
+        for (var i = 0; i < loaded.length; i++) {
+            if (loaded[i].index === PrimeGo.fxFocus.paramIndex && loaded[i].type === PrimeGo.fxFocus.paramType) {
+                cur = i;
+                break;
+            }
+        }
         if (cur === -1) {
-            PrimeGo.fxFocus.paramIndex = loaded[0];
+            PrimeGo.fxFocus.paramIndex = loaded[0].index;
+            PrimeGo.fxFocus.paramType = loaded[0].type;
         } else {
             cur += direction;
             if (cur < 0) cur = loaded.length - 1;
             if (cur >= loaded.length) cur = 0;
-            PrimeGo.fxFocus.paramIndex = loaded[cur];
+            PrimeGo.fxFocus.paramIndex = loaded[cur].index;
+            PrimeGo.fxFocus.paramType = loaded[cur].type;
         }
         PrimeGo.fxUpdateDisplay();
     };
 
-    // FX Select encoder: turn to cycle effect slots (ch5 note 0x09, CC 0x21)
-    // TODO: capacitive touch (note 0x09) — re-add fxSelectTouch to reveal effect on touch
+    // FX Select capacitive touch: hold to enter browse mode, release to exit
+    // While browsing: FX Time turn cycles parameters. Release: FX Time turn adjusts value.
+    PrimeGo.fxBrowseMode = false;
+    PrimeGo.fxSelectMode = "effect";
+
     PrimeGo.fxSelectTouch = function(channel, control, value, status) {
-        // capacitive touch disabled for now
+        PrimeGo.fxBrowseMode = (value === 0x7F);
     };
 
     PrimeGo.fxSelectTurn = function(channel, control, value, status) {
@@ -581,26 +613,32 @@ PrimeGo.init = function(_id, _debug) {
         if (eff < 1) eff = 3;
         PrimeGo.fxFocus.effect = eff;
         PrimeGo.fxFocus.paramIndex = 1;
+        PrimeGo.fxFocus.paramType = 'knob';
         PrimeGo.fxUpdateDisplay();
     };
 
-    // FX Time encoder: touch cycles params, turn always adjusts value, push toggles button
+    // FX Time encoder: turn browses params (hold FX Select) or adjusts value, push toggles button
     PrimeGo.fxTimeTouch = function(channel, control, value, status) {
-        if (value !== 0x7F) return;
-        PrimeGo.fxCycleParam(1);
+        // no-op
     };
 
     PrimeGo.fxTimeTurn = function(channel, control, value, status) {
-        var dir = (value === 0x01) ? 1 : -1;
-        var eff = PrimeGo.fxFocus.effect;
-        var idx = PrimeGo.fxFocus.paramIndex;
-        if (eff > 0 && idx > 0) {
-            var unit = eff <= 2 ? 1 : 2;
-            var eNum = eff <= 2 ? eff : eff - 2;
-            var group = "[EffectRack1_EffectUnit" + unit + "_Effect" + eNum + "]";
-            var cur = engine.getValue(group, "parameter" + idx);
-            var delta = dir * 0.05;
-            engine.setValue(group, "parameter" + idx, Math.min(1.0, Math.max(0.0, cur + delta)));
+        if (PrimeGo.fxBrowseMode) {
+            // Holding FX Select: cycle parameters
+            var dir = (value === 0x01) ? 1 : -1;
+            PrimeGo.fxCycleParam(dir);
+        } else {
+            // Normal: adjust knob value
+            if (PrimeGo.fxFocus.paramType !== 'knob') return;
+            var dir = (value === 0x01) ? 1 : -1;
+            var eff = PrimeGo.fxFocus.effect;
+            var idx = PrimeGo.fxFocus.paramIndex;
+            if (eff > 0 && idx > 0) {
+                var group = "[EffectRack1_EffectUnit1_Effect" + eff + "]";
+                var cur = engine.getValue(group, "parameter" + idx);
+                var delta = dir * 0.05;
+                engine.setValue(group, "parameter" + idx, Math.min(1.0, Math.max(0.0, cur + delta)));
+            }
         }
     };
 
@@ -609,50 +647,60 @@ PrimeGo.init = function(_id, _debug) {
         var eff = PrimeGo.fxFocus.effect;
         var idx = PrimeGo.fxFocus.paramIndex;
         if (eff > 0 && idx > 0) {
-            var unit = eff <= 2 ? 1 : 2;
-            var eNum = eff <= 2 ? eff : eff - 2;
-            var group = "[EffectRack1_EffectUnit" + unit + "_Effect" + eNum + "]";
+            var group = "[EffectRack1_EffectUnit1_Effect" + eff + "]";
             engine.setValue(group, "button_parameter" + idx,
                 engine.getValue(group, "button_parameter" + idx) > 0 ? 0 : 1);
         }
     };
 
-    // FX Select push: toggle focused effect on/off (ch5 CC 0x21 push)
+    // FX Select push: short press toggles effect, long press (>500ms) toggles parameter mode
     PrimeGo.fxSelectPush = function(channel, control, value, status) {
-        if (value !== 0x7F) return;
-        var eff = PrimeGo.fxFocus.effect;
-        if (eff > 0) {
-            var unit = eff <= 2 ? 1 : 2;
-            var eNum = eff <= 2 ? eff : eff - 2;
-            engine.setValue("[EffectRack1_EffectUnit" + unit + "_Effect" + eNum + "]", "enabled",
-                engine.getValue("[EffectRack1_EffectUnit" + unit + "_Effect" + eNum + "]", "enabled") > 0 ? 0 : 1);
+        if (value === 0x7F) {
+            PrimeGo.fxSelectPushStart = Date.now();
+        } else {
+            var duration = Date.now() - (PrimeGo.fxSelectPushStart || 0);
+            if (duration > 500) {
+                // Long press: toggle parameter/effect mode
+                PrimeGo.fxSelectMode = PrimeGo.fxSelectMode === 'effect' ? 'parameter' : 'effect';
+            } else {
+                // Short press: toggle effect on/off
+                var eff = PrimeGo.fxFocus.effect;
+                if (eff > 0) {
+                    var group = "[EffectRack1_EffectUnit1_Effect" + eff + "]";
+                    engine.setValue(group, "enabled",
+                        engine.getValue(group, "enabled") > 0 ? 0 : 1);
+                }
+            }
         }
     };
 
     PrimeGo.fxActivate = function(channel, control, value, status) {
         if (value !== 0x7F) return;
-        var eff = PrimeGo.fxFocus.effect;
-        if (eff > 0) {
-            var unit = eff <= 2 ? 1 : 2;
-            engine.setValue("[EffectRack1_EffectUnit" + unit + "]", "group_[Channel1]_enable",
-                engine.getValue("[EffectRack1_EffectUnit" + unit + "]", "group_[Channel1]_enable") > 0 ? 0 : 1);
+        if (PrimeGo.fxFocus.effect > 0) {
+            var key = "group_[Channel1]_enable";
+            engine.setValue("[EffectRack1_EffectUnit1]", key,
+                engine.getValue("[EffectRack1_EffectUnit1]", key) > 0 ? 0 : 1);
         }
     };
 
     PrimeGo.fxWetDry = function(channel, control, value, status) {
-        var eff = PrimeGo.fxFocus.effect;
-        if (eff > 0) {
-            var unit = eff <= 2 ? 1 : 2;
-            engine.setValue("[EffectRack1_EffectUnit" + unit + "]", "mix", value / 127);
+        if (PrimeGo.fxFocus.effect > 0) {
+            engine.setValue("[EffectRack1_EffectUnit1]", "mix", value / 127);
         }
     };
 
     PrimeGo.fxAssign1 = function(channel, control, value, status) {
         if (value !== 0x7F) return;
+        var key = "group_[Channel1]_enable";
+        engine.setValue("[EffectRack1_EffectUnit1]", key,
+            engine.getValue("[EffectRack1_EffectUnit1]", key) > 0 ? 0 : 1);
     };
 
     PrimeGo.fxAssign2 = function(channel, control, value, status) {
         if (value !== 0x7F) return;
+        var key = "group_[Channel2]_enable";
+        engine.setValue("[EffectRack1_EffectUnit1]", key,
+            engine.getValue("[EffectRack1_EffectUnit1]", key) > 0 ? 0 : 1);
     };
 
     // Press down on the library encoder, acts as 'Enter' key in Mixxx library
