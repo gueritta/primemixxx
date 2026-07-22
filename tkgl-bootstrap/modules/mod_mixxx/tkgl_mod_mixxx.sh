@@ -6,6 +6,22 @@
 tkgl_mod_mixxx() {
     log "=== mod_mixxx: launching Mixxx ==="
 
+    # Disable WiFi power save to prevent SSH drops during sessions
+    iw dev wlan0 set power_save off 2>/dev/null || true
+    log "WiFi power save disabled"
+
+    # Enable USB Ethernet gadget for wired SSH access (192.168.42.1)
+    if [ -x /usr/sbin/usb-gadget-eth.sh ]; then
+        /usr/sbin/usb-gadget-eth.sh 2>/dev/null &
+        log "USB Ethernet gadget started"
+        # Give gadget time to initialize, then bring up usb0 interface
+        sleep 2
+        ifconfig usb0 192.168.42.1 netmask 255.255.255.0 up 2>/dev/null || true
+        # Ensure SSH is running (dropbear)
+        [ -x /usr/sbin/dropbear ] && /usr/sbin/dropbear 2>/dev/null || true
+        log "USB SSH ready on 192.168.42.1:22"
+    fi
+
     if systemctl is-active --quiet mixxx-app.service; then
         log "mixxx-app.service is already active"
         return 0
