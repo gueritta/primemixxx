@@ -22,7 +22,7 @@ Variables:
   ConfigKeyDisp     : display control
 -->
 <Template>
-  <PlayButton>
+  <PushButton>
     <TooltipId><Variable name="TooltipId"/></TooltipId>
     <ObjectName><Variable name="ObjectName"/></ObjectName>
     <Size><Variable name="Size"/></Size>
@@ -55,5 +55,5 @@ Variables:
       <ConfigKey><Variable name="ConfigKeyDisp"/></ConfigKey>
       <ConnectValueFromWidget>false</ConnectValueFromWidget>
     </Connection>
-  </PlayButton>
+  </PushButton>
 </Template>

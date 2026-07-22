@@ -743,9 +743,9 @@ PrimeGo.init = function(_id, _debug) {
         input: function(channel, control, value, status, _group) {
             if (!this.isPress(channel, control, value, status)) return;
             if (PrimeGo.shift) {
-                // Shift+VIEW: toggle skin menubar visibility
-                engine.setValue("[Skin]", "show_menubar",
-                    engine.getValue("[Skin]", "show_menubar") > 0 ? 0 : 1);
+                // Shift+VIEW: maximize library (same as non-shift, kept for consistency)
+                engine.setValue("[Master]", "maximize_library",
+                    engine.getValue("[Master]", "maximize_library") > 0 ? 0 : 1);
             } else {
                 // VIEW: toggle maximize library
                 engine.setValue("[Master]", "maximize_library",
@@ -783,7 +783,7 @@ PrimeGo.init = function(_id, _debug) {
         outConnect: true,
         input: function(channel, control, value, status, _group) {
             if (PrimeGo.shift) {
-                // QML: shiftAction: Action.Quantize
+                // Shift+Fwd: toggle quantize
                 if (this.isPress(channel, control, value, status)) {
                     engine.setValue("[Master]", "quantize",
                         engine.getValue("[Master]", "quantize") > 0 ? 0 : 1);
