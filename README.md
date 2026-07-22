@@ -32,6 +32,15 @@ Prerequisites: u-boot tools, 7-zip, QEMU ARM emulation with binfmt, base develop
 DEVICE_IP=primego.local ./scripts/deploy-to-device.sh  # SCP to device
 ```
 
+### Device Services (Install/Repair)
+
+```bash
+# Install/reinstall all system services without re-deploying the full bundle
+DEVICE_IP=primego.local ./scripts/install-device-services.sh
+```
+
+Installs: `mixxx.service`, `usb-gadget-eth.service` (USB SSH), `fix-mdns.service` (primego.local), `powerbutton-monitor.service`, switcher scripts, and udev rules.
+
 ### Flash Firmware
 
 ```bash
