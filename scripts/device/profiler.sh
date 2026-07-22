@@ -43,7 +43,16 @@ usage() {
 
 # --- Helpers ---
 
-ts() { date +%s.%N 2>/dev/null || awk 'BEGIN{printf "%.6f", systime()}' 2>/dev/null || date +%s; }
+ts() { date +%s 2>/dev/null || awk 'BEGIN{printf "%d", systime()}' 2>/dev/null; }
+
+# High-precision timestamp in centiseconds (via /proc/uptime, 10ms resolution)
+# Falls back to date +%s if /proc/uptime unavailable
+ts_cs() {
+    if [ -f /proc/uptime ]; then
+        awk '{printf "%.0f", $1 * 100}' /proc/uptime 2>/dev/null && return
+    fi
+    date +%s 2>/dev/null
+}
 
 # Read a file, return 0 if empty/missing
 read_file() { cat "$1" 2>/dev/null || true; }
@@ -307,9 +316,9 @@ profile_gpu() {
 
         # Mali GPU frequency (multiple possible paths)
         local gpu_freq="N/A"
-        for p in /sys/class/devfreq/*gpu*/cur_freq /sys/bus/platform/devices/*gpu*/devfreq/*/cur_freq /sys/kernel/debug/mali/clock 2>/dev/null; do
-            [ -f "$p" ] && { gpu_freq=$(cat "$p" 2>/dev/null); break; }
-        done
+        for p in /sys/class/devfreq/*gpu*/cur_freq /sys/bus/platform/devices/*gpu*/devfreq/*/cur_freq /sys/kernel/debug/mali/clock; do
+            [ -f "$p" ] && { gpu_freq=$(cat "$p"); break; }
+        done 2>/dev/null
         # Convert to MHz if in Hz (values > 1000000)
         if [ "$gpu_freq" != "N/A" ] && [ "$gpu_freq" -gt 1000000 ] 2>/dev/null; then
             gpu_freq=$((gpu_freq / 1000000))
@@ -317,21 +326,21 @@ profile_gpu() {
 
         # GPU governor
         local gpu_gov="N/A"
-        for p in /sys/class/devfreq/*gpu*/governor /sys/bus/platform/devices/*gpu*/devfreq/*/governor 2>/dev/null; do
-            [ -f "$p" ] && { gpu_gov=$(cat "$p" 2>/dev/null); break; }
-        done
+        for p in /sys/class/devfreq/*gpu*/governor /sys/bus/platform/devices/*gpu*/devfreq/*/governor; do
+            [ -f "$p" ] && { gpu_gov=$(cat "$p"); break; }
+        done 2>/dev/null
 
         # GPU utilization (load)
         local gpu_load="N/A"
-        for p in /sys/class/devfreq/*gpu*/load /sys/bus/platform/devices/*gpu*/devfreq/*/load 2>/dev/null; do
-            [ -f "$p" ] && { gpu_load=$(cat "$p" 2>/dev/null | awk '{print $1}'); break; }
-        done
+        for p in /sys/class/devfreq/*gpu*/load /sys/bus/platform/devices/*gpu*/devfreq/*/load; do
+            [ -f "$p" ] && { gpu_load=$(cat "$p" | awk '{print $1}'); break; }
+        done 2>/dev/null
 
         # Mali GPU memory (from debug or sysfs)
         local gpu_mem="N/A"
-        for p in /sys/kernel/debug/mali/memory_usage /sys/class/misc/mali*/device/mem 2>/dev/null; do
-            [ -f "$p" ] && { gpu_mem=$(cat "$p" 2>/dev/null | head -1 | awk '{print $1}'); break; }
-        done
+        for p in /sys/kernel/debug/mali/memory_usage /sys/class/misc/mali*/device/mem; do
+            [ -f "$p" ] && { gpu_mem=$(head -1 "$p" | awk '{print $1}'); break; }
+        done 2>/dev/null
 
         # Vsync state (fb0 vsync_on_pan)
         local vsync="N/A"
@@ -445,56 +454,48 @@ profile_temp() {
 }
 
 # --- Timer jitter profiler ---
-# Approximates frame-budget variance by measuring sleep timer precision.
+# Measures sleep timer precision using /proc/uptime (centisecond resolution).
 # High jitter → potential audio buffer underruns / frame drops.
 profile_jitter() {
-    [ "$CSV_MODE" = 1 ] && csv_hdr "target_us,actual_us,error_us,error_pct"
+    [ "$CSV_MODE" = 1 ] && csv_hdr "target_cs,actual_cs,error_cs,error_pct"
 
-    # Use a target close to audio buffer period: 1024 frames @ 44100 Hz = 23.2 ms
-    # But BusyBox sleep only handles seconds, so we use read -t for sub-second waits
-    local target_us=${JITTER_TARGET:-23200}  # 23.2ms default (one audio period)
-    local target_s=$((target_us / 1000000))
-    local target_remainder=$((target_us % 1000000))
+    # Target: 2 centiseconds = 20ms (~1 audio buffer period at 1024/44100 = 23.2ms)
+    local target_cs=${JITTER_TARGET_CS:-2}
+    local target_ms=$((target_cs * 10))
 
     local i=0
-    local max_error=0 min_error=999999999 total_error=0
+    local max_err=0 min_err=999999 total_err=0
 
-    echo "# Target: ${target_us} us (audio buffer period at 1024/44100)"
+    echo "# Target: ${target_ms} ms (~1 audio buffer period)"
+    echo "# Timer resolution: 10ms (centiseconds via /proc/uptime)"
+    echo "# Samples: $SAMPLES"
     echo "#"
 
     while [ $i -lt "$SAMPLES" ]; do
-        local t0=$(ts)
+        local t0=$(ts_cs)
 
-        # Sub-second sleep using read -t (microsecond-ish precision on RT kernel)
-        if command -v usleep >/dev/null 2>&1; then
-            usleep "$target_us"
-        elif command -v read >/dev/null 2>&1 && [ "$target_remainder" -gt 0 ] 2>/dev/null; then
-            sleep "$target_s" 2>/dev/null || true
-            read -t "$(awk "BEGIN {printf \"%.6f\", $target_remainder / 1000000}")" dummy </dev/zero 2>/dev/null || true
-        else
-            sleep "$INTERVAL"
-        fi
+        # usleep gives microsecond sleep — best BusyBox option on RT kernel
+        usleep $((target_cs * 10000)) 2>/dev/null || sleep "$INTERVAL"
 
-        local t1=$(ts)
-        # Calculate actual elapsed in microseconds
-        local actual_us=$(awk "BEGIN {printf \"%d\", ($t1 - $t0) * 1000000}" 2>/dev/null)
-        local error_us=0 error_pct=0
-        if [ -n "$actual_us" ] && [ "$actual_us" -gt 0 ] 2>/dev/null; then
-            error_us=$((actual_us - target_us))
-            [ "$error_us" -lt 0 ] 2>/dev/null && error_us=$((-error_us))
-            error_pct=$(awk "BEGIN {printf \"%.1f\", ($error_us / $target_us) * 100}" 2>/dev/null)
+        local t1=$(ts_cs)
 
-            # Track min/max/total
-            [ "$error_us" -gt "$max_error" ] 2>/dev/null && max_error=$error_us
-            [ "$error_us" -lt "$min_error" ] 2>/dev/null && min_error=$error_us
-            total_error=$((total_error + error_us))
-        fi
+        local elapsed=$((t1 - t0))
+        [ "$elapsed" -lt 0 ] 2>/dev/null && elapsed=$((-elapsed))
+
+        local err=$((elapsed - target_cs))
+        [ "$err" -lt 0 ] 2>/dev/null && err=$((-err))
+        local err_pct=$((err * 100 / target_cs))
+
+        # Track min/max/total
+        [ "$err" -gt "$max_err" ] 2>/dev/null && max_err=$err
+        [ "$err" -lt "$min_err" ] 2>/dev/null && min_err=$err
+        total_err=$((total_err + err))
 
         if [ "$CSV_MODE" = 1 ]; then
-            csv_row "$t0" "$target_us,$actual_us,$error_us,$error_pct"
+            csv_row "$t0" "$target_cs,$elapsed,$err,$err_pct"
         else
-            printf "[jitter] target=%-6d us  actual=%-8s us  error=%-6d us (%-5s%%)\n" \
-                "$target_us" "${actual_us:-N/A}" "${error_us:-0}" "${error_pct:-0.0}"
+            printf "[jitter] target=%d cs (%d ms)  actual=%-3d cs  error=%-3d cs (%-3d%%)\n" \
+                "$target_cs" "$target_ms" "$elapsed" "$err" "$err_pct"
         fi
 
         i=$((i + 1))
@@ -502,16 +503,17 @@ profile_jitter() {
 
     # Summary
     if [ "$SAMPLES" -gt 1 ]; then
-        local avg_err=$((total_error / SAMPLES))
+        local avg_err=$((total_err / SAMPLES))
+        local max_pct=$((max_err * 100 / target_cs))
+        local threshold=$((target_cs * 20 / 100 + 1))  # 1 cs above 20%
         echo ""
-        echo "# Summary (${SAMPLES} samples, target=${target_us} us):"
-        echo "#   avg_error=${avg_err} us  min_error=${min_error} us  max_error=${max_error} us"
-        # max_error as % of audio period
-        local max_pct=$(awk "BEGIN {printf \"%.1f\", ($max_error / $target_us) * 100}" 2>/dev/null)
-        echo "#   max_error=${max_pct}% of audio buffer period"
-        # Rule of thumb: if max_error > 20% of buffer period, audio glitches likely
-        if [ "$max_error" -gt 4640 ] 2>/dev/null; then  # 20% of 23.2ms
-            echo "#   WARNING: jitter exceeds 20% of audio buffer period — underruns likely"
+        echo "# Summary (${SAMPLES} samples, target=${target_cs} cs = ${target_ms} ms):"
+        echo "#   avg_error=${avg_err} cs  min_error=${min_err} cs  max_error=${max_err} cs"
+        echo "#   max_error=${max_pct}% of target"
+        if [ "$max_err" -ge "$threshold" ] 2>/dev/null; then
+            echo "#   WARNING: max jitter >= 1 cs — timer precision limited at 10ms resolution"
+        else
+            echo "#   OK: jitter within 10ms resolution limit"
         fi
     fi
 }
