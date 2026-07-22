@@ -705,29 +705,31 @@ PrimeGo.init = function(_id, _debug) {
     // FX mode: when FX Time capacitive is touched, navigates the effect
     // chain preset selector instead of library scroll.
     PrimeGo.browseEncoder = function(channel, control, value, status, group) {
-        // value: 0x01 = clockwise (down), 0x7F = counter-clockwise (up)
         var step = PrimeGo.shift ? 20 : 1;
 
         if (PrimeGo.fxTimeTouched) {
             // FX Time capacitive held: browse encoder = chain preset navigator
-            var dir = (value === 0x01) ? 1 : -1;
+            var dir = (value >= 0x41) ? -1 : 1;
             for (var i = 0; i < step; i++) {
                 engine.setValue("[EffectRack1_EffectUnit1]", "chain_selector", dir);
             }
             return;
         }
 
-        // Library mode: reclaim focus if popup orphaned it
+        // Library mode: reclaim focus if a popup orphaned it
         var fw = engine.getValue("[Library]", "focused_widget");
         if (fw === 0 || fw === 4) {  // None or ContextMenu
             engine.setValue("[Library]", "focused_widget", 3);  // TracksTable
         }
 
-        if (value === 0x01) {
+        // Handle standard (0x01/0x7F) and fast (0x02-0x3F/0x41-0x7E) encoder ticks
+        if (value > 0 && value <= 0x3F) {
+            // Clockwise (0x01 = normal, 0x02+ = fast)
             for (var i = 0; i < step; i++) {
                 engine.setValue("[Library]", "MoveDown", 1);
             }
-        } else if (value === 0x7F) {
+        } else if (value >= 0x41) {
+            // Counter-clockwise (0x7F = normal, 0x7E- = fast)
             for (var i = 0; i < step; i++) {
                 engine.setValue("[Library]", "MoveUp", 1);
             }

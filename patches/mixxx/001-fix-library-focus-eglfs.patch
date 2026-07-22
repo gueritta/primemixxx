@@ -1,0 +1,72 @@
+Fix library focus on EGLFS when QApplication::focusWindow() is null.
+
+On EGLFS embedded platforms (Mali GPU, no window manager), 
+focusWindow() can be null at startup and after QComboBox popups 
+close. This prevents MIDI controller browse encoders from scrolling 
+the library.
+
+Two changes:
+1. setLibraryFocus: Instead of bailing out when focusWindow() is null,
+   try requestActivate() but proceed with widget focus regardless.
+2. emitKeyEvent: Instead of bailing out when focusWindow() is null,
+   fall through to send key events directly to the library view when 
+   no focus widget is available.
+
+This is safe on EGLFS because MIXXX is the only application.
+
+--- a/src/library/librarycontrol.cpp
++++ b/src/library/librarycontrol.cpp
+@@ -911,10 +911,16 @@ void LibraryControl::slotFocusedWidgetChanged(QWidget* oldW, QWidget* newW) {
+ void LibraryControl::setLibraryFocus(FocusWidget newFocusWidget) {
+     if (!QApplication::focusWindow()) {
+-        qInfo() << "No Mixxx window, popup or menu has focus."
+-                << "Don't attempt to focus a specific widget.";
+-        return;
++        // On EGLFS embedded platforms, focusWindow() may be null at
++        // startup or after QComboBox popups close. Try to activate
++        // the main window so widget focus can be established.
++        if (m_pLibraryWidget) {
++            QWindow* window = m_pLibraryWidget->window()->windowHandle();
++            if (window) {
++                window->requestActivate();
++            }
++        }
++        // Don't return early — on EGLFS the window manager may not
++        // report active focus, but widget-level focus still works.
+     }
+ 
+     // ignore no-op
+@@ -844,13 +850,9 @@ void LibraryControl::slotMoveTrack(double v) {
+ void LibraryControl::emitKeyEvent(QKeyEvent&& event) {
+-    if (!QApplication::focusWindow()) {
+-        qInfo() << "No Mixxx window, popup or menu has focus."
+-                << "Don't send key events.";
+-        return;
+-    }
+-
+     if (m_focusedWidget == FocusWidget::None) {
+         setLibraryFocus(FocusWidget::TracksTable);
+-        return;
++        // Falls through — on EGLFS, setLibraryFocus may succeed even
++        // when focusWindow() is null, so try sending the event anyway.
+     }
+ 
+@@ -861,4 +863,17 @@ void LibraryControl::emitKeyEvent(QKeyEvent&& event) {
+             QApplication::sendEvent(focusWidget, &event);
+         }
++        return;
+     }
++
++    // No focused widget — send directly to the library view.
++    // On EGLFS embedded platforms, focusWidget() may be null at startup
++    // or after QComboBox popups close, but the library view still needs
++    // to receive scroll events from MIDI controllers.
++    if (m_pLibraryWidget) {
++        auto* view = m_pLibraryWidget->getCurrentTrackTableView();
++        if (view) {
++            for (auto i = 0; i < event.count(); ++i) {
++                QApplication::sendEvent(view, &event);
++            }
++        }
++    }
+ }
