@@ -625,6 +625,18 @@ PrimeGo.init = function(_id, _debug) {
         PrimeGo.fxFocus.timeMode = (PrimeGo.fxFocus.timeMode === "select") ? "adjust" : "select";
     };
 
+    // FX Select push: toggle focused effect on/off (ch5 CC 0x21 push)
+    PrimeGo.fxSelectPush = function(channel, control, value, status) {
+        if (value !== 0x7F) return;
+        var eff = PrimeGo.fxFocus.effect;
+        if (eff > 0) {
+            var unit = eff <= 2 ? 1 : 2;
+            var eNum = eff <= 2 ? eff : eff - 2;
+            engine.setValue("[EffectRack1_EffectUnit" + unit + "_Effect" + eNum + "]", "enabled",
+                engine.getValue("[EffectRack1_EffectUnit" + unit + "_Effect" + eNum + "]", "enabled") > 0 ? 0 : 1);
+        }
+    };
+
     PrimeGo.fxActivate = function(channel, control, value, status) {
         if (value !== 0x7F) return;
         var eff = PrimeGo.fxFocus.effect;
