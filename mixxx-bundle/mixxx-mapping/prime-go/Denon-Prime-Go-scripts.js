@@ -536,7 +536,6 @@ PrimeGo.init = function(_id, _debug) {
         if (eff > 0 && idx > 0) {
             engine.setValue("[EffectRack1_EffectUnit1]", "focused_effect", eff);
             engine.setValue("[Skin]", "fx_param_knob_focus_" + eff, idx);
-            engine.setValue("[Skin]", "fx_param_button_focus_" + eff, idx);
         } else {
             engine.setValue("[EffectRack1_EffectUnit1]", "focused_effect", 0);
         }
