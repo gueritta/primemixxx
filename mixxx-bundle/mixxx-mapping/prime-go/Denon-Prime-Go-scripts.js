@@ -691,28 +691,31 @@ PrimeGo.init = function(_id, _debug) {
             engine.getValue("[EffectRack1_EffectUnit1]", key) > 0 ? 0 : 1);
     };
 
-    // Press down on the library encoder: GoToItem + release FX focus back to library
+    // Browse encoder push: hold to switch to UI scroll mode, release to library scroll.
+    // UI mode: encoder sends [Library],MoveUp/Down which MIXXX's slotMoveVertical
+    // auto-routes to popups/menus/dialogs when focused_widget == ContextMenu (4) or Dialog (5).
+    // Library mode: encoder scrolls the tracks table.
+    PrimeGo.encoderUIMode = false;
+
     PrimeGo.encoderLoad = new components.Button({
         midi: [0x9F, 0x06],
         group: "[Library]",
         key: "GoToItem",
         input: function(channel, control, value, status) {
             if (this.isPress(channel, control, value, status)) {
-                engine.setValue("[EffectRack1_EffectUnit1]", "focused_effect", 0);
+                PrimeGo.encoderUIMode = true;
                 engine.setValue("[Library]", "GoToItem", 1);
+            } else {
+                // Release: back to library scroll
+                PrimeGo.encoderUIMode = false;
             }
         }
     });
 
-    // Browse encoder with shift acceleration — dynamically routes to library or FX
+    // Browse encoder with shift acceleration — dynamically routes to library or UI
     PrimeGo.browseEncoder = function(channel, control, value, status, group) {
         // value: 0x01 = clockwise (down), 0x7F = counter-clockwise (up)
         var step = PrimeGo.shift ? 20 : 1;
-        // Ensure FX chain selector dropdown doesn't steal encoder events.
-        // Release any lingering FX focus so Library scroll always works.
-        if (engine.getValue("[EffectRack1_EffectUnit1]", "focused_effect") !== 0) {
-            engine.setValue("[EffectRack1_EffectUnit1]", "focused_effect", 0);
-        }
         if (value === 0x01) {
             for (var i = 0; i < step; i++) {
                 engine.setValue("[Library]", "MoveDown", 1);
@@ -826,11 +829,11 @@ PrimeGo.init = function(_id, _debug) {
             engine.setParameter(effect, "enabled", 1);
         }
 
-        // Release FX focus so browse encoder routes back to Library.
-        // chain_selector cycling can cause the EffectChainSelector dropdown
-        // to grab UI focus; clearing focused_effect ensures the encoder
-        // returns to library scroll after preset selection.
-        engine.setValue("[EffectRack1_EffectUnit1]", "focused_effect", 0);
+        // Focus auto-routing is handled by MIXXX's slotMoveVertical:
+        // when a QComboBox popup is open, focused_widget == ContextMenu (4),
+        // and [Library],MoveUp/Down sends key events to the popup instead.
+        // No need to force focused_effect = 0 — the encoder dynamically
+        // switches between library scroll and UI navigation automatically.
     };
 
     // Sweep FX - Filter Button
