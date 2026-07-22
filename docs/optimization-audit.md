@@ -312,6 +312,45 @@ Without the exact GPL source, we're guessing. Even if we extract the config and
 build vanilla 6.1.111 + RT, it almost certainly won't boot — the device tree and
 driver patches are essential.
 
+#### Where to get it
+
+**The official GPL page is dead.** `https://inmusicbrands.com/gpl/` 301-redirects
+to `www.inmusicbrands.com/gpl/` which returns 404. No Wayback Machine archive
+exists. None of the brand sites (denondj.com, akaipro.com, numark.com) have
+equivalent pages. The page appears to have been removed entirely.
+
+**Practical options (best → worst):**
+
+1. **Extract config from device kernel** — if we can get the zImage off the device,
+   `extract-ikconfig.sh` (already in repo) can dump the `.config`. This gives us
+   the config but NOT the patches.
+
+2. **Contact inMusic support** — file a ticket at `support.denondj.com` referencing
+   the GPL and requesting kernel source for Prime Go firmware 4.3.4. They are
+   legally required to provide it. Include the specific kernel version string
+   (`6.1.111-inmusic-2024-09-19-rt41`) and the product (Denon DJ Prime Go).
+
+3. **Extract from firmware update image** — the `.img.dtb` files contain a zImage.
+   Our `extract-ikconfig.sh` already extracts config from zImage. Same limitation:
+   config only, no patches.
+
+4. **Legal demand** — inMusic Brands, Cumberland, RI, USA. GPL Section 3 requires
+   them to provide the "complete corresponding source code" for any GPL-licensed
+   components they distribute (which includes the Linux kernel). A formal written
+   request citing GPLv2 §3(b) may be necessary if support ignores the request.
+
+**What the MPC hacking community does:** TheKikGen, henning/Hakai-MPC, and others
+have been working with inMusic's Rockchip RK3288 platform (MPC Live/X/Force/One)
+for years **without** kernel source access. They rely on:
+- Reverse-engineering device trees from `/sys/firmware/devicetree/base/`
+- Extracting config from boot images with `extract-ikconfig`
+- Using stock inMusic kernels as-is, patching userspace instead
+- Mount-binding over device tree properties for hardware spoofing
+
+This is viable: we don't *need* to rebuild the kernel to enable ftrace if we can
+extract the config and see what's already compiled in (or if `debugfs` mount is
+enough — `CONFIG_DEBUG_FS=y` is already set in our buildroot config).
+
 ### Blocker 3: RT patch availability
 
 PREEMPT_RT patches are maintained per kernel minor version. For 6.1:
@@ -384,3 +423,27 @@ inMusic GPL source
 
 **Bottom line**: The critical blocker is **inMusic's modified kernel source**. Everything
 else (RT patch, config extraction, toolchain) is solvable once the source is available.
+
+### First check: what's already on the device?
+
+Before chasing a kernel rebuild, verify what the device kernel actually exposes.
+This tells us whether `CONFIG_FTRACE` might already be enabled in the stock kernel
+(different from our buildroot config):
+
+```bash
+# 1. Can we get the running config?
+ssh root@192.168.42.1 'zcat /proc/config.gz 2>/dev/null | head -20 || echo "IKCONFIG_PROC not enabled"'
+
+# 2. Does debugfs already have tracing?
+ssh root@192.168.42.1 'mount -t debugfs none /sys/kernel/debug 2>/dev/null; ls /sys/kernel/debug/tracing/ 2>/dev/null || echo "ftrace not available"'
+
+# 3. What scheduler interfaces exist?
+ssh root@192.168.42.1 'ls /proc/schedstat /proc/sched_debug /proc/pressure 2>&1'
+
+# 4. What's the kernel command line? (may reveal nohz_full, rcu_nocbs, etc.)
+ssh root@192.168.42.1 'cat /proc/cmdline'
+```
+
+If `IKCONFIG_PROC=y` on the device kernel, we can get the exact config and check
+whether `CONFIG_FTRACE`, `CONFIG_NO_HZ_FULL`, etc. are already set — without any
+rebuild at all.
