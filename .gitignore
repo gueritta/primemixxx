@@ -43,6 +43,7 @@ mixxx-bundle/controllers/*
 !mixxx-bundle/controllers/common-hid-packet-parser.js
 !mixxx-bundle/controllers/common-hid-devices.js
 !mixxx-bundle/controllers/common-bulk-midi.js
+!mixxx-bundle/controllers/LateNightMini_toggle_helper.js
 
 # Only LateNightMini skin is tracked; everything else is local-only
 mixxx-bundle/skins/*
