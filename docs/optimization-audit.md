@@ -347,9 +347,43 @@ for years **without** kernel source access. They rely on:
 - Using stock inMusic kernels as-is, patching userspace instead
 - Mount-binding over device tree properties for hardware spoofing
 
+**Our buildroot doesn't use inMusic patches either.** The `jp11_defconfig` builds
+vanilla 6.1.78 + RT patch only — no Rockchip BSP, no audio drivers, no Mali.
+This works because the buildroot kernel *never boots on the device*. It's only
+used for kernel headers during cross-compilation. The device boots inMusic's
+stock 6.1.111 which has all hardware patches pre-applied at the factory.
+
 This is viable: we don't *need* to rebuild the kernel to enable ftrace if we can
 extract the config and see what's already compiled in (or if `debugfs` mount is
 enough — `CONFIG_DEBUG_FS=y` is already set in our buildroot config).
+
+#### Where to get the patches (if we must rebuild)
+
+The patches are the diff between vanilla 6.1.111 and inMusic's 6.1.111-inmusic.
+They contain Rockchip BSP, audio drivers (XMOS/AKM), Mali integration, and Denon
+hardware support. Without them, a rebuilt kernel won't boot.
+
+**Only path: inMusic's GPL source tarball.** There is no other source:
+- No public repo (GitHub, GitLab, etc.)
+- No leaked patchset in the MPC hacking community
+- No device tree source files on the device (only compiled `.dtb`)
+- `extract-ikconfig` gives config, NOT patches
+
+A successful GPL request should yield a tarball containing the *exact* kernel
+source tree inMusic used to build `6.1.111-inmusic-2024-09-19-rt41`. From that:
+1. `diff -ruN vanilla-6.1.111/ inmusic-6.1.111/ > inmusic-patches.patch`
+2. Apply those patches to vanilla 6.1.111
+3. Apply matching RT patchset for 6.1.111
+4. Merge our `linux.config` changes (FTRACE, SCHED_DEBUG, etc.) via `menuconfig`
+5. Build → pack → flash
+
+**What's legally required:** Under GPLv2 §3, inMusic must provide "the complete
+corresponding machine-readable source code" for any GPL-licensed work they
+distribute in binary form. The Linux kernel is GPLv2. The source must include
+*all* modifications — device trees, drivers, and build scripts needed to
+reproduce the binary. A tarball on a CD/DVD or download link satisfies this.
+They cannot charge more than the cost of physically performing the source
+distribution.
 
 ### Blocker 3: RT patch availability
 
