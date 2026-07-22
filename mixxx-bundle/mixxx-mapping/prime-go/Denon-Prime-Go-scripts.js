@@ -529,23 +529,14 @@ PrimeGo.init = function(_id, _debug) {
     PrimeGo.fxUpdateDisplay = function() {
         var eff = PrimeGo.fxFocus.effect;
         var idx = PrimeGo.fxFocus.paramIndex;
-        // Clear all COs first
         for (var e = 1; e <= 3; e++) {
             engine.setValue("[Skin]", "fx_param_knob_focus_" + e, 0);
             engine.setValue("[Skin]", "fx_param_button_focus_" + e, 0);
         }
         if (eff > 0 && idx > 0) {
             engine.setValue("[EffectRack1_EffectUnit1]", "focused_effect", eff);
-            // Only highlight the correct widget type (knob OR button, never both)
-            var unit = eff <= 2 ? 1 : 2;
-            var eNum = eff <= 2 ? eff : eff - 2;
-            var group = "[EffectRack1_EffectUnit" + unit + "_Effect" + eNum + "]";
-            var pType = engine.getValue(group, "parameter" + idx + "_type");
-            if (pType === 0) {
-                engine.setValue("[Skin]", "fx_param_knob_focus_" + eff, idx);
-            } else {
-                engine.setValue("[Skin]", "fx_param_button_focus_" + eff, idx);
-            }
+            engine.setValue("[Skin]", "fx_param_knob_focus_" + eff, idx);
+            engine.setValue("[Skin]", "fx_param_button_focus_" + eff, idx);
         } else {
             engine.setValue("[EffectRack1_EffectUnit1]", "focused_effect", 0);
         }
