@@ -110,6 +110,8 @@ Custom firmware + MIXXX deployment for **Denon DJ Prime Go** hardware (Rockchip 
 
 ### Firmware Overlay (local: `buildroot-customizations/…/rootfs_overlay/`, device: `/`)
 
+> **NOTE:** `buildroot-customizations/` is a **git submodule** (remote: `../buildroot-enginedevices.git`, branch: `mixxx`). Changes here live in a separate repo. Use `git submodule update --init` after clone.
+
 | Artifact Type | Canonical Location (local repo) | Device path |
 |---|---|---|
 | Entry point (thin delegator) | `buildroot-customizations/…/data/mixxx/mixxx` | `/data/mixxx/mixxx` |
@@ -212,6 +214,10 @@ docs/                                                 | Human documentation. No 
        echo "FAIL: tkgl_mod_mixxx.sh is too short (<50 lines), likely stripped version"; exit 1
      fi
    fi
+
+8. Controller path in mixxx.cfg must NOT point to settings/controllers/:
+   grep -q "settings/controllers/" mixxx-bundle/settings/mixxx.cfg && \
+     { echo "FAIL: mixxx.cfg points to settings/controllers/ instead of controllers/"; exit 1; } || true
 ```
 
 ---
@@ -265,14 +271,89 @@ Boot chain:
 - After any SCP-based file change on the device, update the local repo to match. The repo is always the source of truth.
 ```
 
+### Runtime modification workflow — CRITICAL
+
+When editing files directly on the device at runtime (SSH in, tweak, restart MIXXX to test), you MUST sync them back to the local repo BEFORE committing. The deploy scripts are unidirectional (local → device) — there is no automated pull-back.
+
+**Connecting to the device (two methods):**
+
+```bash
+# Primary: USB Ethernet gadget (always works, no WiFi dropouts)
+ssh root@192.168.42.1   # password: denonprime4
+
+# Fallback: WiFi (requires keepalive ping)
+ping -i 25 $DEVICE_IP > /dev/null 2>&1 &   # start keepalive first
+ssh root@$DEVICE_IP
+kill %1   # stop keepalive when done
+```
+
+**Every runtime editing session MUST end with pulling changed files back:**
+
+```bash
+DEV=root@192.168.42.1  # or root@$DEVICE_IP
+BUNDLE=/media/az01-internal/mixxx
+
+# 1. Controller mappings (most frequently edited at runtime)
+scp $DEV:$BUNDLE/controllers/Denon-Prime-Go-scripts.js mixxx-bundle/mixxx-mapping/prime-go/
+scp $DEV:$BUNDLE/controllers/Denon-Prime-Go.midi.xml mixxx-bundle/mixxx-mapping/prime-go/
+scp $DEV:$BUNDLE/controllers/Denon-Prime-Go-Jog-Wheels.midi.xml mixxx-bundle/mixxx-mapping/prime-go/
+scp $DEV:$BUNDLE/controllers/Denon-Prime-Go-jog-wheel-scripts.js mixxx-bundle/mixxx-mapping/prime-go/
+scp $DEV:$BUNDLE/controllers/LateNightMini_toggle_helper.js mixxx-bundle/mixxx-mapping/prime-go/
+scp $DEV:$BUNDLE/controllers/common-*.js mixxx-bundle/mixxx-mapping/prime-go/
+
+# 2. Skin files (LateNightMini is canonical — NOT RoundCorners)
+scp -r $DEV:$BUNDLE/skins/LateNightMini /tmp/device-LateNightMini
+diff -rq mixxx-bundle/skins/LateNightMini /tmp/device-LateNightMini | grep -v "\.bak"
+# Merge any differences into mixxx-bundle/skins/LateNightMini/
+
+# 3. Runtime configs (rewritten by MIXXX on every run)
+scp $DEV:$BUNDLE/settings/mixxx.cfg mixxx-bundle/settings/
+scp $DEV:$BUNDLE/settings/effects.xml mixxx-bundle/settings/
+scp $DEV:$BUNDLE/settings/samplers.xml mixxx-bundle/settings/
+scp $DEV:$BUNDLE/settings/soundconfig.xml mixxx-bundle/settings/
+
+# 4. System files (service units, udev rules, scripts)
+scp $DEV:/etc/systemd/system/mixxx.service scripts/device/
+scp $DEV:/usr/sbin/powerbutton-monitor scripts/device/
+scp $DEV:/etc/systemd/system/powerbutton-monitor.service scripts/device/
+scp $DEV:/usr/sbin/usb-gadget-eth.sh scripts/device/
+scp $DEV:/etc/systemd/system/usb-gadget-eth.service scripts/device/
+scp $DEV:/etc/udev/rules.d/99-wifi-power-save.rules scripts/device/
+
+# 5. Launcher and entry point
+scp $DEV:$BUNDLE/mixxx_launcher.sh mixxx-bundle/
+scp $DEV:/data/mixxx/mixxx mixxx-bundle/
+```
+
+**After pulling, always verify:**
+```bash
+# Check what changed
+git status --short
+
+# CRITICAL: Verify controller path in mixxx.cfg points to controllers/ NOT settings/controllers/
+grep "settings/controllers" mixxx-bundle/settings/mixxx.cfg && echo "FAIL: wrong path!" || echo "OK"
+
+# Run pre-commit checks
+./scripts/verify-launcher.sh
+./scripts/check-duplicates.sh
+```
+
+**Canonical skin is LateNightMini** (`mixxx-bundle/skins/LateNightMini/`). RoundCorners (`mixxx-bundle/skins/roundcorners/`) is a legacy deployment target — all new skin work goes into LateNightMini. The deploy scripts deploy RoundCorners to device `skins/roundcorners/`; if you edit skins at runtime, map changes back to the correct LateNightMini source file.
+
+**Files that MUST be committed together**: controller mappings + skin + launcher + runtime configs form a single deployable unit. Never commit one without verifying the others are in sync.
+
+**`settings/controllers/` is WRONG.** Controller files live in `controllers/` (flat). MIXXX writes stale copies to `settings/controllers/` at runtime — these must be cleaned up and `mixxx.cfg` must point to `controllers/`. Check on every pull-back.
+
 ---
 
 ## PACKAGE / ENVIRONMENT CONSTANTS
 
 ```
-- Device IP:          set via DEVICE_IP env var, never hardcoded
+- Device IP (WiFi):   set via DEVICE_IP env var, never hardcoded
+- Device IP (USB):    192.168.42.1 (USB Ethernet gadget, always available)
 - Device hostname:    primego.local (mDNS, may not resolve from all networks)
 - Device SSH pass:    denonprime4 (from DEPLOY.md — never hardcode)
+- Preferred SSH:      USB Ethernet at 192.168.42.1 — no keepalive needed, no dropouts
 - Device arch:        armv7l (Cortex-A17)
 - Device kernel:      6.1.111-inmusic-2024-09-19-rt41 (PREEMPT_RT)
 - Cross-compiler:     buildroot/output/host/bin/arm-buildroot-linux-gnueabihf-
@@ -319,12 +400,15 @@ DEVICE_IP=primego.local ./scripts/deploy-to-device.sh  # SCP to device
 
 ### Go tools (cross-platform updater)
 
+Module: `github.com/icedream/denon-prime4/go` (Go 1.24). Key deps: FLTK (`go-fltk`) for GUI, `gousb` for USB flashing, `xz` for firmware decompression, `u-root` for fastboot.
+
 ```bash
 cd go
 go build ./cmd/updater/      # Build the GUI firmware updater (FLTK-based, requires build-fltk)
 go build ./cmd/find_update/  # Build the CLI update finder (no GUI deps)
-go test ./pkg/updater/       # Run the single Go test (XZ decompression)
+go test ./pkg/updater/       # Run updater package tests (XZ decompression)
 go test ./pkg/fastboot/      # Run fastboot package tests
+go test ./...                # Run all Go tests
 ```
 
 Cross-compile for Windows: `make -C go all-windows-amd64`
@@ -338,12 +422,6 @@ Cross-compile for Windows: `make -C go all-windows-amd64`
 
 Both scripts exit non-zero on failure — run before every commit.
 
-### Skin QSS build
-
-```bash
-./scripts/build-style-qss.sh     # Concatenate style_qss/_*.qss modules → style.qss
-```
-
 ### Fast iteration (device)
 
 ```bash
@@ -356,6 +434,8 @@ Both scripts exit non-zero on failure — run before every commit.
 make PRIMEGO-4.3.4-STOCK-SSH-Update.img.dtb   # Build SSH-enabled stock firmware (SSH+WiFi auto-provisioned)
 make PRIMEGO-4.3.4-Update.img.dtb             # Build custom MIXXX-enabled firmware
 ```
+
+All `PRIMEGO-*.img.dtb` and `PRIME4-*.img.dtb` targets are built from corresponding `.dts` files via `mkimage -f`. The Makefile also provides shorthand targets (`make unpack`, `make clone-buildroot`, `make compile-buildroot`, `make pack`) that delegate to the same-named shell scripts.
 
 ---
 

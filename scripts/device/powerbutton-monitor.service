@@ -1,0 +1,10 @@
+[Unit]
+Description=Power button shutdown monitor
+Documentation=https://github.com/gueritta/denon-prime4
+After=local-fs.target
+
+[Service]
+Type=simple
+ExecStart=/usr/sbin/powerbutton-monitor
+Restart=always
+RestartSec=3

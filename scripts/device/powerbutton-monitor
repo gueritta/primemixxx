@@ -1,0 +1,139 @@
+#!/bin/sh
+# Power button → clean shutdown (stop MIXXX gracefully, then poweroff).
+#
+# The Denon Prime 4 / Prime Go (RK3288 + RK808 PMIC) exposes the power button
+# as an input device (name typically "rk8xx_pwrkey" on /dev/input/event0).
+# This script reads raw input_event structs (16 bytes on ARM 32-bit LE)
+# and watches for KEY_POWER (code 116 = 0x74, type EV_KEY=1, value=1 for press).
+#
+# Shutdown sequence:
+#   1. Debounce: ignore presses within 3s of the last one
+#   2. systemctl stop mixxx-app.service (SIGTERM → MIXXX saves DB, exits cleanly)
+#   3. Wait up to 30s for MIXXX to stop; SIGKILL if it hangs
+#   4. Stop engine.service (if active)
+#   5. sync + poweroff
+
+LOG_TAG="powerbutton"
+log() { echo "[$LOG_TAG] $*" >&2; }
+
+# Locate hexdump — BusyBox places it in /usr/bin; util-linux in /usr/bin
+for candidate in /usr/bin/hexdump /sbin/hexdump /bin/hexdump; do
+    [ -x "$candidate" ] && { HEXDUMP="$candidate"; break; }
+done
+[ -z "$HEXDUMP" ] && { log "hexdump not found"; exit 1; }
+
+# --- Find the input device carrying the power key ---
+find_pwr_device() {
+    # Stable by-path symlink takes priority (e.g., platform-gpio-keys-event)
+    if [ -e /dev/input/by-path/platform-gpio-keys-event ]; then
+        log "using stable by-path symlink"
+        echo /dev/input/by-path/platform-gpio-keys-event
+        return 0
+    fi
+    for symlink in /dev/input/by-path/*; do
+        [ -e "$symlink" ] || continue
+        name=$(cat "/sys/class/input/$(readlink -f "$symlink" | xargs basename)/device/name" 2>/dev/null) || continue
+        case "$name" in
+            *key*|*Key*|*pwr*|*PWR*|*button*|*Button*)
+                log "using $symlink ($name)"
+                echo "$symlink"
+                return 0
+                ;;
+        esac
+    done
+    for dev in /dev/input/event*; do
+        [ -e "$dev" ] || continue
+        name=$(cat "/sys/class/input/${dev##*/}/device/name" 2>/dev/null) || continue
+        case "$name" in
+            *pwr*|*PWR*|*Power*|*power*|*button*|*Button*|rk8xx*|rk808*|gpio*|*key*|*Key*)
+                log "using $dev ($name)"
+                echo "$dev"
+                return 0
+                ;;
+        esac
+    done
+    [ -e /dev/input/event0 ] && { log "fallback to /dev/input/event0"; echo /dev/input/event0; return 0; }
+    return 1
+}
+
+# --- Read one input_event and check for KEY_POWER press ---
+# input_event layout (ARM 32-bit LE):
+#   [0-3] tv_sec  [4-7] tv_usec  [8-9] type  [10-11] code  [12-15] value
+# KEY_POWER: type=1 (EV_KEY), code=116 (0x0074), value=1 (press)
+check_event() {
+    line=$("$HEXDUMP" -v -n 16 -e '16/1 " %02x" "\n"' /dev/stdin 2>/dev/null) || return 1
+    [ -z "$line" ] && return 1
+    set -- $line
+    [ "${9}"  = "01" ] && [ "${10}" = "00" ] && [ "${11}" = "74" ] && \
+    [ "${12}" = "00" ] && [ "${13}" = "01" ] || return 1
+    return 0
+}
+
+# --- Stop a systemd service with timeout ---
+stop_service() {
+    local svc="$1" timeout="${2:-30}"
+    if ! systemctl is-active --quiet "$svc" 2>/dev/null; then
+        log "$svc is not active"
+        return 0
+    fi
+    log "stopping $svc (timeout ${timeout}s)"
+    systemctl stop "$svc" 2>/dev/null || true
+    local waited=0
+    while systemctl is-active --quiet "$svc" 2>/dev/null && [ "$waited" -lt "$timeout" ]; do
+        sleep 1
+        waited=$((waited + 1))
+    done
+    if systemctl is-active --quiet "$svc" 2>/dev/null; then
+        log "WARNING: $svc still running after ${timeout}s — sending SIGKILL"
+        # systemctl kill may not exist on old systemd; fall back to kill
+        systemctl kill -s KILL "$svc" 2>/dev/null || {
+            pid=$(systemctl show -p MainPID "$svc" 2>/dev/null | cut -d= -f2)
+            [ -n "$pid" ] && [ "$pid" != "0" ] && kill -9 "$pid" 2>/dev/null
+        }
+        sleep 1
+    fi
+    log "$svc stopped after ${waited}s"
+}
+
+# --- Debounce helper ---
+should_debounce() {
+    [ -f /tmp/pwrbtn_last ] || return 1
+    local now last diff
+    now=$(cat /proc/uptime 2>/dev/null | cut -d. -f1)
+    last=$(cat /tmp/pwrbtn_last)
+    diff=$((now - last))
+    [ "$diff" -lt 3 ]
+}
+
+# === Main ===
+PWR_DEV=$(find_pwr_device) || { log "no input device found"; exit 1; }
+log "monitoring $PWR_DEV for KEY_POWER"
+
+while true; do
+    if dd if="$PWR_DEV" bs=16 count=1 2>/dev/null | check_event; then
+        log "KEY_POWER press detected"
+
+        if should_debounce; then
+            log "debounce — ignoring (last press < 3s ago)"
+            continue
+        fi
+        cat /proc/uptime | cut -d. -f1 > /tmp/pwrbtn_last
+
+        # 1. Gracefully stop MIXXX (SIGTERM → save DB → exit)
+        stop_service mixxx-app.service 30
+
+        # 2. Stop Engine if running (belt & suspenders)
+        if systemctl is-active --quiet engine.service 2>/dev/null; then
+            log "stopping engine.service"
+            systemctl stop engine.service 2>/dev/null || true
+            sleep 2
+        fi
+
+        # 3. Power off
+        log "shutting down"
+        sync
+        /sbin/poweroff 2>/dev/null || /sbin/shutdown -h now 2>/dev/null || /bin/busybox poweroff
+        log "poweroff returned — sleeping, systemd will restart us"
+        sleep 10
+    fi
+done

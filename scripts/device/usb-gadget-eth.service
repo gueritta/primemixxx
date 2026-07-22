@@ -1,0 +1,10 @@
+[Unit]
+Description=USB Ethernet Gadget
+After=sys-kernel-config.mount
+Before=network.target
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/usb-gadget-eth.sh
+[Install]
+WantedBy=multi-user.target
