@@ -244,19 +244,31 @@ could provide similar tracing without ftrace. Check the device kernel config for
 eBPF is lighter-weight than ftrace and more flexible for targeted probing, but requires
 cross-compiling bpftrace or using `bpftool` on-device.
 
-### Buildroot version note
+### Rebuild procedure
 
-This project uses **Buildroot 2021.02.10** (not 2023.02.x). The `buildroot/2023.02.11/`
-directory present in the repo is a separate unused clone. The kernel config lives at
-`buildroot-customizations/board/inmusic/common/linux.config` and targets 6.1.78 with
-PREEMPT_RT patch `patches-6.1.77-rt24`.
+The workflow described in research is correct in structure, but the version numbers
+need correction for this project:
 
-### GPL kernel source
+| Item | Research says | **Actual** |
+|---|---|---|
+| Buildroot version | 2023.02.x LTS | **2021.02.10** |
+| Base kernel | 5.15 | **6.1.78** (buildroot) / **6.1.111** (device stock) |
+| RT patch | 5.15.86-rt56 | **patches-6.1.77-rt24** |
+| Kernel source | Request from inMusic | GPL compliance: https://inmusicbrands.com/gpl/ |
+| Kconfig interface | `make linux-menuconfig` | Correct — standard Buildroot kernel config target |
+| `/proc/schedstat` | Listed as verification target | Requires `CONFIG_SCHEDSTATS=y` (not `CONFIG_SCHED_DEBUG`) |
+| `/proc/sched_debug` | Not mentioned | Requires `CONFIG_SCHED_DEBUG=y` |
+| `/proc/<PID>/sched` | Not mentioned | Always available — no config dependency |
 
-The device's actual stock kernel (6.1.111-inmusic-2024-09-19-rt41) has a different
-and unknown config. InMusic is legally required to provide the modified kernel source
-under the GPL. Obtaining it would allow rebuilding with ftrace + sched debug + nohz_full.
-Contact: inMusic GPL compliance at https://inmusicbrands.com/gpl/
+**Correct rebuild sequence for this project:**
+
+1. Obtain inMusic's 6.1.111 GPL kernel source
+2. Apply PREEMPT_RT patchset matching the kernel version
+3. Copy device kernel config as starting `.config` (or start from `linux.config`)
+4. `make linux-menuconfig` → enable ftrace + sched debug + nohz_full + rcu_nocb
+5. `./compile-buildroot.sh` → produces new `zImage` + `.dtb`
+6. Flash via Go updater (`./go/cmd/updater/`)
+7. Verify: `mount -t debugfs none /sys/kernel/debug && ls /sys/kernel/debug/tracing/`
 
 ### ⚠ Device kernel caveat
 
