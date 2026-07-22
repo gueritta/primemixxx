@@ -1,5 +1,1 @@
-midi = new Object();
-
-midi.sendShortMsg = function(status, a, b) {
-    controller.send([status, a, b], 3);
-}
+../mixxx-mapping/prime-go/common-bulk-midi.js
