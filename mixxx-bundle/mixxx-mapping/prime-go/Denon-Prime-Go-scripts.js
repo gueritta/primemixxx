@@ -708,6 +708,11 @@ PrimeGo.init = function(_id, _debug) {
     PrimeGo.browseEncoder = function(channel, control, value, status, group) {
         // value: 0x01 = clockwise (down), 0x7F = counter-clockwise (up)
         var step = PrimeGo.shift ? 20 : 1;
+        // Ensure FX chain selector dropdown doesn't steal encoder events.
+        // Release any lingering FX focus so Library scroll always works.
+        if (engine.getValue("[EffectRack1_EffectUnit1]", "focused_effect") !== 0) {
+            engine.setValue("[EffectRack1_EffectUnit1]", "focused_effect", 0);
+        }
         if (value === 0x01) {
             for (var i = 0; i < step; i++) {
                 engine.setValue("[Library]", "MoveDown", 1);
@@ -820,6 +825,12 @@ PrimeGo.init = function(_id, _debug) {
 
             engine.setParameter(effect, "enabled", 1);
         }
+
+        // Release FX focus so browse encoder routes back to Library.
+        // chain_selector cycling can cause the EffectChainSelector dropdown
+        // to grab UI focus; clearing focused_effect ensures the encoder
+        // returns to library scroll after preset selection.
+        engine.setValue("[EffectRack1_EffectUnit1]", "focused_effect", 0);
     };
 
     // Sweep FX - Filter Button
