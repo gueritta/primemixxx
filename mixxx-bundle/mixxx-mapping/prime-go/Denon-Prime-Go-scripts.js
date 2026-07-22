@@ -691,14 +691,20 @@ PrimeGo.init = function(_id, _debug) {
             engine.getValue("[EffectRack1_EffectUnit1]", key) > 0 ? 0 : 1);
     };
 
-    // Press down on the library encoder, acts as 'Enter' key in Mixxx library
+    // Press down on the library encoder: GoToItem + release FX focus back to library
     PrimeGo.encoderLoad = new components.Button({
         midi: [0x9F, 0x06],
         group: "[Library]",
         key: "GoToItem",
+        input: function(channel, control, value, status) {
+            if (this.isPress(channel, control, value, status)) {
+                engine.setValue("[EffectRack1_EffectUnit1]", "focused_effect", 0);
+                engine.setValue("[Library]", "GoToItem", 1);
+            }
+        }
     });
 
-    // Browse encoder with shift acceleration
+    // Browse encoder with shift acceleration — dynamically routes to library or FX
     PrimeGo.browseEncoder = function(channel, control, value, status, group) {
         // value: 0x01 = clockwise (down), 0x7F = counter-clockwise (up)
         var step = PrimeGo.shift ? 20 : 1;
