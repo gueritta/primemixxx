@@ -55,5 +55,9 @@
       </WidgetGroup><!-- EffectUnit 1 -->
 
     </Children>
+    <Connection>
+      <ConfigKey>[Skin],show_effectrack</ConfigKey>
+      <BindProperty>visible</BindProperty>
+    </Connection>
   </WidgetGroup>
 </Template>

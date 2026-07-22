@@ -20,7 +20,7 @@
     <SizePolicy>me,min</SizePolicy>
     <Children>
       <WidgetGroup>
-        <ObjectName>FxParameterFocusBg</ObjectName>
+        <ObjectName>FxParametersFocusBg</ObjectName>
         <Size>0me,3f</Size>
         <SizePolicy>me,f</SizePolicy>
         <Connection>

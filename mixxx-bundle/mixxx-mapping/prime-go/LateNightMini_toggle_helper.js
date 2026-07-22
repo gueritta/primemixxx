@@ -14,16 +14,6 @@
 
     // Each trigger key maps to { group, target, sync[]? }
     var TOGGLE_TARGETS = {
-        "maximize_library_trig": { group: "[Master]",   target: "maximize_library" },
-        "show_waveforms_trig":   { target: "show_waveforms" },
-        "show_effectrack_trig":  { target: "show_effectrack",
-                                    sync: ["[EffectRack1]", "show"] },
-        "show_samplers_trig":    { target: "show_samplers",
-                                    sync: ["[Samplers]", "show_samplers"] },
-        "show_settings_trig":    { target: "show_settings",
-                                    sync: ["[Skin]", "show_settings"] },
-        "max_lib_show_decks_trig": { target: "max_lib_show_decks" },
-
         // Skin settings submenu toggles (button_2state_touch)
         "timing_shift_buttons_trig":           { group: "[Skin]", target: "timing_shift_buttons" },
         "keep_consistent_waveform_heights_trig": { group: "[Skin]", target: "keep_consistent_waveform_heights" },
