@@ -15,6 +15,11 @@ This guide covers deploying MIXXX to a Denon Prime Go **without stripping** the 
 
 ## Quick Start
 
+> **⚠️ Golden rule: every change applies to BOTH local repo AND device.**  
+> The repo is always the source of truth — commit locally first, then deploy to device.  
+> Never edit files directly on the device without updating the repo.  
+> Never commit without deploying. **Local ↔ device must always be in sync.**
+
 ```bash
 # 1. Collect MIXXX + dependencies from Buildroot output
 ./scripts/collect-mixxx-bundle.sh
