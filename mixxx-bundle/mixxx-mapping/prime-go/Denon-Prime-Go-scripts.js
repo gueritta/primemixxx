@@ -517,8 +517,7 @@ PrimeGo.init = function(_id, _debug) {
 
     PrimeGo.fxFocus = {
         effect: 1,
-        paramIndex: 0,
-        timeMode: "select"   // "select" = turn cycles params, "adjust" = turn tweaks value
+        paramIndex: 0
     };
 
     PrimeGo.fxParamNames = [
@@ -585,34 +584,37 @@ PrimeGo.init = function(_id, _debug) {
         PrimeGo.fxUpdateDisplay();
     };
 
-    // FX Time encoder: push toggles select/adjust, turn acts on mode (ch5 note 0x0A, CC 0x22)
-    // TODO: capacitive touch (note 0x0A) — re-add fxTimeTouch to reveal/cycle params on touch
+    // FX Time encoder: touch cycles params, turn always adjusts value, push toggles button
     PrimeGo.fxTimeTouch = function(channel, control, value, status) {
-        // capacitive touch disabled for now
+        if (value !== 0x7F) return;
+        PrimeGo.fxCycleParam(1);
     };
 
     PrimeGo.fxTimeTurn = function(channel, control, value, status) {
         var dir = (value === 0x01) ? 1 : -1;
-        if (PrimeGo.fxFocus.timeMode === "adjust") {
-            var eff = PrimeGo.fxFocus.effect;
-            var idx = PrimeGo.fxFocus.paramIndex;
-            if (eff > 0 && idx > 0) {
-                var unit = eff <= 2 ? 1 : 2;
-                var eNum = eff <= 2 ? eff : eff - 2;
-                var group = "[EffectRack1_EffectUnit" + unit + "_Effect" + eNum + "]";
-                var cur = engine.getValue(group, "parameter" + idx);
-                var delta = dir * 0.05;
-                engine.setValue(group, "parameter" + idx, Math.min(1.0, Math.max(0.0, cur + delta)));
-            }
-        } else {
-            PrimeGo.fxCycleParam(dir);
+        var eff = PrimeGo.fxFocus.effect;
+        var idx = PrimeGo.fxFocus.paramIndex;
+        if (eff > 0 && idx > 0) {
+            var unit = eff <= 2 ? 1 : 2;
+            var eNum = eff <= 2 ? eff : eff - 2;
+            var group = "[EffectRack1_EffectUnit" + unit + "_Effect" + eNum + "]";
+            var cur = engine.getValue(group, "parameter" + idx);
+            var delta = dir * 0.05;
+            engine.setValue(group, "parameter" + idx, Math.min(1.0, Math.max(0.0, cur + delta)));
         }
     };
 
-    // FX Time push: toggle select ↔ adjust mode
     PrimeGo.fxTimePush = function(channel, control, value, status) {
         if (value !== 0x7F) return;
-        PrimeGo.fxFocus.timeMode = (PrimeGo.fxFocus.timeMode === "select") ? "adjust" : "select";
+        var eff = PrimeGo.fxFocus.effect;
+        var idx = PrimeGo.fxFocus.paramIndex;
+        if (eff > 0 && idx > 0) {
+            var unit = eff <= 2 ? 1 : 2;
+            var eNum = eff <= 2 ? eff : eff - 2;
+            var group = "[EffectRack1_EffectUnit" + unit + "_Effect" + eNum + "]";
+            engine.setValue(group, "button_parameter" + idx,
+                engine.getValue(group, "button_parameter" + idx) > 0 ? 0 : 1);
+        }
     };
 
     // FX Select push: toggle focused effect on/off (ch5 CC 0x21 push)
