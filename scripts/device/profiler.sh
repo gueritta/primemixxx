@@ -162,8 +162,11 @@ profile_irq() {
 #   BBB = pcount (number of tasks run)
 profile_sched() {
     [ "$CSV_MODE" = 1 ] && csv_hdr "cpu,run_delay_ns,pcount,avg_delay_ns"
-    # /proc/schedstat may not exist on all kernels
-    [ -f /proc/schedstat ] || { echo "ERROR: /proc/schedstat not found"; exit 1; }
+    # /proc/schedstat may not exist on all kernels (requires CONFIG_SCHEDSTATS)
+    if [ ! -f /proc/schedstat ]; then
+        echo "WARNING: /proc/schedstat not available (CONFIG_SCHEDSTATS not enabled in kernel)"
+        return 0
+    fi
 
     cp /proc/schedstat /tmp/profiler-sched-0.$$
 
