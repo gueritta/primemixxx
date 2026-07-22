@@ -505,6 +505,40 @@ Engine Prime (`/usr/Engine/Engine`) has a sophisticated built-in profiler
 **exclusively `/proc` and `/sys`** — no ftrace, no eBPF, no kernel debug features.
 This validates our profiling approach.
 
+### Sentry — crash reporting, NOT performance profiling
+
+Engine OS embeds `sentry-native` 0.7.2 (with Google Crashpad) for **crash telemetry**.
+It is separate from Engine's performance profiling system (`TrackPerformanceData`,
+which uses protobuf, not Sentry).
+
+**What Sentry collects (on crash only):**
+- Minidump crash reports (stack traces via `libunwind-ptrace`)
+- System logs at crash time
+- System environment information
+
+**What Sentry does NOT collect:** CPU usage, memory pressure, audio xruns, GPU
+frequency, scheduler stats — none of the data useful for optimization measurement.
+
+**Hardcoded DSNs in `/usr/Engine/Engine`:**
+```
+https://56d5dbf7dc264b6892b936f7a1be21bc@o230257.ingest.sentry.io/1388643
+https://36ed0ada58dc4840953dd3d06c811c44@o230257.ingest.sentry.io/5608362
+https://45cfde58e99249f79c5973bc263d691b@o230257.ingest.sentry.io/6661444
+```
+
+**Three control methods:**
+
+| Method | What | How |
+|---|---|---|
+| Env override | Redirect to your server | `export SENTRY_DSN="https://key@your-host/project"` in `/usr/Engine/Scripts/runengine` |
+| DNS block | Disable entirely | `127.0.0.1 o230257.ingest.sentry.io` in `/etc/hosts` |
+| Dev UI | Manual crash test | Engine debug menu: "Sentry Event" button, `CrashOnFreeze` toggle |
+
+**Conclusion for profiling:** Sentry is irrelevant to optimization measurement.
+Redirecting it could capture Engine crash dumps for debugging, but it provides
+zero runtime performance data. Engine has a separate `TrackPerformanceData`
+system (protobuf, gRPC) for performance metrics — that's the performance path.
+
 **Engine's data sources (extracted via `strings /usr/Engine/Engine`):**
 
 | Metric | Engine source | Our equivalent |
