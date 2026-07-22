@@ -277,3 +277,110 @@ The device kernel's `.config` is unknown. Verify on-device with:
 ```bash
 ssh root@192.168.42.1 'zcat /proc/config.gz 2>/dev/null | grep -E "FTRACE|SCHED_DEBUG|SCHEDSTATS|BPF" || echo "config.gz not available — kernel built without /proc/config.gz"'
 ```
+
+---
+
+## 10. WHAT'S MISSING FOR A KERNEL REBUILD FROM DEVICE CONFIG
+
+Six blockers prevent us from taking the device's actual kernel config and rebuilding
+with ftrace + sched debug + nohz_full enabled:
+
+### Blocker 1: Kernel version mismatch
+
+| | Buildroot | Device |
+|---|---|---|
+| Kernel | 6.1.78 | **6.1.111** |
+| RT patch | patches-6.1.77-rt24 | **unknown** |
+| Source | vanilla linux-stable | **inMusic modified** |
+
+Our entire build chain (`clone-buildroot.sh`, `compile-buildroot.sh`) is hardcoded to
+6.1.78. Bumping to 6.1.111 means changing:
+- `BR2_DEFAULT_KERNEL_VERSION` in `jp11_defconfig` (6.1.78 → 6.1.111)
+- `BR2_LINUX_KERNEL_PATCH` URL to a matching RT patchset for 6.1.111
+- `linux.config` header version (currently says `Linux/arm 6.1.78`)
+
+### Blocker 2: inMusic kernel source unknown
+
+The stock 6.1.111-inmusic-2024-09-19-rt41 kernel contains unknown modifications:
+- Rockchip RK3288 BSP patches (device tree, DRM, clock, PMIC)
+- Audio driver stack (XMOS USB audio, AK4621 CODEC, AK4413 DAC)
+- Mali GPU integration (r1p0 DDK bindings, `/sbin/az01-libmali-setup`)
+- Denon-specific hardware support (ILI2117 touch, SD mux, power button)
+- Possibly custom kernel APIs used by Engine OS
+
+Without the exact GPL source, we're guessing. Even if we extract the config and
+build vanilla 6.1.111 + RT, it almost certainly won't boot — the device tree and
+driver patches are essential.
+
+### Blocker 3: RT patch availability
+
+PREEMPT_RT patches are maintained per kernel minor version. For 6.1:
+- `patches-6.1.77-rt24.tar.xz` — we use this for 6.1.78
+- Patches exist up to ~6.1.90-rt26+
+- 6.1.111 may not have a published RT patchset
+
+Options if no matching RT patch exists:
+1. Find the closest patchset and fix rebase conflicts
+2. Use a kernel version close to the device's that HAS an RT patch (e.g. 6.1.90-rt26)
+3. Request inMusic's source which includes their RT patch
+
+### Blocker 4: Config extraction
+
+Our buildroot config has `CONFIG_IKCONFIG_PROC=y` — but the **device** runs inMusic's
+kernel, not ours. If inMusic disabled IKCONFIG, `/proc/config.gz` won't exist.
+
+Fallbacks:
+1. `extract-ikconfig.sh` — extracts config from a zImage file (requires firmware unpack)
+2. Dump running config via `cat /proc/sched_debug` header (if enabled)
+3. Guess from `/proc` filesystem presence and kernel cmdline
+
+### Blocker 5: Toolchain compatibility
+
+We use `arm-buildroot-linux-gnueabihf-gcc 12.3.0` (from Buildroot 2021.02.10's GCC 12.x).
+This should be fine for 6.1.111 — same architecture, similar compiler requirements.
+Low risk.
+
+### Blocker 6: Boot chain integration
+
+Even if we rebuild and flash a kernel with ftrace enabled, the boot chain must still work:
+- U-Boot must load our new zImage
+- Device tree (`.dtb`) must match — we'd need to rebuild it too
+- Our TKGL bootstrap / MIXXX launcher / Mali setup must still function
+- A non-booting kernel on a sealed device means USB flashing back to stock
+
+### Dependency graph
+
+```
+inMusic GPL source
+  ├─ kernel 6.1.111 patches
+  ├─ Rockchip BSP patches
+  ├─ Audio driver patches
+  └─ Denon hardware patches
+       │
+       ▼
+  Full modified kernel source
+       │
+       ▼
+  RT patchset for matching version ──► Apply PREEMPT_RT
+       │
+       ▼
+  Device config (from /proc/config.gz or zImage)
+       │
+       ▼
+  Enable ftrace + sched debug + nohz_full + rcu_nocb
+       │
+       ▼
+  Rebuild zImage + DTB via buildroot
+       │
+       ▼
+  Pack into .img.dtb firmware
+       │
+       ▼
+  Flash via USB (Go updater)
+       │
+       ▼
+  Verify: /sys/kernel/debug/tracing/ exists
+```
+
+**Bottom line**: The critical blocker is **inMusic's modified kernel source**. Everything
+else (RT patch, config extraction, toolchain) is solvable once the source is available.
