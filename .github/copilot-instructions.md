@@ -293,6 +293,17 @@ kill %1   # stop keepalive when done
 DEV=root@192.168.42.1  # or root@$DEVICE_IP
 BUNDLE=/media/az01-internal/mixxx
 
+# 0. Before pulling, back up the SD card (EXCLUDE music/ — it's USB content, not SD)
+#    Also skip lib/ (huge, rebuildable), bin/ (binary), logs, and databases:
+BACKUP_DIR="sdcard-backup-$(date +%Y%m%d-%H%M%S)"
+mkdir -p "$BACKUP_DIR"
+scp $DEV:$BUNDLE/mixxx_launcher.sh "$BACKUP_DIR/"
+scp -r $DEV:$BUNDLE/controllers "$BACKUP_DIR/"
+scp -r $DEV:$BUNDLE/skins "$BACKUP_DIR/"
+scp -r $DEV:$BUNDLE/settings "$BACKUP_DIR/"
+# ⚠ NEVER scp $BUNDLE/music/ — it's a USB mount point, NOT SD card content
+# ⚠ NEVER scp $BUNDLE/lib/ or $BUNDLE/bin/ — they're large and rebuildable
+
 # 1. Controller mappings (most frequently edited at runtime)
 scp $DEV:$BUNDLE/controllers/Denon-Prime-Go-scripts.js mixxx-bundle/mixxx-mapping/prime-go/
 scp $DEV:$BUNDLE/controllers/Denon-Prime-Go.midi.xml mixxx-bundle/mixxx-mapping/prime-go/

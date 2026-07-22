@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # switch-to-mixxx — Switch from Engine DJ to MIXXX (deployed on SD card)
 # Usage: ssh root@primego switch-to-mixxx
 set -e

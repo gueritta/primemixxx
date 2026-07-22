@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # switch-to-engine — Switch from MIXXX back to Engine DJ
 # Usage: ssh root@primego switch-to-engine
 set -e
