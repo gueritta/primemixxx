@@ -1,0 +1,67 @@
+<!DOCTYPE template>
+<Template>
+
+    <!--
+    **************************************************************************************
+    DECK DEVICE BEGIN
+    **************************************************************************************
+    -->
+    <WidgetGroup>
+        <Layout>stacked</Layout>
+        <SizePolicy>me,me</SizePolicy>
+        <Children>
+
+            <!-- Hack for BUG https://github.com/22degrees/RoundCorners/issues/4 -->
+            <Template src="skin:shared/confighack.xml"/>
+
+            <Template src="skin:device/deck/config.xml"/>
+
+            <Template src="skin:device/deck/passthrough.xml"/>
+
+            <WidgetGroup>
+                <ObjectName>Deck<Variable name="Number"/></ObjectName>
+                <Layout>vertical</Layout>
+                <SizePolicy>me,max</SizePolicy>
+                <Children>
+
+                    <Template src="skin:device/deck/border_top.xml"/>
+
+                    <WidgetGroup>
+                        <ObjectName>Rectangle</ObjectName>
+                        <Layout>vertical</Layout>
+                        <SizePolicy>me,max</SizePolicy>
+                        <Children>
+
+                            <Template src="skin:device/deck/trackinfo.xml"/>
+
+                            <Template src="skin:device/deck/gutter.xml"/>
+
+                        </Children>
+                    </WidgetGroup>
+
+                    <Template src="skin:device/deck/transport.xml"/>
+
+                    <Template src="skin:device/deck/hotcue_row.xml"/>
+
+                    <Template src="skin:device/deck/loop.xml"/>
+
+                    <WidgetGroup><!-- dyn.expander: fixed to 10px to prevent over-expansion into sampler/FX area -->
+                        <ObjectName>TransportRow</ObjectName>
+                        <Size>me,10f</Size>
+                        <MaximumSize>-1,10</MaximumSize>
+                    </WidgetGroup>
+
+                    <Template src="skin:device/deck/border_bottom.xml"/>
+
+                </Children>
+            </WidgetGroup>
+
+        </Children>
+    </WidgetGroup>
+    <!--
+    **************************************************************************************
+    DECK DEVICE END
+    **************************************************************************************
+    -->
+
+</Template>

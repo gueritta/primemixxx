@@ -1,14 +1,24 @@
-# Deploying MIXXX on the Denon Prime Go
+# Deploying MIXXX on Denon Prime Series
 
 ## End User Quickstart (No Compiling)
 
-If you just want MIXXX on your Prime Go without building anything:
+If you just want MIXXX on your Prime Go or Prime 4 without building anything:
 
-1. **Download the SSH firmware** from [icedream/denon-prime4 Releases](https://github.com/icedream/denon-prime4/releases/latest) — file `PRIMEGO-4.3.4-STOCK-SSH-Update.img`
-2. **Download the SD card bundle** from [gueritta/denon-prime4 Releases](https://github.com/gueritta/denon-prime4/releases/latest) — file `primego-sdcard-mixxx-*.tar.gz`
-3. **Flash the firmware** via USB (put device in update mode, use the Go updater)
-4. **Extract the bundle** to a microSD card formatted as ext4 (label `TKGL_BOOTSTRAP`)
-5. **Insert the SD card** and power on — MIXXX auto-launches
+1. **Download the SD card bundle** from [GitHub Releases](https://github.com/gueritta/denon-prime4/releases/latest) — file `prime-series-sdcard-*.tar.gz`
+2. **Extract the bundle** to a microSD card formatted as ext4 (label `TKGL_BOOTSTRAP`)
+3. **Insert the SD card** and power on
+4. **SSH in** and run the bootstrap:
+
+```bash
+ssh root@<device-ip>   # password: denonprime4
+mount -L TKGL_BOOTSTRAP /media/TKGL_BOOTSTRAP
+/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/scripts/tkgl_bootstrap
+```
+
+| Device | Status |
+|---|---|
+| **Prime Go** | ✅ Verified working — display, audio, touch, MIDI all functional |
+| **Prime 4** | ⚠️ Untested — MIXXX runs in offscreen mode but native display (DSI) causes GPU segfault |
 
 See the [README Quick Start](README.md#quick-start-end-users) for detailed step-by-step instructions.
 
@@ -18,14 +28,11 @@ See the [README Quick Start](README.md#quick-start-end-users) for detailed step-
 
 ## Prerequisites
 
-1. **Flash the stock+SSH firmware** to your Prime Go:
-   - File: `PRIMEGO-4.3.4-STOCK-SSH-Update.img` (168MB)
-   - This is stock Engine OS 4.3.4 with SSH + WiFi auto-provisioning added
-   - Flash via USB using the Go updater tool (`go/cmd/updater/`) in device update mode (`reboot loader`)
-   
-2. **SSH access**: `ssh root@primego.local` (password: `denonprime4`)
+1. **SSH access**: `ssh root@<device-ip>` (password: `denonprime4`)
+   - Prime Go: USB Ethernet gadget at `192.168.42.1` or WiFi
+   - Prime 4: WiFi (keepalive ping needed to prevent SSH drops)
 
-3. **Build machine**: MIXXX already compiled via Buildroot (`scripts/collect-mixxx-bundle.sh` needs the output)
+2. **Build machine**: MIXXX already compiled via Buildroot (`scripts/collect-mixxx-bundle.sh` needs the output)
 
 ## Quick Start
 
@@ -54,47 +61,48 @@ ssh root@primego.local switch-to-engine
 to fix/reinstall services without re-deploying the full MIXXX bundle:
 
 ```bash
-DEVICE_IP=primego.local ./scripts/install-device-services.sh
+DEVICE_IP=<ip> ./scripts/install-device-services.sh
 ```
 
 | Service | Purpose | Auto-start |
 |---|---|---|
-| `mixxx.service` | MIXXX launcher via SD card | No (explicit switch-to-mixxx) |
 | `usb-gadget-eth.service` | USB Ethernet gadget (RNDIS) | Yes (boot) |
-| `fix-mdns.service` | Fixes mDNS to `primego.local` | Yes (boot, oneshot) |
+| `fix-mdns.service` | Fixes mDNS hostname | Yes (boot, oneshot) |
 | `powerbutton-monitor.service` | Graceful shutdown on power button | No (only during MIXXX sessions) |
 | `99-usb-automount.rules` | Auto-mount USB drives for music library | Yes (udev) |
 | `99-wifi-power-save.rules` | Disable WiFi power save (prevents SSH drops) | Yes (udev) |
 
-## What Gets Deployed
+## What Gets Deployed (SD-Only Approach)
 
-| Path on device | Contents |
+The SD-only bundle lives entirely on the SD card — nothing is written to internal storage.
+
+| Path on SD card | Contents |
 |---|---|
-| `/media/az01-internal/mixxx/lib/bin/mixxx` | MIXXX binary (ARMv7, ~10 MB, working) |
-| `/media/az01-internal/mixxx/bin/mixxx` | Symlink → `../lib/bin/mixxx` |
-| `/media/az01-internal/mixxx/mixxx.real` | 17 MB binary — DO NOT USE (EGLFS crash) |
-| `/media/az01-internal/mixxx/lib/` | All shared libraries MIXXX needs |
-| `/media/az01-internal/mixxx/qt-plugins/` | Qt5 EGLFS platform, image, SQL plugins |
-| `/media/az01-internal/mixxx/mixxx-mapping/` | MIDI controller mappings |
-| `/media/az01-internal/mixxx/mixxx_launcher.sh` | Minimal wrapper with env vars only |
-| `/data/mixxx/mixxx` | Entry point — delegates to SD launcher |
-| `/usr/bin/switch-to-mixxx` | Switcher: Engine → MIXXX |
-| `/usr/bin/switch-to-engine` | Switcher: MIXXX → Engine |
+| `tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/lib/bin/mixxx` | MIXXX binary (ARMv7, ~10 MB, working) |
+| `tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/bin/mixxx` | Symlink → `../lib/bin/mixxx` |
+| `tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/lib/` | All shared libraries MIXXX needs |
+| `tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/qt-plugins/` | Qt5 EGLFS platform, image, SQL plugins |
+| `tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/mixxx-mapping/` | MIDI controller mappings (Prime Go + Prime 4) |
+| `tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/mixxx_launcher.sh` | Launcher with env vars, Mali, CPU shielding |
+| `tkgl_bootstrap_DenonPrimeGO/modules/mod_mixxx/` | TKGL module — launches MIXXX via systemd-run |
+| `tkgl_bootstrap_DenonPrimeGO/scripts/tkgl_bootstrap` | Bootstrap entry point |
 
 ## How It Works
 
 For the full boot chain, architecture, and launch path details, see
 [`docs/ONBOARDING.md`](docs/ONBOARDING.md).
 
-**Quick summary:**
-- **Autostart (TKGL):** `tkgl-mixxx.service` → bootstrap → `systemd-run --unit=mixxx-app` → SD card launcher → MIXXX
-- **Manual switch:** `ssh root@primego.local switch-to-mixxx` / `switch-to-engine`
+**Quick summary (SD-only approach):**
+- User inserts SD card, powers on → Engine OS boots normally (hardware init)
+- User SSHes in and runs the TKGL bootstrap script on the SD card
+- TKGL bootstrap → `systemd-run --unit=mixxx-app` → SD card launcher → MIXXX
+- MIXXX runs entirely from SD card — internal storage is never modified
 
 ### Boot Verification
 ```bash
-ssh root@primego.local 'ps | grep mixxx'
-ssh root@primego.local 'systemctl status mixxx-app.service'
-ssh root@primego.local 'mount | grep "az01-internal/mixxx/music"'
+ssh root@<ip> 'ps | grep mixxx'
+ssh root@<ip> 'systemctl status mixxx-app.service'
+ssh root@<ip> 'mount | grep TKGL_BOOTSTRAP'
 ```
 
 ## SD Card Backup
@@ -124,31 +132,13 @@ cd go && go run ./cmd/updater/ --firmware ../PRIMEGO-4.3.4-STOCK-SSH-Update.img
 ## Troubleshooting
 
 **Can't SSH to device**:
-- Ensure WiFi is configured (the firmware auto-provisions "pd" network)
-- Try USB ethernet gadget: connect USB-C to computer, device appears as USB Ethernet
-- Fallback: flash stock firmware, use `mount.sh --write` to manually add WiFi config
+- Ensure device is on the same WiFi network
+- Try USB Ethernet gadget: connect USB-C to computer, device appears at `192.168.42.1`
+- WiFi SSH drops after ~30s silence — keep a keepalive ping running: `ping -i 25 <device-ip> > /dev/null &`
 
-**MIXXX segfaults (exit code 139)**:
+**MIXXX segfaults (exit code 139 / signal 11)**:
 - **System libs conflict**: The bundle must NOT contain `libc.so.6`, `libm.so.6`, `libpthread.so.0`, `libdl.so.2`, `librt.so.1`, `libstdc++.so.6`, `libgcc_s.so.1`, `ld-linux-armhf.so.3`, or `libatomic.so.1`. These MUST come from the device's `/lib`.
-- **Mali DDK mismatch**: Error "DDK is not compatible... r1p0 vs r0p0" means the bundled `libEGL.so`/`libGLESv2.so` target the wrong Mali driver version. Fix: `cd /media/az01-internal/mixxx/lib && rm -f libEGL.so libGLESv2.so libGLESv1_CM.so && ln -sf /usr/lib/libmali.so.14.0 libEGL.so && ln -sf /usr/lib/libmali.so.14.0 libGLESv2.so && ln -sf /usr/lib/libmali.so.14.0 libGLESv1_CM.so`
+- **Mali DDK mismatch**: Error "DDK is not compatible... r1p0 vs r0p0" means the bundled `libEGL.so`/`libGLESv2.so` target the wrong Mali driver version. Fix: `cd $BUNDLE/lib && rm -f libEGL.so libGLESv2.so libGLESv1_CM.so && ln -sf /usr/lib/libmali.so.14.0 libEGL.so && ln -sf /usr/lib/libmali.so.14.0 libGLESv2.so && ln -sf /usr/lib/libmali.so.14.0 libGLESv1_CM.so`
 - **EGLFS crash "OpenGL windows cannot be mixed with others"**: This happens when using the wrong binary (`mixxx.real` 17 MB). Use `lib/bin/mixxx` 10 MB instead. Check: `ls -la bin/mixxx` should point to `../lib/bin/mixxx`, NOT `../mixxx.real`.
-- **Qt 5.15.8 bundled on SD card**: MIXXX is compiled against Qt 5.15.8 and the SD card bundles this exact version. The device's native Qt 5.15.2 at `/usr/qt/lib` is used as fallback only.
-
-**MIXXX fails to start**:
-- Check `journalctl -u mixxx.service` or `journalctl -u mixxx-app.service` on device
-- Check TKGL boot log: `ls /var/log/tkgl/mixxx*.log`
-- **mixxx-app.service is masked**: Run `systemctl unmask mixxx-app.service` — the TKGL module needs this unit name for `systemd-run`
-- Common issue: EGLFS can't open display — ensure engine.service is fully stopped first
-- Verify `/media/az01-internal/mixxx/lib/` contains all needed .so files
-
-**MIXXX runs but no display**:
-- The Mali GPU needs proper initialization. Engine does this on boot.
-- Try: stop engine, wait 3 seconds, then start MIXXX
-- If still blank, reboot device and run `switch-to-mixxx` immediately after boot (before Engine fully initializes the display)
-
-**Want MIXXX to autostart?**:
-```bash
-ssh root@primego.local systemctl enable mixxx.service
-# Device will now boot directly into MIXXX (skipping Engine)
-```
+- **Prime 4 DSI display**: Prime 4 uses DSI-1 display (not LVDS-1 like Prime Go). MIXXX may segfault during EGL initialization due to DDK/DSI incompatibility. Run `-platform offscreen` to verify the binary works. Native display support requires further investigation.
 

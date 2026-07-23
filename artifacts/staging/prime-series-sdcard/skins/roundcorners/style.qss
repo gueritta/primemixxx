@@ -1,0 +1,2318 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ROUNDCORNERS SKIN — TOUCH DESIGN SYSTEM
+   ════════════════════════════════════════════════════════════════════════════
+   
+   Target device: Denon Prime 4 / Prime Go (1280×800, 10.1" touchscreen)
+   Qt version:    5.15.8 EGLFS (no window manager, direct framebuffer)
+   
+   ── GRID ───────────────────────────────────────────────────────────────────
+   Base unit:      4px
+   All sizes should be multiples of 4px where possible.
+   
+   ── TOUCH TARGETS ──────────────────────────────────────────────────────────
+   Minimum:        48×48px  (finger-friendly on 10.1" 1280×800)
+   Row height:     48px     (standard interactive row)
+   Sub-row:        24px     (half-height, non-interactive labels)
+   
+   ── SPACING ────────────────────────────────────────────────────────────────
+   Inter-element:  12px     (between adjacent interactive controls)
+   Margin outer:   6px      (screen edge padding)
+   Margin inner:   12px     (section padding)
+   
+   ── FONT SCALE ─────────────────────────────────────────────────────────────
+   Body:           16px     (library track text, small labels)
+   Label:          18px     (button text, deck info)
+   Subheader:      20px     (section headers)
+   Header:         22px     (main UI headers, column headers)
+   
+   ── BORDER RADIUS ──────────────────────────────────────────────────────────
+   Small:          6px      (buttons, inputs, small containers)
+   Large:          10px     (panels, search bar, section borders)
+   
+   ── COLORS ─────────────────────────────────────────────────────────────────
+   Neon green (Deck 1, 3):
+     High:  #77ff88   Mid:  #5cff2e   Low:  #44dd55
+     Mark:  #337744   Mark disabled:  #88aa88
+   
+   Blue (Deck 2):
+     High:  #4488ff   Mid:  #3366ee   Low:  #2244cc
+     Mark:  #112244   Mark disabled:  #4466aa
+   
+   Deck 4:
+     High:  #88cc66   Mid:  #77bb55   Low:  #3b2e18
+     Mark:  #557733   Mark disabled:  #669966
+   
+   Background:  #000000 (true black)
+   Surface:     #2a2a2a (dark gray panels)
+   Muted:       #777777 (inactive/dimmed)
+   
+   ── RESPONSIVE BREAKPOINTS ─────────────────────────────────────────────────
+   sm:  0–600px    (compact, icons only)
+   md:  601–800px  (medium, short labels)
+   lg:  801px+     (full labels, device native at 1280px)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/**
+ * Global reset — all widget groups start transparent with no border
+ */
+
+WWidgetGroup { border: 0; border-radius: 0; margin: 0; padding: 0; background: transparent; color: #cccccc; }
+
+/* CONTEXT MENU
+   ========================================================================== */
+
+QMenu {
+    background-color: #000000;
+    border: 1px solid #000000;
+    font-size: 20px;
+    color: #cccccc;
+}
+
+QMenu::item {
+    padding: 12px 48px;
+}
+
+QMenu::item:enabled {
+    color: #ffffff;
+}
+
+QMenu::item:enabled:selected {
+    background-color: #39ff14;
+    color: #000000;
+}
+
+QMenu::separator {
+    height: 1px;
+    background-color: #888888;
+    margin: 18px 12px;
+}
+
+/* TOOLTIP
+   ========================================================================== */
+
+QToolTip {
+    background-color: #000000;
+    border: 1px solid #000000;
+    font-size: 20px;
+    color: #ffffff;
+}
+
+#Body { background-color: #000000; font-family: 'Open Sans'; font-weight: normal; }
+#BorderTop { border: 0; border-top-right-radius: 10px; border-top-left-radius: 10px; background-color: #000000; margin: 10px 0 0 0; }
+#BorderBottom { border: 0; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; background-color: #000000; margin: 0 0 8px 0; }
+#Rectangle { border: 0; border-radius: 0; background-color: #000000; margin: 0; padding: 0; height: 0; width: 0; }
+#RoundedRectangle { border: 0; border-radius: 10px; background-color: #000000; margin: 10px; padding: 0; height: 0; width: 0; }
+
+/* DEVICE-SETTINGS-BOX
+   ========================================================================== */
+
+#OuterConfigBox {
+    border: 0;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 180);
+    margin: 10px 0 8px 0;
+    padding: 0;
+    height: 0;
+    width: 0;
+}
+
+#InnerConfigBox {
+    border: 0;
+    border-radius: 10px;
+    background-color: rgba(25, 25, 25, 210);
+    margin: 0;
+    padding: 0;
+    height: 0;
+    width: 0;
+}
+
+/* PASSTHROUGH-BOX
+   ========================================================================== */
+
+#OuterPassthroughBox {
+    border: 0;
+    border-radius: 10px;
+    background-color: #000000;
+    margin: 10px 0 8px 0;
+    padding: 0;
+    height: 0;
+    width: 0;
+}
+
+/* SEARCHBAR
+   ========================================================================== */
+
+WSearchLineEdit {
+    min-height: 48px;
+    padding: 10px 8px 8px 18px;
+    border: 0;
+    border-radius: 10px;
+    margin: 10px 0 8px 0;
+    font-size: 22px;
+    background-color: #000000;
+    color: #ffffff;
+}
+
+WSearchLineEdit:focus {
+    min-height: 48px;
+    padding: 10px 8px 8px 18px;
+    border: 0;
+    border-radius: 10px;
+    margin: 10px 0 8px 0;
+    font-size: 22px;
+    background-color: #2a2a2a;
+    color: #ffffff;
+}
+
+
+/* SIDEBAR
+   ========================================================================== */
+
+/**
+ * Default Styles/Resets
+ */
+#Sidebar {
+    border: 0;
+    border-radius: 0;
+    background: #000000;
+    margin: 0;
+    padding: 0;
+    height: 0;
+    width: 0;
+}
+
+QTreeView {
+    border: 0;
+    show-decoration-selected: 0;
+    outline: none;
+    background: transparent;
+    font-size: 22px;
+    color: #ffffff;
+}
+
+/**
+ * TreeView-Items
+ */
+QTreeView::item {
+    border: 0;
+    width: 400px;
+    height: 48px;
+    padding-left: 20px;
+}
+
+QTreeView::item:hover {
+    background: transparent;
+}
+
+QTreeView::item:selected:active {
+    background-color: #39ff14;
+    color: #000000;
+}
+
+QTreeView::item:selected:!active {
+    background-color: #39ff14;
+    color: #000000;
+}
+
+/**
+ * TreeView-Branches
+ */
+QTreeView::branch:selected:active {
+    background-color: #39ff14;
+}
+
+QTreeView::branch:selected:!active {
+    background-color: #39ff14;
+}
+
+QTreeView::branch:has-children:!has-siblings:closed,
+QTreeView::branch:closed:has-children:has-siblings {
+    border-image: none;
+    image: url(skin:/style/branch_closed.svg);
+}
+
+QTreeView::branch:open:has-children:!has-siblings,
+QTreeView::branch:open:has-children:has-siblings {
+    border-image: none;
+    image: url(skin:/style/branch_open.svg);
+}
+
+QTreeView::branch:has-siblings:!adjoins-item {
+    border-image: url(skin:/style/branch_line.svg) 0;
+}
+
+QTreeView::branch:has-siblings:adjoins-item {
+    border-image: url(skin:/style/branch_more.svg) 0;
+}
+
+QTreeView::branch:!has-children:!has-siblings:adjoins-item {
+    border-image: url(skin:/style/branch_end.svg) 0;
+}
+
+/* SPLITTER
+   ========================================================================== */
+
+QSplitter {
+    width: 4px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+QSplitter::handle {
+    image: url(skin:/style/handle_unchecked.svg);
+    background: none;
+    width: 4px;
+    margin: 0;
+    padding: 0;
+}
+
+QSplitter::handle:vertical {
+    background: none;
+    margin: 0;
+    padding: 0;
+    width: 0;
+}
+
+QSplitter::handle:pressed {
+    image: url(skin:/style/handle_checked.svg);
+    background: none;
+}
+
+/* LIBRARY TRACKTABLE
+   ========================================================================== */
+
+/**
+ * Default Styles/Resets
+ */
+#Library {
+    border: 0;
+    border-radius: 0;
+    background: #000000;
+    margin: 0;
+    padding: 0;
+    height: 0;
+    width: 0;
+}
+
+QHeaderView {
+    font-size: 22px;
+    font-weight: bold;
+    margin: 0;
+    padding: 0;
+    border-bottom: 2px solid #888888;
+    background-color: #000000;
+    text-transform: uppercase;
+}
+
+QHeaderView::section {
+    height: 48px;
+    font-size: 22px;
+    font-weight: bold;
+    margin: 0;
+    padding: 18px 0 0 4px;
+    background: transparent;
+    color: #ffffff;
+    border-radius: 0;
+}
+
+QHeaderView::section:selected {
+    font-size: 22px;
+    font-weight: bold;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    color: #ffffff;
+}
+
+QHeaderView::up-arrow {
+	image: url(skin:/style/sort_up.svg);
+}
+
+QHeaderView::down-arrow {
+	image: url(skin:/style/sort_down.svg);
+}
+
+QTableView {
+    border: none;
+    padding: 0;
+    margin: 0;
+    outline: none;
+    border-radius: 0;
+    font-size: 22px;
+    background: transparent;
+    color: #ffffff;
+    alternate-background-color: #2a2a2a;
+}
+
+QTableView QLineEdit {
+    background: #39ff14;
+    selection-background-color: #000000;
+}
+
+QTableView::item:selected,
+QTableView::item:selected:!active {
+    selection-background-color: #39ff14;
+    background-color: #39ff14;
+    color: #000000;
+    outline: none;
+}
+
+QTableView::item {
+    height: 48px;
+    padding: 10px 0;
+}
+
+QTableView::item:!selected {
+    background: transparent;
+    outline: none;
+}
+
+/**
+ * Played Column
+ */
+QTableView::indicator {
+    width: 12px;
+    height: 12px;
+    border: none;
+    background: transparent;
+    outline: none;
+}
+
+QTableView::indicator:checked {
+    background: transparent url(skin:/style/checked.svg);
+}
+
+QTableView::indicator:unchecked {
+    background: transparent url(skin:/style/unchecked.svg);
+}
+
+/**
+ * Preview Column
+ */
+#LibraryPreviewButton {
+    width: 12px;
+    height: 12px;
+    border: none;
+    background: transparent;
+    outline: none;
+}
+
+#LibraryPreviewButton:checked {
+    image: url(skin:/style/preview_pause.png);
+    outline: none;
+    border: none;
+}
+
+#LibraryPreviewButton:!checked {
+    image: url(skin:/style/preview_play.png);
+    outline: none;
+    border: none;
+}
+
+/**
+ * BPM Column
+ */
+#LibraryBPMButton {
+    margin: 0;
+    padding: 0;
+    width: 12px;
+    height: 12px;
+    border: 0;
+    color: #ffffff;
+    outline: none;
+}
+
+#LibraryBPMButton::indicator:checked {
+    image: url(skin:/style/checked.svg);
+}
+
+#LibraryBPMButton::indicator:!checked {
+    image: url(skin:/style/unchecked.svg);
+}
+
+#LibraryBPMButton::item:selected {
+    color: #000000;
+    background-color: #39ff14;
+}
+
+
+/* LIBRARY TOP UI-ELEMENTS
+   ========================================================================== */
+
+/**
+ * QPushButton Default Styles
+ */
+#DlgMissing > QPushButton,
+#DlgHidden > QPushButton,
+#DlgAutoDJ > QPushButton,
+#DlgRecording > QPushButton,
+#DlgAnalysis > QPushButton {
+    height: 60px;
+    padding: 0 48px;
+    text-transform: uppercase;
+    font-size: 22px;
+    color: #000000;
+    background-color: #888888;
+    border: none;
+    border-radius: none;
+    outline: none;
+}
+
+#DlgMissing > QPushButton:!enabled,
+#DlgHidden > QPushButton:!enabled,
+#DlgAutoDJ > QPushButton:!enabled,
+#DlgRecording > QPushButton:!enabled,
+#DlgAnalysis > QPushButton:!enabled {
+    color: #cccccc;
+    background-color: #444444;
+}
+
+#DlgMissing > QPushButton:hover,
+#DlgHidden > QPushButton:hover,
+#DlgAutoDJ > QPushButton:hover,
+#DlgAutoDJ > QSpinBox::up-button:hover,
+#DlgAutoDJ > QSpinBox::down-button:hover,
+#DlgRecording > QPushButton:hover,
+#DlgAnalysis > QPushButton:hover {
+    background-color: #555555;
+}
+
+#DlgMissing > QPushButton:checked,
+#DlgHidden > QPushButton:checked,
+#DlgAutoDJ > QPushButton:checked,
+#DlgRecording > QPushButton:checked,
+#DlgAnalysis > QPushButton:checked {
+    background-color: #5cff2e;
+}
+
+#DlgMissing > QPushButton:checked:hover,
+#DlgHidden > QPushButton:checked:hover,
+#DlgAutoDJ > QPushButton:checked:hover,
+#DlgRecording > QPushButton:checked:hover,
+#DlgAnalysis > QPushButton:checked:hover {
+    background-color: #44dd55;
+}
+
+/**
+ * QLabel Default Styles
+ */
+#DlgAutoDJ > QLabel,
+#DlgRecording > QLabel,
+#DlgAnalysis > QLabel {
+    height: 60px;
+    padding: 0 48px;
+    min-width: 0;
+    text-transform: uppercase;
+    font-size: 22px;
+    color: #000000;
+    background-color: #888888;
+    border: none;
+    border-radius: 0;
+    outline: none;
+}
+
+#DlgAutoDJ > QLabel:!enabled,
+#DlgRecording > QLabel:!enabled,
+#DlgAnalysis > QLabel:!enabled {
+    background: transparent;
+    color: transparent;
+}
+
+/**
+ * dlgautodj.ui
+ */
+#DlgAutoDJ > QPushButton#pushButtonShuffle {
+    margin: 10px 2px 14px 12px;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+
+#DlgAutoDJ > QPushButton#pushButtonAddRandom {
+    margin: 10px 2px 14px 0;
+}
+
+#DlgAutoDJ > QPushButton#pushButtonSkipNext {
+    margin: 10px 2px 14px 0;
+}
+
+#DlgAutoDJ > QPushButton#pushButtonFadeNow {
+    margin: 10px 2px 14px 0;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+#DlgAutoDJ > QSpinBox#spinBoxTransition {
+    min-height: 60px;
+    margin: 10px 0 14px 12px;
+    padding: 0 48px;
+    font-size: 22px;
+    color: #000000;
+    background-color: #888888;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+
+#DlgAutoDJ > QSpinBox#spinBoxTransition:editable {
+    background: transparent;
+    color: #000000;
+}
+
+#DlgAutoDJ > QSpinBox#spinBoxTransition::up-button {
+    padding: 0;
+    margin: 0;
+    width: 24px;
+    height: 25px;
+    border: 0;
+    border-left: 1px solid #000000;
+    border-right: 1px solid #000000;
+    border-bottom: 1px solid #000000;
+    outline: none;
+}
+
+#DlgAutoDJ > QSpinBox::up-arrow {
+    image: url(skin:/style/arrow_up.svg);
+    width: 8px;
+    height: 8px;
+}
+
+#DlgAutoDJ > QSpinBox#spinBoxTransition::down-button {
+    padding: 0;
+    margin: 0;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    border-top: 0 solid #000000;
+    border-left: 1px solid #000000;
+    border-right: 1px solid #000000;
+    outline: none;
+}
+
+#DlgAutoDJ > QSpinBox::down-arrow {
+    image: url(skin:/style/arrow_down.svg);
+    width: 8px;
+    height: 8px;
+}
+
+#DlgAutoDJ > QLabel#labelTransitionAppendix {
+    margin: 10px 0 14px 0;
+    padding: 0 48px 0 0;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+#DlgAutoDJ > QLabel#labelSelectionInfo {
+    margin: 10px 12px 14px 0;
+    border-radius: 6px;
+}
+
+#DlgAutoDJ > QPushButton#pushButtonAutoDJ {
+    margin: 10px 12px 14px 0;
+    border-radius: 6px;
+}
+
+/**
+ * dlgmissing.ui
+ */
+#DlgMissing > QPushButton#btnSelect {
+    margin: 10px 2px 14px 0;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+
+#DlgMissing > QPushButton#btnPurge {
+    margin: 10px 12px 14px 0;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+/**
+ * dlghidden.ui
+ */
+#DlgHidden > QPushButton#btnSelect {
+    margin: 10px 2px 14px 0;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+
+#DlgHidden > QPushButton#btnPurge {
+    margin: 10px 2px 14px 0;
+}
+
+#DlgHidden > QPushButton#btnUnhide {
+    margin: 10px 12px 14px 0;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+/**
+ * dlgrecording.ui
+ */
+#DlgRecording > QLabel#label {
+    margin: 10px 12px 14px 0;
+    border-radius: 6px;
+}
+
+#DlgRecording > QPushButton#pushButtonRecording {
+    margin: 10px 12px 14px 0;
+    border-radius: 6px;
+}
+
+/**
+ * dlganalysis.ui
+ */
+WLibrary QRadioButton {
+    color: #ffffff;
+    margin: 12px 10px 6px 0px;
+    outline: none;
+}
+
+WLibrary QRadioButton::indicator {
+    height: 12px;
+    width: 12px;
+    margin: 0px 5px 0px 2px;
+}
+
+WLibrary QRadioButton#radioButtonRecentlyAdded {
+    margin: 12px 10px 6px 14px;
+}
+
+WLibrary QRadioButton::indicator:checked {
+    background: url(skin:/style/checked.svg);
+}
+
+WLibrary QRadioButton::indicator:unchecked {
+    background: url(skin:/style/unchecked.svg);
+}
+
+
+#DlgAnalysis > QLabel#labelProgress {
+    margin: 10px 12px 14px 0;
+    border-radius: 6px;
+}
+
+#DlgAnalysis > QPushButton#pushButtonSelectAll {
+    margin: 10px 2px 14px 0;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+
+#DlgAnalysis > QPushButton#pushButtonAnalyze {
+  margin: 10px 12px 14px 0;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+
+/* TEXTBROWSER
+   ========================================================================== */
+
+QTextBrowser {
+    border: 0;
+    padding: 27px;
+    margin: 0;
+    border-radius: 0;
+    background-color: #000000;
+    color: #ffffff;
+    font-size: 22px;
+}
+
+
+/* SCROLLBARS
+   ========================================================================== */
+
+/**
+ * Horizontal
+ */
+QScrollBar:horizontal {
+    border: 0;
+    background: transparent;
+    height: 10px;
+    margin: 0;
+    padding: 0;
+}
+
+QScrollBar::handle:horizontal {
+    background-color: #888888;
+    max-width: 20px;
+    margin: 0;
+}
+
+QScrollBar::add-line:horizontal {
+    border: 0;
+    background: none;
+    width: 0;
+    subcontrol-position: right;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:horizontal {
+    border: 0;
+    background: none;
+    width: 0;
+    subcontrol-position: left;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::add-page:horizontal,
+QScrollBar::sub-page:horizontal {
+    background: transparent;
+    margin: 0;
+    padding: 0;
+}
+
+/**
+ * Vertical
+ */
+QScrollBar:vertical {
+    border: 0;
+    background: transparent;
+    width: 10px;
+    margin: 0;
+    padding: 0;
+}
+
+QScrollBar::handle:vertical {
+    background-color: #888888;
+    min-height: 50px;
+    width: 0;
+    margin: 0;
+    padding: 0;
+}
+
+QScrollBar::add-line:vertical {
+    border: 0;
+    background: none;
+    height: 0;
+    subcontrol-position: bottom;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:vertical {
+    border: 0;
+    background: none;
+    height: 0;
+    subcontrol-position: bottom;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical {
+    background: transparent;
+    margin: 0;
+    padding: 0;
+}
+
+
+
+
+#Deck1,
+#Deck2,
+#Deck3,
+#Deck4 {
+    qproperty-layoutAlignment: 'AlignCenter | AlignTop';
+}
+
+#EffectChain {
+    qproperty-layoutAlignment: 'AlignLeft | AlignTop';
+}
+
+#Deck1 #Artist,
+#Deck1 #VisualBpm,
+#InternalClock #VisualBpm,
+#Main #RecordingDuration,
+#Deck1 #Time,
+#Deck1 #Duration,
+#Deck1 #SyncMode {
+    color: #77ff88;
+    font-size: 22px;
+}
+
+#Deck1 #Title,
+#Deck1 #VisualKey,
+#Deck1 #RateDisplay {
+    color: #77ff88;
+    font-size: 20px;
+}
+
+#Deck2 #Artist,
+#Deck2 #VisualBpm,
+#Deck2 #Time,
+#Deck2 #Duration,
+#Deck2 #SyncMode {
+    color: #77ff88;
+    font-size: 22px;
+}
+
+#Deck2 #Title,
+#Deck2 #VisualKey,
+#Deck2 #RateDisplay {
+    color: #77ff88;
+    font-size: 20px;
+}
+
+#Deck3 #Artist,
+#Deck3 #VisualBpm,
+#Deck3 #Time,
+#Deck3 #Duration,
+#Deck3 #SyncMode {
+    color: #99dd77;
+    font-size: 22px;
+}
+
+#Deck3 #Title,
+#Deck3 #VisualKey,
+#Deck3 #RateDisplay {
+    color: #99dd77;
+    font-size: 20px;
+}
+
+
+#Deck4 #Artist,
+#Deck4 #VisualBpm,
+#Deck4 #Time,
+#Deck4 #Duration,
+#Deck4 #SyncMode {
+    color: #88cc66;
+    font-size: 22px;
+}
+
+#Deck4 #Title,
+#Deck4 #VisualKey,
+#Deck4 #RateDisplay {
+    color: #88cc66;
+    font-size: 20px;
+}
+
+#Sampler1 #Artist,
+#Sampler1 #Title,
+#Sampler1 #Hyphen,
+#EffectUnit1 #EffectChainName {
+    color: #77ff88;
+    font-size: 20px;
+}
+
+#Sampler1 #Time,
+#Sampler1 #VisualBpm,
+#Sampler1 #SyncMode {
+    color: #77ff88;
+    font-size: 22px;
+}
+
+#Sampler2 #Artist,
+#Sampler2 #Title,
+#Sampler2 #Hyphen,
+#EffectUnit2 #EffectChainName {
+    color: #77ff88;
+    font-size: 20px;
+}
+
+#Sampler2 #Time,
+#Sampler2 #VisualBpm,
+#Sampler2 #SyncMode {
+    color: #77ff88;
+    font-size: 22px;
+}
+
+#Sampler3 #Artist,
+#Sampler3 #Title,
+#Sampler3 #Hyphen,
+#EffectUnit3 #EffectChainName {
+    color: #99dd77;
+    font-size: 20px;
+}
+
+#Sampler3 #Time,
+#Sampler3 #VisualBpm,
+#Sampler3 #SyncMode {
+    color: #99dd77;
+    font-size: 22px;
+}
+
+#Sampler4 #Artist,
+#Sampler4 #Title,
+#Sampler4 #Hyphen,
+#EffectUnit4 #EffectChainName {
+    color: #88cc66;
+    font-size: 20px;
+}
+
+#Sampler4 #Time,
+#Sampler4 #VisualBpm,
+#Sampler4 #SyncMode {
+    color: #88cc66;
+    font-size: 22px;
+}
+
+#KnobLabel,
+#EffectKnobLabel,
+#EqualizerEffectKnobLabel {
+    color: #ffffff;
+    background-color: #ff0000;
+    font-size: 20px;
+    line-height: 14px;
+    qproperty-alignment: 'AlignCenter';
+    text-transform: uppercase;
+}
+
+#EffectName {
+    border: 0;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    background-color: #888888;
+    color: #000000;
+    margin: 0 0 1px 0;
+    font-size: 16px;
+    line-height: 18px;
+}
+
+#FxParamSlot {
+    qproperty-layoutAlignment: 'AlignCenter | AlignTop';
+}
+
+#EffectKnobLabelFocused {
+    color: #ffffff;
+    background-color: #ff0000;
+    border-radius: 4px;
+    font-size: 20px;
+    line-height: 14px;
+    qproperty-alignment: 'AlignCenter';
+    text-transform: uppercase;
+}
+
+
+#PreviewDeck #Artist,
+#PreviewDeck #Title,
+#PreviewDeck #Hyphen {
+    color: #77ff88;
+    font-size: 22px;
+}
+
+#Row {
+    qproperty-layoutAlignment: 'AlignCenter | AlignTop';
+}
+
+#Line {
+    border: 0;
+    border-radius: 0;
+    background-color: #888888;
+}
+
+#Logo {
+    background: transparent url(skin:/background/logo.png) no-repeat center left;
+    padding-top: 48px;
+}
+
+#Version {
+    font-size: 16px;
+    background: transparent;
+    color: #cccccc;
+}
+
+#Time {
+    font-size: 22px;
+    background: transparent;
+    color: #ffffff;
+}
+
+#ConfigHeadline {
+    font-size: 17px;
+    background: transparent;
+    border: 0;
+    color: #ffffff;
+    margin: 0;
+}
+
+#ConfigLabel {
+    font-size: 22px;
+    background: transparent;
+    border: 0;
+    color: #ffffff;
+    margin: 0;
+}
+
+/* DEVICE-LABELS
+   ========================================================================== */
+
+/**
+ * General Label Styles
+ */
+#DeckLabel {
+    font-size: 22px;
+    background: transparent;
+    border: 0;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-top-left-radius: 6px;
+    color: #000000;
+    margin: 0;
+}
+
+#SamplerLabel,
+#EffectLabel {
+    font-size: 20px;
+    background: transparent;
+    border: 0;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-top-left-radius: 6px;
+    color: #000000;
+    margin: 0;
+}
+
+/**
+ * Deck1
+ */
+#Deck1 #DeckLabel {
+    background-color: #5cff2e;
+}
+
+/**
+ * Deck2
+ */
+#Deck2 #DeckLabel {
+    background-color: #5cff2e;
+}
+
+/**
+ * Deck3
+ */
+#Deck3 #DeckLabel {
+    background-color: #88cc66;
+}
+
+/**
+ * Deck4
+ */
+#Deck4 #DeckLabel {
+    background-color: #77bb55;
+}
+
+/**
+ * Sampler1
+ */
+#Sampler1 #SamplerLabel {
+    background-color: #5cff2e;
+}
+
+/**
+ * Sampler2
+ */
+#Sampler2 #SamplerLabel {
+    background-color: #55ee88;
+}
+
+/**
+ * Sampler3
+ */
+#Sampler3 #SamplerLabel {
+    background-color: #88cc66;
+}
+
+/**
+ * Sampler4
+ */
+#Sampler4 #SamplerLabel {
+    background-color: #77bb55;
+}
+
+/**
+ * EffectUnit1
+ */
+#EffectUnit1 #EffectLabel {
+    background-color: #5cff2e;
+}
+
+/**
+ * EffectUnit2
+ */
+#EffectUnit2 #EffectLabel {
+    background-color: #5cff2e;
+}
+
+ /**
+ * EffectUnit3
+ */
+#EffectUnit3 #EffectLabel {
+    background-color: #88cc66;
+}
+
+ /**
+ * EffectUnit4
+ */
+#EffectUnit4 #EffectLabel {
+    background-color: #77bb55;
+}
+
+
+/* BUTTONS
+   ========================================================================== */
+
+/**
+ * Menubar Icons
+ */
+#MenuBar #Visuals #Btn-btlr {
+    background-image: url(skin:button/visuals.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Visuals-2 #Btn-btlr {
+    background-image: url(skin:button/visuals_2.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Settings #Btn-bblr {
+    background-image: url(skin:button/settings.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Settings-2 #Btn-bblr {
+    background-image: url(skin:button/settings_2.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Decks #Btn-nbr-bisected, #MenuBar #Decks #Btn-nbr {
+    background-image: url(skin:button/decks.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Decks-2 #Btn-nbr-bisected, #MenuBar #Decks-2 #Btn-nbr {
+    background-image: url(skin:button/decks_2.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Mixer #Btn-nbr-bisected {
+    background-image: url(skin:button/mixer.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Mixer-2 #Btn-nbr-bisected {
+    background-image: url(skin:button/mixer_2.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Samplers #Btn-nbr-bisected {
+    background-image: url(skin:button/samplers.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Samplers-2 #Btn-nbr-bisected {
+    background-image: url(skin:button/samplers_2.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Effects #Btn-nbr-bisected {
+    background-image: url(skin:button/effects.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Effects-2 #Btn-nbr-bisected {
+    background-image: url(skin:button/effects_2.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Main #Btn-nbr-bisected {
+    background-image: url(skin:button/main.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Main-2 #Btn-nbr-bisected {
+    background-image: url(skin:button/main_2.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Internalclock #Btn-nbr-bisected {
+    background-image: url(skin:button/internalclock.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Internalclock-2 #Btn-nbr-bisected {
+    background-image: url(skin:button/internalclock_2.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Headphones #Btn-nbr-bisected {
+    background-image: url(skin:button/headphones.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Headphones-2 #Btn-nbr-bisected {
+    background-image: url(skin:button/headphones_2.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Clock #Btn-nbr-bisected {
+    background-image: url(skin:button/clock.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Clock-2 #Btn-nbr-bisected {
+    background-image: url(skin:button/clock_2.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Vinylcontrols #Btn-btrr {
+    background-image: url(skin:button/vinylcontrols.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Vinylcontrols-2 #Btn-btrr {
+    background-image: url(skin:button/vinylcontrols_2.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Microphones #Btn-bbrr {
+    background-image: url(skin:button/microphones.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Microphones-2 #Btn-bbrr {
+    background-image: url(skin:button/microphones_2.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/**
+ * General Button Styles
+ */
+#Btn-br {
+    border: 0;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-top-left-radius: 6px;
+    background-color: #888888;
+    color: #000000;
+    margin: 0;
+    font-size: 22px;
+}
+
+#Btn-btr {
+    border: 0;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 6px;
+    background-color: #888888;
+    color: #000000;
+    margin: 0 0 1px 0;
+    font-size: 22px;
+}
+
+#Btn-bbr {
+    border: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-top-left-radius: 0;
+    background-color: #888888;
+    color: #000000;
+    margin: 0 0 1px 0;
+    font-size: 22px;
+}
+
+#Btn-blr {
+    border: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 6px;
+    border-top-left-radius: 6px;
+    background-color: #888888;
+    color: #000000;
+    margin: 0;
+    font-size: 22px;
+}
+
+#Btn-brr {
+    border: 0;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    background-color: #888888;
+    color: #000000;
+    margin: 0 0 0 1px;
+    font-size: 22px;
+}
+
+#Btn-btlr {
+    border: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 6px;
+    background-color: #888888;
+    color: #000000;
+    margin: 0 0 1px 0;
+    font-size: 22px;
+}
+
+#Btn-btrr {
+    border: 0;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    background-color: #888888;
+    color: #000000;
+    margin: 0 0 1px 1px;
+    font-size: 22px;
+}
+
+#Btn-bblr {
+    border: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 6px;
+    border-top-left-radius: 0;
+    background-color: #888888;
+    color: #000000;
+    margin: 0 0 1px 0;
+    font-size: 22px;
+}
+
+#Btn-bbrr {
+    border: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    background-color: #888888;
+    color: #000000;
+    margin: 0 0 1px 1px;
+    font-size: 22px;
+}
+
+#Btn-nbr {
+    border: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    background-color: #888888;
+    color: #000000;
+    margin: 0 0 0 1px;
+    font-size: 22px;
+}
+
+#Btn-nbr-bisected {
+    border: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    background-color: #888888;
+    color: #000000;
+    margin: 0 0 1px 1px;
+    font-size: 22px;
+}
+
+/**
+ * Hover
+ */
+#Btn-br:hover,
+#Btn-btr:hover,
+#Btn-bbr:hover,
+#Btn-blr:hover,
+#Btn-brr:hover,
+#Btn-btlr:hover,
+#Btn-btrr:hover,
+#Btn-bblr:hover,
+#Btn-bbrr:hover,
+#Btn-nbr:hover,
+#Btn-nbr-bisected:hover {
+    background-color: #555555;
+}
+
+/**
+ * MenuBar
+ */
+#MenuBar #Btn-btlr[value="1"],
+#MenuBar #Btn-bblr[value="1"],
+#MenuBar #Btn-btrr[value="1"],
+#MenuBar #Btn-bbrr[value="1"],
+#MenuBar #Btn-nbr-bisected[value="1"] {
+    background-color: #5cff2e;
+}
+
+#MenuBar #Btn-btlr[value="1"]:hover,
+#MenuBar #Btn-bblr[value="1"]:hover,
+#MenuBar #Btn-btrr[value="1"]:hover,
+#MenuBar #Btn-bbrr[value="1"]:hover,
+#MenuBar #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #44dd55;
+}
+
+/**
+ * InternalClock
+ */
+#InternalClock #Btn-blr[value="1"],
+#InternalClock #Btn-btrr[value="1"]
+#InternalClock #Btn-bbrr[value="1"] {
+    background-color: #5cff2e;
+}
+
+#InternalClock #Btn-blr[value="1"]:hover,
+#InternalClock #Btn-btrr[value="1"]:hover,
+#InternalClock #Btn-bbrr[value="1"]:hover {
+    background-color: #44dd55;
+}
+
+/**
+ * Headphone
+ */
+#Headphone #Btn-br[value="1"] {
+    background-color: #5cff2e;
+}
+
+#Headphone #Btn-br[value="1"]:hover {
+    background-color: #44dd55;
+}
+
+/**
+ * Main/Recording
+ */
+#Main #Btn-br[value="2"] {
+    background-color: #5cff2e;
+}
+
+#Main #Btn-br[value="2"]:hover {
+    background-color: #44dd55;
+}
+
+/**
+ * Deck1
+ */
+#Deck1 #Btn-br[value="1"],
+#Deck1 #Btn-btr[value="1"],
+#Deck1 #Btn-bbr[value="1"],
+#Deck1 #Btn-blr[value="1"],
+#Deck1 #Btn-brr[value="1"],
+#Deck1 #Btn-btlr[value="1"],
+#Deck1 #Btn-btrr[value="1"],
+#Deck1 #Btn-bblr[value="1"],
+#Deck1 #Btn-bbrr[value="1"],
+#Deck1 #Btn-nbr[value="1"],
+#Deck1 #Btn-nbr-bisected[value="1"] {
+    background-color: #5cff2e;
+}
+
+#Deck1 #Btn-br[value="1"]:hover,
+#Deck1 #Btn-btr[value="1"]:hover,
+#Deck1 #Btn-bbr[value="1"]:hover,
+#Deck1 #Btn-blr[value="1"]:hover,
+#Deck1 #Btn-brr[value="1"]:hover,
+#Deck1 #Btn-btlr[value="1"]:hover,
+#Deck1 #Btn-btrr[value="1"]:hover,
+#Deck1 #Btn-bblr[value="1"]:hover,
+#Deck1 #Btn-bbrr[value="1"]:hover,
+#Deck1 #Btn-nbr[value="1"]:hover,
+#Deck1 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #44dd55;
+}
+
+/**
+ * Deck2
+ */
+#Deck2 #Btn-br[value="1"],
+#Deck2 #Btn-btr[value="1"],
+#Deck2 #Btn-bbr[value="1"],
+#Deck2 #Btn-blr[value="1"],
+#Deck2 #Btn-brr[value="1"],
+#Deck2 #Btn-btlr[value="1"],
+#Deck2 #Btn-btrr[value="1"],
+#Deck2 #Btn-bblr[value="1"],
+#Deck2 #Btn-bbrr[value="1"],
+#Deck2 #Btn-nbr[value="1"],
+#Deck2 #Btn-nbr-bisected[value="1"] {
+    background-color: #5cff2e;
+}
+
+#Deck2 #Btn-br[value="1"]:hover,
+#Deck2 #Btn-btr[value="1"]:hover,
+#Deck2 #Btn-bbr[value="1"]:hover,
+#Deck2 #Btn-blr[value="1"]:hover,
+#Deck2 #Btn-brr[value="1"]:hover,
+#Deck2 #Btn-btlr[value="1"]:hover,
+#Deck2 #Btn-btrr[value="1"]:hover,
+#Deck2 #Btn-bblr[value="1"]:hover,
+#Deck2 #Btn-bbrr[value="1"]:hover,
+#Deck2 #Btn-nbr[value="1"]:hover,
+#Deck2 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #44dd55;
+}
+
+/**
+ * Deck3
+ */
+#Deck3 #Btn-br[value="1"],
+#Deck3 #Btn-btr[value="1"],
+#Deck3 #Btn-bbr[value="1"],
+#Deck3 #Btn-blr[value="1"],
+#Deck3 #Btn-brr[value="1"],
+#Deck3 #Btn-btlr[value="1"],
+#Deck3 #Btn-btrr[value="1"],
+#Deck3 #Btn-bblr[value="1"],
+#Deck3 #Btn-bbrr[value="1"],
+#Deck3 #Btn-nbr[value="1"],
+#Deck3 #Btn-nbr-bisected[value="1"] {
+    background-color: #88cc66;
+}
+
+#Deck3 #Btn-br[value="1"]:hover,
+#Deck3 #Btn-btr[value="1"]:hover,
+#Deck3 #Btn-bbr[value="1"]:hover,
+#Deck3 #Btn-blr[value="1"]:hover,
+#Deck3 #Btn-brr[value="1"]:hover,
+#Deck3 #Btn-btlr[value="1"]:hover,
+#Deck3 #Btn-btrr[value="1"]:hover,
+#Deck3 #Btn-bblr[value="1"]:hover,
+#Deck3 #Btn-bbrr[value="1"]:hover,
+#Deck3 #Btn-nbr[value="1"]:hover,
+#Deck3 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #77bb55;
+}
+
+/**
+ * Deck4
+ */
+#Deck4 #Btn-br[value="1"],
+#Deck4 #Btn-btr[value="1"],
+#Deck4 #Btn-bbr[value="1"],
+#Deck4 #Btn-blr[value="1"],
+#Deck4 #Btn-brr[value="1"],
+#Deck4 #Btn-btlr[value="1"],
+#Deck4 #Btn-btrr[value="1"],
+#Deck4 #Btn-bblr[value="1"],
+#Deck4 #Btn-bbrr[value="1"],
+#Deck4 #Btn-nbr[value="1"],
+#Deck4 #Btn-nbr-bisected[value="1"] {
+    background-color: #77bb55;
+}
+
+#Deck4 #Btn-br[value="1"]:hover,
+#Deck4 #Btn-btr[value="1"]:hover,
+#Deck4 #Btn-bbr[value="1"]:hover,
+#Deck4 #Btn-blr[value="1"]:hover,
+#Deck4 #Btn-brr[value="1"]:hover,
+#Deck4 #Btn-btlr[value="1"]:hover,
+#Deck4 #Btn-btrr[value="1"]:hover,
+#Deck4 #Btn-bblr[value="1"]:hover,
+#Deck4 #Btn-bbrr[value="1"]:hover,
+#Deck4 #Btn-nbr[value="1"]:hover,
+#Deck4 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #669933;
+}
+
+/**
+ * Sampler1
+ */
+#Sampler1 #Btn-br[value="1"],
+#Sampler1 #Btn-btr[value="1"],
+#Sampler1 #Btn-bbr[value="1"],
+#Sampler1 #Btn-blr[value="1"],
+#Sampler1 #Btn-brr[value="1"],
+#Sampler1 #Btn-btlr[value="1"],
+#Sampler1 #Btn-btrr[value="1"],
+#Sampler1 #Btn-bblr[value="1"],
+#Sampler1 #Btn-bbrr[value="1"],
+#Sampler1 #Btn-nbr[value="1"],
+#Sampler1 #Btn-nbr-bisected[value="1"] {
+    background-color: #5cff2e;
+}
+
+#Sampler1 #Btn-br[value="1"]:hover,
+#Sampler1 #Btn-btr[value="1"]:hover,
+#Sampler1 #Btn-bbr[value="1"]:hover,
+#Sampler1 #Btn-blr[value="1"]:hover,
+#Sampler1 #Btn-brr[value="1"]:hover,
+#Sampler1 #Btn-btlr[value="1"]:hover,
+#Sampler1 #Btn-btrr[value="1"]:hover,
+#Sampler1 #Btn-bblr[value="1"]:hover,
+#Sampler1 #Btn-bbrr[value="1"]:hover,
+#Sampler1 #Btn-nbr[value="1"]:hover,
+#Sampler1 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #44dd55;
+}
+
+/**
+ * Sampler2
+ */
+#Sampler2 #Btn-br[value="1"],
+#Sampler2 #Btn-btr[value="1"],
+#Sampler2 #Btn-bbr[value="1"],
+#Sampler2 #Btn-blr[value="1"],
+#Sampler2 #Btn-brr[value="1"],
+#Sampler2 #Btn-btlr[value="1"],
+#Sampler2 #Btn-btrr[value="1"],
+#Sampler2 #Btn-bblr[value="1"],
+#Sampler2 #Btn-bbrr[value="1"],
+#Sampler2 #Btn-nbr[value="1"],
+#Sampler2 #Btn-nbr-bisected[value="1"] {
+    background-color: #55ee88;
+}
+
+#Sampler2 #Btn-br[value="1"]:hover,
+#Sampler2 #Btn-btr[value="1"]:hover,
+#Sampler2 #Btn-bbr[value="1"]:hover,
+#Sampler2 #Btn-blr[value="1"]:hover,
+#Sampler2 #Btn-brr[value="1"]:hover,
+#Sampler2 #Btn-btlr[value="1"]:hover,
+#Sampler2 #Btn-btrr[value="1"]:hover,
+#Sampler2 #Btn-bblr[value="1"]:hover,
+#Sampler2 #Btn-bbrr[value="1"]:hover,
+#Sampler2 #Btn-nbr[value="1"]:hover,
+#Sampler2 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #44cc66;
+}
+
+/**
+ * Sampler3
+ */
+#Sampler3 #Btn-br[value="1"],
+#Sampler3 #Btn-btr[value="1"],
+#Sampler3 #Btn-bbr[value="1"],
+#Sampler3 #Btn-blr[value="1"],
+#Sampler3 #Btn-brr[value="1"],
+#Sampler3 #Btn-btlr[value="1"],
+#Sampler3 #Btn-btrr[value="1"],
+#Sampler3 #Btn-bblr[value="1"],
+#Sampler3 #Btn-bbrr[value="1"],
+#Sampler3 #Btn-nbr[value="1"],
+#Sampler3 #Btn-nbr-bisected[value="1"] {
+    background-color: #88cc66;
+}
+
+#Sampler3 #Btn-br[value="1"]:hover,
+#Sampler3 #Btn-btr[value="1"]:hover,
+#Sampler3 #Btn-bbr[value="1"]:hover,
+#Sampler3 #Btn-blr[value="1"]:hover,
+#Sampler3 #Btn-brr[value="1"]:hover,
+#Sampler3 #Btn-btlr[value="1"]:hover,
+#Sampler3 #Btn-btrr[value="1"]:hover,
+#Sampler3 #Btn-bblr[value="1"]:hover,
+#Sampler3 #Btn-bbrr[value="1"]:hover,
+#Sampler3 #Btn-nbr[value="1"]:hover,
+#Sampler3 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #77bb55;
+}
+
+/**
+ * Sampler4
+ */
+#Sampler4 #Btn-br[value="1"],
+#Sampler4 #Btn-btr[value="1"],
+#Sampler4 #Btn-bbr[value="1"],
+#Sampler4 #Btn-blr[value="1"],
+#Sampler4 #Btn-brr[value="1"],
+#Sampler4 #Btn-btlr[value="1"],
+#Sampler4 #Btn-btrr[value="1"],
+#Sampler4 #Btn-bblr[value="1"],
+#Sampler4 #Btn-bbrr[value="1"],
+#Sampler4 #Btn-nbr[value="1"],
+#Sampler4 #Btn-nbr-bisected[value="1"] {
+    background-color: #77bb55;
+}
+
+#Sampler4 #Btn-br[value="1"]:hover,
+#Sampler4 #Btn-btr[value="1"]:hover,
+#Sampler4 #Btn-bbr[value="1"]:hover,
+#Sampler4 #Btn-blr[value="1"]:hover,
+#Sampler4 #Btn-brr[value="1"]:hover,
+#Sampler4 #Btn-btlr[value="1"]:hover,
+#Sampler4 #Btn-btrr[value="1"]:hover,
+#Sampler4 #Btn-bblr[value="1"]:hover,
+#Sampler4 #Btn-bbrr[value="1"]:hover,
+#Sampler4 #Btn-nbr[value="1"]:hover,
+#Sampler4 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #669933;
+}
+
+/**
+ * Auxiliary1
+ */
+#Auxiliary1 #Btn-br[value="1"],
+#Auxiliary1 #Btn-btr[value="1"],
+#Auxiliary1 #Btn-bbr[value="1"],
+#Auxiliary1 #Btn-blr[value="1"],
+#Auxiliary1 #Btn-brr[value="1"],
+#Auxiliary1 #Btn-btlr[value="1"],
+#Auxiliary1 #Btn-btrr[value="1"],
+#Auxiliary1 #Btn-bblr[value="1"],
+#Auxiliary1 #Btn-bbrr[value="1"],
+#Auxiliary1 #Btn-nbr[value="1"],
+#Auxiliary1 #Btn-nbr-bisected[value="1"] {
+    background-color: #5cff2e;
+}
+
+#Auxiliary1 #Btn-br[value="1"]:hover,
+#Auxiliary1 #Btn-btr[value="1"]:hover,
+#Auxiliary1 #Btn-bbr[value="1"]:hover,
+#Auxiliary1 #Btn-blr[value="1"]:hover,
+#Auxiliary1 #Btn-brr[value="1"]:hover,
+#Auxiliary1 #Btn-btlr[value="1"]:hover,
+#Auxiliary1 #Btn-btrr[value="1"]:hover,
+#Auxiliary1 #Btn-bblr[value="1"]:hover,
+#Auxiliary1 #Btn-bbrr[value="1"]:hover,
+#Auxiliary1 #Btn-nbr[value="1"]:hover,
+#Auxiliary1 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #44dd55;
+}
+
+/**
+ * Auxiliary2
+ */
+#Auxiliary2 #Btn-br[value="1"],
+#Auxiliary2 #Btn-btr[value="1"],
+#Auxiliary2 #Btn-bbr[value="1"],
+#Auxiliary2 #Btn-blr[value="1"],
+#Auxiliary2 #Btn-brr[value="1"],
+#Auxiliary2 #Btn-btlr[value="1"],
+#Auxiliary2 #Btn-btrr[value="1"],
+#Auxiliary2 #Btn-bblr[value="1"],
+#Auxiliary2 #Btn-bbrr[value="1"],
+#Auxiliary2 #Btn-nbr[value="1"],
+#Auxiliary2 #Btn-nbr-bisected[value="1"] {
+    background-color: #55ee88;
+}
+
+#Auxiliary2 #Btn-br[value="1"]:hover,
+#Auxiliary2 #Btn-btr[value="1"]:hover,
+#Auxiliary2 #Btn-bbr[value="1"]:hover,
+#Auxiliary2 #Btn-blr[value="1"]:hover,
+#Auxiliary2 #Btn-brr[value="1"]:hover,
+#Auxiliary2 #Btn-btlr[value="1"]:hover,
+#Auxiliary2 #Btn-btrr[value="1"]:hover,
+#Auxiliary2 #Btn-bblr[value="1"]:hover,
+#Auxiliary2 #Btn-bbrr[value="1"]:hover,
+#Auxiliary2 #Btn-nbr[value="1"]:hover,
+#Auxiliary2 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #44cc66;
+}
+
+/**
+ * Auxiliary3
+ */
+#Auxiliary3 #Btn-br[value="1"],
+#Auxiliary3 #Btn-btr[value="1"],
+#Auxiliary3 #Btn-bbr[value="1"],
+#Auxiliary3 #Btn-blr[value="1"],
+#Auxiliary3 #Btn-brr[value="1"],
+#Auxiliary3 #Btn-btlr[value="1"],
+#Auxiliary3 #Btn-btrr[value="1"],
+#Auxiliary3 #Btn-bblr[value="1"],
+#Auxiliary3 #Btn-bbrr[value="1"],
+#Auxiliary3 #Btn-nbr[value="1"],
+#Auxiliary3 #Btn-nbr-bisected[value="1"] {
+    background-color: #88cc66;
+}
+
+#Auxiliary3 #Btn-br[value="1"]:hover,
+#Auxiliary3 #Btn-btr[value="1"]:hover,
+#Auxiliary3 #Btn-bbr[value="1"]:hover,
+#Auxiliary3 #Btn-blr[value="1"]:hover,
+#Auxiliary3 #Btn-brr[value="1"]:hover,
+#Auxiliary3 #Btn-btlr[value="1"]:hover,
+#Auxiliary3 #Btn-btrr[value="1"]:hover,
+#Auxiliary3 #Btn-bblr[value="1"]:hover,
+#Auxiliary3 #Btn-bbrr[value="1"]:hover,
+#Auxiliary3 #Btn-nbr[value="1"]:hover,
+#Auxiliary3 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #77bb55;
+}
+
+/**
+ * Auxiliary4
+ */
+#Auxiliary4 #Btn-br[value="1"],
+#Auxiliary4 #Btn-btr[value="1"],
+#Auxiliary4 #Btn-bbr[value="1"],
+#Auxiliary4 #Btn-blr[value="1"],
+#Auxiliary4 #Btn-brr[value="1"],
+#Auxiliary4 #Btn-btlr[value="1"],
+#Auxiliary4 #Btn-btrr[value="1"],
+#Auxiliary4 #Btn-bblr[value="1"],
+#Auxiliary4 #Btn-bbrr[value="1"],
+#Auxiliary4 #Btn-nbr[value="1"],
+#Auxiliary4 #Btn-nbr-bisected[value="1"] {
+    background-color: #77bb55;
+}
+
+#Auxiliary4 #Btn-br[value="1"]:hover,
+#Auxiliary4 #Btn-btr[value="1"]:hover,
+#Auxiliary4 #Btn-bbr[value="1"]:hover,
+#Auxiliary4 #Btn-blr[value="1"]:hover,
+#Auxiliary4 #Btn-brr[value="1"]:hover,
+#Auxiliary4 #Btn-btlr[value="1"]:hover,
+#Auxiliary4 #Btn-btrr[value="1"]:hover,
+#Auxiliary4 #Btn-bblr[value="1"]:hover,
+#Auxiliary4 #Btn-bbrr[value="1"]:hover,
+#Auxiliary4 #Btn-nbr[value="1"]:hover,
+#Auxiliary4 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #669933;
+}
+
+/**
+ * Microphone1
+ */
+#Microphone1 #Btn-br[value="1"],
+#Microphone1 #Btn-btr[value="1"],
+#Microphone1 #Btn-bbr[value="1"],
+#Microphone1 #Btn-blr[value="1"],
+#Microphone1 #Btn-brr[value="1"],
+#Microphone1 #Btn-btlr[value="1"],
+#Microphone1 #Btn-btrr[value="1"],
+#Microphone1 #Btn-bblr[value="1"],
+#Microphone1 #Btn-bbrr[value="1"],
+#Microphone1 #Btn-nbr[value="1"],
+#Microphone1 #Btn-nbr-bisected[value="1"] {
+    background-color: #5cff2e;
+}
+
+#Microphone1 #Btn-br[value="1"]:hover,
+#Microphone1 #Btn-btr[value="1"]:hover,
+#Microphone1 #Btn-bbr[value="1"]:hover,
+#Microphone1 #Btn-blr[value="1"]:hover,
+#Microphone1 #Btn-brr[value="1"]:hover,
+#Microphone1 #Btn-btlr[value="1"]:hover,
+#Microphone1 #Btn-btrr[value="1"]:hover,
+#Microphone1 #Btn-bblr[value="1"]:hover,
+#Microphone1 #Btn-bbrr[value="1"]:hover,
+#Microphone1 #Btn-nbr[value="1"]:hover,
+#Microphone1 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #44dd55;
+}
+
+/**
+ * Microphone2
+ */
+#Microphone2 #Btn-br[value="1"],
+#Microphone2 #Btn-btr[value="1"],
+#Microphone2 #Btn-bbr[value="1"],
+#Microphone2 #Btn-blr[value="1"],
+#Microphone2 #Btn-brr[value="1"],
+#Microphone2 #Btn-btlr[value="1"],
+#Microphone2 #Btn-btrr[value="1"],
+#Microphone2 #Btn-bblr[value="1"],
+#Microphone2 #Btn-bbrr[value="1"],
+#Microphone2 #Btn-nbr[value="1"],
+#Microphone2 #Btn-nbr-bisected[value="1"] {
+    background-color: #55ee88;
+}
+
+#Microphone2 #Btn-br[value="1"]:hover,
+#Microphone2 #Btn-btr[value="1"]:hover,
+#Microphone2 #Btn-bbr[value="1"]:hover,
+#Microphone2 #Btn-blr[value="1"]:hover,
+#Microphone2 #Btn-brr[value="1"]:hover,
+#Microphone2 #Btn-btlr[value="1"]:hover,
+#Microphone2 #Btn-btrr[value="1"]:hover,
+#Microphone2 #Btn-bblr[value="1"]:hover,
+#Microphone2 #Btn-bbrr[value="1"]:hover,
+#Microphone2 #Btn-nbr[value="1"]:hover,
+#Microphone2 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #44cc66;
+}
+
+/**
+ * Microphone3
+ */
+#Microphone3 #Btn-br[value="1"],
+#Microphone3 #Btn-btr[value="1"],
+#Microphone3 #Btn-bbr[value="1"],
+#Microphone3 #Btn-blr[value="1"],
+#Microphone3 #Btn-brr[value="1"],
+#Microphone3 #Btn-btlr[value="1"],
+#Microphone3 #Btn-btrr[value="1"],
+#Microphone3 #Btn-bblr[value="1"],
+#Microphone3 #Btn-bbrr[value="1"],
+#Microphone3 #Btn-nbr[value="1"],
+#Microphone3 #Btn-nbr-bisected[value="1"] {
+    background-color: #88cc66;
+}
+
+#Microphone3 #Btn-br[value="1"]:hover,
+#Microphone3 #Btn-btr[value="1"]:hover,
+#Microphone3 #Btn-bbr[value="1"]:hover,
+#Microphone3 #Btn-blr[value="1"]:hover,
+#Microphone3 #Btn-brr[value="1"]:hover,
+#Microphone3 #Btn-btlr[value="1"]:hover,
+#Microphone3 #Btn-btrr[value="1"]:hover,
+#Microphone3 #Btn-bblr[value="1"]:hover,
+#Microphone3 #Btn-bbrr[value="1"]:hover,
+#Microphone3 #Btn-nbr[value="1"]:hover,
+#Microphone3 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #77bb55;
+}
+
+/**
+ * Microphone4
+ */
+#Microphone4 #Btn-br[value="1"],
+#Microphone4 #Btn-btr[value="1"],
+#Microphone4 #Btn-bbr[value="1"],
+#Microphone4 #Btn-blr[value="1"],
+#Microphone4 #Btn-brr[value="1"],
+#Microphone4 #Btn-btlr[value="1"],
+#Microphone4 #Btn-btrr[value="1"],
+#Microphone4 #Btn-bblr[value="1"],
+#Microphone4 #Btn-bbrr[value="1"],
+#Microphone4 #Btn-nbr[value="1"],
+#Microphone4 #Btn-nbr-bisected[value="1"] {
+    background-color: #77bb55;
+}
+
+#Microphone4 #Btn-br[value="1"]:hover,
+#Microphone4 #Btn-btr[value="1"]:hover,
+#Microphone4 #Btn-bbr[value="1"]:hover,
+#Microphone4 #Btn-blr[value="1"]:hover,
+#Microphone4 #Btn-brr[value="1"]:hover,
+#Microphone4 #Btn-btlr[value="1"]:hover,
+#Microphone4 #Btn-btrr[value="1"]:hover,
+#Microphone4 #Btn-bblr[value="1"]:hover,
+#Microphone4 #Btn-bbrr[value="1"]:hover,
+#Microphone4 #Btn-nbr[value="1"]:hover,
+#Microphone4 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #669933;
+}
+
+/**
+ * EffectUnit1
+ */
+#EffectUnit1 #Btn-br[value="1"],
+#EffectUnit1 #Btn-btr[value="1"],
+#EffectUnit1 #Btn-bbr[value="1"],
+#EffectUnit1 #Btn-blr[value="1"],
+#EffectUnit1 #Btn-brr[value="1"],
+#EffectUnit1 #Btn-btlr[value="1"],
+#EffectUnit1 #Btn-btrr[value="1"],
+#EffectUnit1 #Btn-bblr[value="1"],
+#EffectUnit1 #Btn-bbrr[value="1"],
+#EffectUnit1 #Btn-nbr[value="1"],
+#EffectUnit1 #Btn-nbr-bisected[value="1"] {
+    background-color: #5cff2e;
+}
+
+#EffectUnit1 #Btn-br[value="1"]:hover,
+#EffectUnit1 #Btn-btr[value="1"]:hover,
+#EffectUnit1 #Btn-bbr[value="1"]:hover,
+#EffectUnit1 #Btn-blr[value="1"]:hover,
+#EffectUnit1 #Btn-brr[value="1"]:hover,
+#EffectUnit1 #Btn-btlr[value="1"]:hover,
+#EffectUnit1 #Btn-btrr[value="1"]:hover,
+#EffectUnit1 #Btn-bblr[value="1"]:hover,
+#EffectUnit1 #Btn-bbrr[value="1"]:hover,
+#EffectUnit1 #Btn-nbr[value="1"]:hover,
+#EffectUnit1 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #44dd55;
+}
+
+/**
+ * EffectUnit2
+ */
+#EffectUnit2 #Btn-br[value="1"],
+#EffectUnit2 #Btn-btr[value="1"],
+#EffectUnit2 #Btn-bbr[value="1"],
+#EffectUnit2 #Btn-blr[value="1"],
+#EffectUnit2 #Btn-brr[value="1"],
+#EffectUnit2 #Btn-btlr[value="1"],
+#EffectUnit2 #Btn-btrr[value="1"],
+#EffectUnit2 #Btn-bblr[value="1"],
+#EffectUnit2 #Btn-bbrr[value="1"],
+#EffectUnit2 #Btn-nbr[value="1"],
+#EffectUnit2 #Btn-nbr-bisected[value="1"] {
+    background-color: #5cff2e;
+}
+
+#EffectUnit2 #Btn-br[value="1"]:hover,
+#EffectUnit2 #Btn-btr[value="1"]:hover,
+#EffectUnit2 #Btn-bbr[value="1"]:hover,
+#EffectUnit2 #Btn-blr[value="1"]:hover,
+#EffectUnit2 #Btn-brr[value="1"]:hover,
+#EffectUnit2 #Btn-btlr[value="1"]:hover,
+#EffectUnit2 #Btn-btrr[value="1"]:hover,
+#EffectUnit2 #Btn-bblr[value="1"]:hover,
+#EffectUnit2 #Btn-bbrr[value="1"]:hover,
+#EffectUnit2 #Btn-nbr[value="1"]:hover,
+#EffectUnit2 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #44dd55;
+}
+
+/**
+ * EffectUnit3
+ */
+#EffectUnit3 #Btn-br[value="1"],
+#EffectUnit3 #Btn-btr[value="1"],
+#EffectUnit3 #Btn-bbr[value="1"],
+#EffectUnit3 #Btn-blr[value="1"],
+#EffectUnit3 #Btn-brr[value="1"],
+#EffectUnit3 #Btn-btlr[value="1"],
+#EffectUnit3 #Btn-btrr[value="1"],
+#EffectUnit3 #Btn-bblr[value="1"],
+#EffectUnit3 #Btn-bbrr[value="1"],
+#EffectUnit3 #Btn-nbr[value="1"],
+#EffectUnit3 #Btn-nbr-bisected[value="1"] {
+    background-color: #88cc66;
+}
+
+#EffectUnit3 #Btn-br[value="1"]:hover,
+#EffectUnit3 #Btn-btr[value="1"]:hover,
+#EffectUnit3 #Btn-bbr[value="1"]:hover,
+#EffectUnit3 #Btn-blr[value="1"]:hover,
+#EffectUnit3 #Btn-brr[value="1"]:hover,
+#EffectUnit3 #Btn-btlr[value="1"]:hover,
+#EffectUnit3 #Btn-btrr[value="1"]:hover,
+#EffectUnit3 #Btn-bblr[value="1"]:hover,
+#EffectUnit3 #Btn-bbrr[value="1"]:hover,
+#EffectUnit3 #Btn-nbr[value="1"]:hover,
+#EffectUnit3 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #77bb55;
+}
+
+/**
+ * EffectUnit4
+ */
+#EffectUnit4 #Btn-br[value="1"],
+#EffectUnit4 #Btn-btr[value="1"],
+#EffectUnit4 #Btn-bbr[value="1"],
+#EffectUnit4 #Btn-blr[value="1"],
+#EffectUnit4 #Btn-brr[value="1"],
+#EffectUnit4 #Btn-btlr[value="1"],
+#EffectUnit4 #Btn-btrr[value="1"],
+#EffectUnit4 #Btn-bblr[value="1"],
+#EffectUnit4 #Btn-bbrr[value="1"],
+#EffectUnit4 #Btn-nbr[value="1"],
+#EffectUnit4 #Btn-nbr-bisected[value="1"] {
+    background-color: #77bb55;
+}
+
+#EffectUnit4 #Btn-br[value="1"]:hover,
+#EffectUnit4 #Btn-btr[value="1"]:hover,
+#EffectUnit4 #Btn-bbr[value="1"]:hover,
+#EffectUnit4 #Btn-blr[value="1"]:hover,
+#EffectUnit4 #Btn-brr[value="1"]:hover,
+#EffectUnit4 #Btn-btlr[value="1"]:hover,
+#EffectUnit4 #Btn-btrr[value="1"]:hover,
+#EffectUnit4 #Btn-bblr[value="1"]:hover,
+#EffectUnit4 #Btn-bbrr[value="1"]:hover,
+#EffectUnit4 #Btn-nbr[value="1"]:hover,
+#EffectUnit4 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #669933;
+}
+
+/**
+ * VinylControl1
+ */
+#VinylControl1 #Btn-br[value="1"],
+#VinylControl1 #Btn-btr[value="1"],
+#VinylControl1 #Btn-bbr[value="1"],
+#VinylControl1 #Btn-blr[value="1"],
+#VinylControl1 #Btn-brr[value="1"],
+#VinylControl1 #Btn-btlr[value="1"],
+#VinylControl1 #Btn-btrr[value="1"],
+#VinylControl1 #Btn-bblr[value="1"],
+#VinylControl1 #Btn-bbrr[value="1"],
+#VinylControl1 #Btn-nbr[value="1"],
+#VinylControl1 #Btn-nbr-bisected[value="1"] {
+    background-color: #5cff2e;
+}
+
+#Vinylcontrol1 #Btn-br[value="1"]:hover,
+#Vinylcontrol1 #Btn-btr[value="1"]:hover,
+#Vinylcontrol1 #Btn-bbr[value="1"]:hover,
+#Vinylcontrol1 #Btn-blr[value="1"]:hover,
+#Vinylcontrol1 #Btn-brr[value="1"]:hover,
+#Vinylcontrol1 #Btn-btlr[value="1"]:hover,
+#Vinylcontrol1 #Btn-btrr[value="1"]:hover,
+#Vinylcontrol1 #Btn-bblr[value="1"]:hover,
+#Vinylcontrol1 #Btn-bbrr[value="1"]:hover,
+#Vinylcontrol1 #Btn-nbr[value="1"]:hover,
+#Vinylcontrol1 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #44dd55;
+}
+
+/**
+ * VinylControl2
+ */
+#VinylControl2 #Btn-br[value="1"],
+#VinylControl2 #Btn-btr[value="1"],
+#VinylControl2 #Btn-bbr[value="1"],
+#VinylControl2 #Btn-blr[value="1"],
+#VinylControl2 #Btn-brr[value="1"],
+#VinylControl2 #Btn-btlr[value="1"],
+#VinylControl2 #Btn-btrr[value="1"],
+#VinylControl2 #Btn-bblr[value="1"],
+#VinylControl2 #Btn-bbrr[value="1"],
+#VinylControl2 #Btn-nbr[value="1"],
+#VinylControl2 #Btn-nbr-bisected[value="1"] {
+    background-color: #55ee88;
+}
+
+#Vinylcontrol2 #Btn-br[value="1"]:hover,
+#Vinylcontrol2 #Btn-btr[value="1"]:hover,
+#Vinylcontrol2 #Btn-bbr[value="1"]:hover,
+#Vinylcontrol2 #Btn-blr[value="1"]:hover,
+#Vinylcontrol2 #Btn-brr[value="1"]:hover,
+#Vinylcontrol2 #Btn-btlr[value="1"]:hover,
+#Vinylcontrol2 #Btn-btrr[value="1"]:hover,
+#Vinylcontrol2 #Btn-bblr[value="1"]:hover,
+#Vinylcontrol2 #Btn-bbrr[value="1"]:hover,
+#Vinylcontrol2 #Btn-nbr[value="1"]:hover,
+#Vinylcontrol2 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #44cc66;
+}
+
+/**
+ * VinylControl3
+ */
+#VinylControl3 #Btn-br[value="1"],
+#VinylControl3 #Btn-btr[value="1"],
+#VinylControl3 #Btn-bbr[value="1"],
+#VinylControl3 #Btn-blr[value="1"],
+#VinylControl3 #Btn-brr[value="1"],
+#VinylControl3 #Btn-btlr[value="1"],
+#VinylControl3 #Btn-btrr[value="1"],
+#VinylControl3 #Btn-bblr[value="1"],
+#VinylControl3 #Btn-bbrr[value="1"],
+#VinylControl3 #Btn-nbr[value="1"],
+#VinylControl3 #Btn-nbr-bisected[value="1"] {
+    background-color: #88cc66;
+}
+
+#Vinylcontrol3 #Btn-br[value="1"]:hover,
+#Vinylcontrol3 #Btn-btr[value="1"]:hover,
+#Vinylcontrol3 #Btn-bbr[value="1"]:hover,
+#Vinylcontrol3 #Btn-blr[value="1"]:hover,
+#Vinylcontrol3 #Btn-brr[value="1"]:hover,
+#Vinylcontrol3 #Btn-btlr[value="1"]:hover,
+#Vinylcontrol3 #Btn-btrr[value="1"]:hover,
+#Vinylcontrol3 #Btn-bblr[value="1"]:hover,
+#Vinylcontrol3 #Btn-bbrr[value="1"]:hover,
+#Vinylcontrol3 #Btn-nbr[value="1"]:hover,
+#Vinylcontrol3 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #77bb55;
+}
+
+/**
+ * VinylControl4
+ */
+#VinylControl4 #Btn-br[value="1"],
+#VinylControl4 #Btn-btr[value="1"],
+#VinylControl4 #Btn-bbr[value="1"],
+#VinylControl4 #Btn-blr[value="1"],
+#VinylControl4 #Btn-brr[value="1"],
+#VinylControl4 #Btn-btlr[value="1"],
+#VinylControl4 #Btn-btrr[value="1"],
+#VinylControl4 #Btn-bblr[value="1"],
+#VinylControl4 #Btn-bbrr[value="1"],
+#VinylControl4 #Btn-nbr[value="1"],
+#VinylControl4 #Btn-nbr-bisected[value="1"] {
+    background-color: #77bb55;
+}
+
+#Vinylcontrol4 #Btn-br[value="1"]:hover,
+#Vinylcontrol4 #Btn-btr[value="1"]:hover,
+#Vinylcontrol4 #Btn-bbr[value="1"]:hover,
+#Vinylcontrol4 #Btn-blr[value="1"]:hover,
+#Vinylcontrol4 #Btn-brr[value="1"]:hover,
+#Vinylcontrol4 #Btn-btlr[value="1"]:hover,
+#Vinylcontrol4 #Btn-btrr[value="1"]:hover,
+#Vinylcontrol4 #Btn-bblr[value="1"]:hover,
+#Vinylcontrol4 #Btn-bbrr[value="1"]:hover,
+#Vinylcontrol4 #Btn-nbr[value="1"]:hover,
+#Vinylcontrol4 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #669933;
+}
+
+
+#Slider {
+    background: transparent url(skin:/background/bg_1_slider.svg) repeat-y center top;
+}
+
+#SliderTop {
+    background: transparent url(skin:/background/bg_1_slider_top.svg) no-repeat center top;
+}
+
+#SliderBottom {
+    background: transparent url(skin:/background/bg_1_slider_bottom.svg) no-repeat center top;
+}
+
+#PitchSlider {
+    background: transparent url(skin:/background/bg_2_slider.svg) repeat-y center top;
+}
+
+#PitchSliderTop {
+    background: transparent url(skin:/background/bg_2_slider_top.svg) no-repeat center top;
+}
+
+#PitchSliderBottom {
+    background: transparent url(skin:/background/bg_2_slider_bottom.svg) no-repeat center top;
+}
+
+#CrossFader {
+    background: transparent url(skin:/background/bg_3_slider.svg) no-repeat center top;
+}
+
+#CrossFaderLeft {
+    background: transparent url(skin:/background/bg_3_slider_left.svg) no-repeat center top;
+}
+
+#CrossFaderRight {
+    background: transparent url(skin:/background/bg_3_slider_right.svg) no-repeat center top;
+}
+
+#Vu {
+    background: transparent url(skin:/background/bg_1_vu.svg) repeat-y center top;
+}
+
+#VuBottom {
+    background: transparent url(skin:/background/bg_1_vu_bottom.svg) no-repeat center top;
+}
+
+#MasterVu, #ChannelVu {
+    background: transparent url(skin:/background/bg_4_vu.svg) repeat-x right center;
+    padding-top: 4px;
+}
+
+#MasterVuBottom, #ChannelVuBottom {
+    background: transparent url(skin:/background/bg_4_vu_bottom.svg) no-repeat left center;
+}
+
+
+#TransportRow,
+#HotCueRow,
+#LoopRow,
+#BeatGridRow {
+    border: 0;
+    border-radius: 0;
+    background-color: #000000;
+    margin: 0;
+    padding: 0;
+}
+
+/* AGGRESSIVE DECK2 BLUE OVERRIDE */

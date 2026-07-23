@@ -1,0 +1,45 @@
+<Template>
+  <SetVariable name="ChannelType">channel</SetVariable>
+  <SetVariable name="VuSize">deck</SetVariable>
+  <SetVariable name="VuColor">light</SetVariable>
+
+  <WidgetGroup>
+    <SizePolicy>min,min</SizePolicy>
+    <Layout>vertical</Layout>
+    <Children>
+
+      <WidgetGroup><!-- 1 / Main / 2 -->
+        <Layout>horizontal</Layout>
+        <SizePolicy>min,me</SizePolicy>
+        <Children>
+          <WidgetGroup>
+            <ObjectName>VuMeterDeck1_Compact</ObjectName>
+            <Layout>horizontal</Layout>
+            <SizePolicy>min,me</SizePolicy>
+            <Children>
+              <Template src="skin:/mixer/vumeter_single.xml">
+                <SetVariable name="Group">[Channel1]</SetVariable>
+              </Template>
+            </Children>
+          </WidgetGroup>
+
+          <WidgetGroup>
+            <ObjectName>VuMeterDeck2_Compact</ObjectName>
+            <Layout>horizontal</Layout>
+            <SizePolicy>min,me</SizePolicy>
+            <Children>
+              <Template src="skin:/mixer/vumeter_single.xml">
+                <SetVariable name="Group">[Channel2]</SetVariable>
+              </Template>
+            </Children>
+          </WidgetGroup>
+        </Children>
+      </WidgetGroup><!-- 1 / Main / 2 -->
+
+    </Children>
+    <Connection>
+      <ConfigKey persist="true">[LateNightMini],show_vumeters_compact</ConfigKey>
+      <BindProperty>visible</BindProperty>
+    </Connection>
+  </WidgetGroup>
+</Template>

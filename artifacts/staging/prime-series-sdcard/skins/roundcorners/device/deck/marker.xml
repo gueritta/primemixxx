@@ -1,0 +1,109 @@
+<!DOCTYPE template>
+<Template>
+
+    <!--
+    **************************************************************************************
+    HOTCUE BEGIN
+    **************************************************************************************
+    -->
+    <WidgetGroup>
+        <Layout>horizontal</Layout>
+        <SizePolicy>me,f</SizePolicy>
+        <MinimumSize>-1,48</MinimumSize>
+        <MaximumSize>-1,48</MaximumSize>
+        <Children>
+
+            <WidgetGroup><!-- margin left -->
+                <SizePolicy>f,f</SizePolicy>
+                <MinimumSize>10,48</MinimumSize>
+                <MaximumSize>10,48</MaximumSize>
+            </WidgetGroup>
+
+            <PushButton>
+                <ObjectName>Btn-blr</ObjectName>
+                <Size>44f,48f</Size>
+                <NumberStates>1</NumberStates>
+                <State><Number>0</Number><Text>&lt;</Text></State>
+                <Connection>
+                    <ConfigKey><Variable name="Widget"/>,hotcuepage_prev</ConfigKey>
+                    <EmitOnPressAndRelease>true</EmitOnPressAndRelease>
+                    <ButtonState>LeftButton</ButtonState>
+                </Connection>
+            </PushButton>
+
+            <WidgetStack>
+                <NextControl><Variable name="Widget"/>,hotcuepage_next</NextControl>
+                <PrevControl><Variable name="Widget"/>,hotcuepage_prev</PrevControl>
+                <Children>
+
+                    <WidgetGroup><Layout>horizontal</Layout><SizePolicy>me,f</SizePolicy><MinimumSize>-1,48</MinimumSize><MaximumSize>-1,48</MaximumSize><Children>
+                        <Template src="skin:device/deck/marker_button.xml"><SetVariable name="label">◢ 1</SetVariable><SetVariable name="hotcue_x">13</SetVariable></Template>
+                        <Template src="skin:device/deck/marker_button.xml"><SetVariable name="label">◣ 1</SetVariable><SetVariable name="hotcue_x">14</SetVariable></Template>
+                        <Template src="skin:device/deck/marker_button.xml"><SetVariable name="label">◢ 2</SetVariable><SetVariable name="hotcue_x">15</SetVariable></Template>
+                        <Template src="skin:device/deck/marker_button.xml"><SetVariable name="label">◣ 2</SetVariable><SetVariable name="hotcue_x">16</SetVariable></Template>
+                        <Template src="skin:device/deck/marker_button.xml"><SetVariable name="label">◢ 3</SetVariable><SetVariable name="hotcue_x">17</SetVariable></Template>
+                        <Template src="skin:device/deck/marker_button.xml"><SetVariable name="label">◣ 3</SetVariable><SetVariable name="hotcue_x">18</SetVariable></Template>
+                    </Children></WidgetGroup>
+
+                    <WidgetGroup><Layout>horizontal</Layout><SizePolicy>me,f</SizePolicy><MinimumSize>-1,48</MinimumSize><MaximumSize>-1,48</MaximumSize><Children>
+                        <Template src="skin:device/deck/marker_button.xml"><SetVariable name="label">◢ 4</SetVariable><SetVariable name="hotcue_x">19</SetVariable></Template>
+                        <Template src="skin:device/deck/marker_button.xml"><SetVariable name="label">◣ 4</SetVariable><SetVariable name="hotcue_x">20</SetVariable></Template>
+                        <Template src="skin:device/deck/marker_button.xml"><SetVariable name="label">◢ 5</SetVariable><SetVariable name="hotcue_x">21</SetVariable></Template>
+                        <Template src="skin:device/deck/marker_button.xml"><SetVariable name="label">◣ 5</SetVariable><SetVariable name="hotcue_x">22</SetVariable></Template>
+                        <Template src="skin:device/deck/marker_button.xml"><SetVariable name="label">◢ 6</SetVariable><SetVariable name="hotcue_x">23</SetVariable></Template>
+                        <Template src="skin:device/deck/marker_button.xml"><SetVariable name="label">◣ 6</SetVariable><SetVariable name="hotcue_x">24</SetVariable></Template>
+                    </Children></WidgetGroup>
+
+                    <WidgetGroup><Layout>horizontal</Layout><SizePolicy>me,f</SizePolicy><MinimumSize>-1,48</MinimumSize><MaximumSize>-1,48</MaximumSize><Children>
+                        <Template src="skin:device/deck/marker_button.xml"><SetVariable name="label">↦ 1</SetVariable><SetVariable name="hotcue_x">25</SetVariable></Template>
+                        <Template src="skin:device/deck/marker_button.xml"><SetVariable name="label">⇥ 1</SetVariable><SetVariable name="hotcue_x">26</SetVariable></Template>
+                        <Template src="skin:device/deck/marker_button.xml"><SetVariable name="label">↦ 2</SetVariable><SetVariable name="hotcue_x">27</SetVariable></Template>
+                        <Template src="skin:device/deck/marker_button.xml"><SetVariable name="label">⇥ 2</SetVariable><SetVariable name="hotcue_x">28</SetVariable></Template>
+                        <Template src="skin:device/deck/marker_button.xml"><SetVariable name="label">↦ 3</SetVariable><SetVariable name="hotcue_x">29</SetVariable></Template>
+                        <Template src="skin:device/deck/marker_button.xml"><SetVariable name="label">⇥ 3</SetVariable><SetVariable name="hotcue_x">30</SetVariable></Template>
+                    </Children></WidgetGroup>
+
+                    <WidgetGroup><Layout>horizontal</Layout><SizePolicy>me,f</SizePolicy><MinimumSize>-1,48</MinimumSize><MaximumSize>-1,48</MaximumSize><Children>
+                        <Template src="skin:device/deck/marker_button.xml"><SetVariable name="label">↦ 4</SetVariable><SetVariable name="hotcue_x">31</SetVariable></Template>
+                        <Template src="skin:device/deck/marker_button.xml"><SetVariable name="label">⇥ 4</SetVariable><SetVariable name="hotcue_x">32</SetVariable></Template>
+                        <Template src="skin:device/deck/marker_button.xml"><SetVariable name="label">↦ 5</SetVariable><SetVariable name="hotcue_x">33</SetVariable></Template>
+                        <Template src="skin:device/deck/marker_button.xml"><SetVariable name="label">⇥ 5</SetVariable><SetVariable name="hotcue_x">34</SetVariable></Template>
+                        <Template src="skin:device/deck/marker_button.xml"><SetVariable name="label">↦ 6</SetVariable><SetVariable name="hotcue_x">35</SetVariable></Template>
+                        <Template src="skin:device/deck/marker_button.xml"><SetVariable name="label">⇥ 6</SetVariable><SetVariable name="hotcue_x">36</SetVariable></Template>
+                    </Children></WidgetGroup>
+
+                </Children>
+            </WidgetStack>
+
+            <PushButton>
+                <ObjectName>Btn-brr</ObjectName>
+                <Size>44f,48f</Size>
+                <NumberStates>1</NumberStates>
+                <State><Number>0</Number><Text>&gt;</Text></State>
+                <Connection>
+                    <ConfigKey><Variable name="Widget"/>,hotcuepage_next</ConfigKey>
+                    <EmitOnPressAndRelease>true</EmitOnPressAndRelease>
+                    <ButtonState>LeftButton</ButtonState>
+                </Connection>
+            </PushButton>
+
+            <WidgetGroup><!-- margin right -->
+                <SizePolicy>f,f</SizePolicy>
+                <MinimumSize>10,48</MinimumSize>
+                <MaximumSize>10,48</MaximumSize>
+            </WidgetGroup>
+
+        </Children>
+        <Connection>
+            <ConfigKey persist="true"><Variable name="Widget"/>,show_advanced_markers</ConfigKey>
+            <BindProperty>visible</BindProperty>
+        </Connection>
+    </WidgetGroup>
+
+    <!--
+    **************************************************************************************
+    HOTCUE END
+    **************************************************************************************
+    -->
+
+</Template>

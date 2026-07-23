@@ -1,0 +1,141 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ROUNDCORNERS SKIN — TOUCH DESIGN SYSTEM
+   ════════════════════════════════════════════════════════════════════════════
+   
+   Target device: Denon Prime 4 / Prime Go (1280×800, 10.1" touchscreen)
+   Qt version:    5.15.8 EGLFS (no window manager, direct framebuffer)
+   
+   ── GRID ───────────────────────────────────────────────────────────────────
+   Base unit:      4px
+   All sizes should be multiples of 4px where possible.
+   
+   ── TOUCH TARGETS ──────────────────────────────────────────────────────────
+   Minimum:        48×48px  (finger-friendly on 10.1" 1280×800)
+   Row height:     48px     (standard interactive row)
+   Sub-row:        24px     (half-height, non-interactive labels)
+   
+   ── SPACING ────────────────────────────────────────────────────────────────
+   Inter-element:  12px     (between adjacent interactive controls)
+   Margin outer:   6px      (screen edge padding)
+   Margin inner:   12px     (section padding)
+   
+   ── FONT SCALE ─────────────────────────────────────────────────────────────
+   Body:           16px     (library track text, small labels)
+   Label:          18px     (button text, deck info)
+   Subheader:      20px     (section headers)
+   Header:         22px     (main UI headers, column headers)
+   
+   ── BORDER RADIUS ──────────────────────────────────────────────────────────
+   Small:          6px      (buttons, inputs, small containers)
+   Large:          10px     (panels, search bar, section borders)
+   
+   ── COLORS ─────────────────────────────────────────────────────────────────
+   Neon green (Deck 1, 3):
+     High:  #77ff88   Mid:  #5cff2e   Low:  #44dd55
+     Mark:  #337744   Mark disabled:  #88aa88
+   
+   Blue (Deck 2):
+     High:  #4488ff   Mid:  #3366ee   Low:  #2244cc
+     Mark:  #112244   Mark disabled:  #4466aa
+   
+   Deck 4:
+     High:  #88cc66   Mid:  #77bb55   Low:  #3b2e18
+     Mark:  #557733   Mark disabled:  #669966
+   
+   Background:  #000000 (true black)
+   Surface:     #2a2a2a (dark gray panels)
+   Muted:       #777777 (inactive/dimmed)
+   
+   ── RESPONSIVE BREAKPOINTS ─────────────────────────────────────────────────
+   sm:  0–600px    (compact, icons only)
+   md:  601–800px  (medium, short labels)
+   lg:  801px+     (full labels, device native at 1280px)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/**
+ * Global reset — all widget groups start transparent with no border
+ */
+
+WWidgetGroup { border: 0; border-radius: 0; margin: 0; padding: 0; background: transparent; color: #cccccc; }
+
+/* CONTEXT MENU
+   ========================================================================== */
+
+QMenu {
+    background-color: #000000;
+    border: 1px solid #000000;
+    font-size: 20px;
+    color: #cccccc;
+}
+
+QMenu::item {
+    padding: 12px 48px;
+}
+
+QMenu::item:enabled {
+    color: #ffffff;
+}
+
+QMenu::item:enabled:selected {
+    background-color: #39ff14;
+    color: #000000;
+}
+
+QMenu::separator {
+    height: 1px;
+    background-color: #888888;
+    margin: 18px 12px;
+}
+
+/* TOOLTIP
+   ========================================================================== */
+
+QToolTip {
+    background-color: #000000;
+    border: 1px solid #000000;
+    font-size: 20px;
+    color: #ffffff;
+}
+
+#Body { background-color: #000000; font-family: 'Open Sans'; font-weight: normal; }
+#BorderTop { border: 0; border-top-right-radius: 10px; border-top-left-radius: 10px; background-color: #000000; margin: 10px 0 0 0; }
+#BorderBottom { border: 0; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; background-color: #000000; margin: 0 0 8px 0; }
+#Rectangle { border: 0; border-radius: 0; background-color: #000000; margin: 0; padding: 0; height: 0; width: 0; }
+#RoundedRectangle { border: 0; border-radius: 10px; background-color: #000000; margin: 10px; padding: 0; height: 0; width: 0; }
+
+/* DEVICE-SETTINGS-BOX
+   ========================================================================== */
+
+#OuterConfigBox {
+    border: 0;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 180);
+    margin: 10px 0 8px 0;
+    padding: 0;
+    height: 0;
+    width: 0;
+}
+
+#InnerConfigBox {
+    border: 0;
+    border-radius: 10px;
+    background-color: rgba(25, 25, 25, 210);
+    margin: 0;
+    padding: 0;
+    height: 0;
+    width: 0;
+}
+
+/* PASSTHROUGH-BOX
+   ========================================================================== */
+
+#OuterPassthroughBox {
+    border: 0;
+    border-radius: 10px;
+    background-color: #000000;
+    margin: 10px 0 8px 0;
+    padding: 0;
+    height: 0;
+    width: 0;
+}
+

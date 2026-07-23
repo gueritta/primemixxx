@@ -1,1 +1,1 @@
-../../../mixxx-bundle/mixxx-mapping/prime-go/Denon-Prime-Go-scripts.js
+../../../mixxx-bundle/mixxx-mapping/Denon-Prime-Go-scripts.js

@@ -1,0 +1,1071 @@
+/* BUTTONS
+   ========================================================================== */
+
+/**
+ * Menubar Icons
+ */
+#MenuBar #Visuals #Btn-btlr {
+    background-image: url(skin:button/visuals.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Visuals-2 #Btn-btlr {
+    background-image: url(skin:button/visuals_2.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Settings #Btn-bblr {
+    background-image: url(skin:button/settings.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Settings-2 #Btn-bblr {
+    background-image: url(skin:button/settings_2.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Decks #Btn-nbr-bisected, #MenuBar #Decks #Btn-nbr {
+    background-image: url(skin:button/decks.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Decks-2 #Btn-nbr-bisected, #MenuBar #Decks-2 #Btn-nbr {
+    background-image: url(skin:button/decks_2.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Mixer #Btn-nbr-bisected {
+    background-image: url(skin:button/mixer.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Mixer-2 #Btn-nbr-bisected {
+    background-image: url(skin:button/mixer_2.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Samplers #Btn-nbr-bisected {
+    background-image: url(skin:button/samplers.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Samplers-2 #Btn-nbr-bisected {
+    background-image: url(skin:button/samplers_2.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Effects #Btn-nbr-bisected {
+    background-image: url(skin:button/effects.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Effects-2 #Btn-nbr-bisected {
+    background-image: url(skin:button/effects_2.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Main #Btn-nbr-bisected {
+    background-image: url(skin:button/main.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Main-2 #Btn-nbr-bisected {
+    background-image: url(skin:button/main_2.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Internalclock #Btn-nbr-bisected {
+    background-image: url(skin:button/internalclock.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Internalclock-2 #Btn-nbr-bisected {
+    background-image: url(skin:button/internalclock_2.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Headphones #Btn-nbr-bisected {
+    background-image: url(skin:button/headphones.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Headphones-2 #Btn-nbr-bisected {
+    background-image: url(skin:button/headphones_2.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Clock #Btn-nbr-bisected {
+    background-image: url(skin:button/clock.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Clock-2 #Btn-nbr-bisected {
+    background-image: url(skin:button/clock_2.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Vinylcontrols #Btn-btrr {
+    background-image: url(skin:button/vinylcontrols.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Vinylcontrols-2 #Btn-btrr {
+    background-image: url(skin:button/vinylcontrols_2.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Microphones #Btn-bbrr {
+    background-image: url(skin:button/microphones.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#MenuBar #Microphones-2 #Btn-bbrr {
+    background-image: url(skin:button/microphones_2.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/**
+ * General Button Styles
+ */
+#Btn-br {
+    border: 0;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-top-left-radius: 6px;
+    background-color: #888888;
+    color: #000000;
+    margin: 0;
+    font-size: 22px;
+}
+
+#Btn-btr {
+    border: 0;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 6px;
+    background-color: #888888;
+    color: #000000;
+    margin: 0 0 1px 0;
+    font-size: 22px;
+}
+
+#Btn-bbr {
+    border: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-top-left-radius: 0;
+    background-color: #888888;
+    color: #000000;
+    margin: 0 0 1px 0;
+    font-size: 22px;
+}
+
+#Btn-blr {
+    border: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 6px;
+    border-top-left-radius: 6px;
+    background-color: #888888;
+    color: #000000;
+    margin: 0;
+    font-size: 22px;
+}
+
+#Btn-brr {
+    border: 0;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    background-color: #888888;
+    color: #000000;
+    margin: 0 0 0 1px;
+    font-size: 22px;
+}
+
+#Btn-btlr {
+    border: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 6px;
+    background-color: #888888;
+    color: #000000;
+    margin: 0 0 1px 0;
+    font-size: 22px;
+}
+
+#Btn-btrr {
+    border: 0;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    background-color: #888888;
+    color: #000000;
+    margin: 0 0 1px 1px;
+    font-size: 22px;
+}
+
+#Btn-bblr {
+    border: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 6px;
+    border-top-left-radius: 0;
+    background-color: #888888;
+    color: #000000;
+    margin: 0 0 1px 0;
+    font-size: 22px;
+}
+
+#Btn-bbrr {
+    border: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    background-color: #888888;
+    color: #000000;
+    margin: 0 0 1px 1px;
+    font-size: 22px;
+}
+
+#Btn-nbr {
+    border: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    background-color: #888888;
+    color: #000000;
+    margin: 0 0 0 1px;
+    font-size: 22px;
+}
+
+#Btn-nbr-bisected {
+    border: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    background-color: #888888;
+    color: #000000;
+    margin: 0 0 1px 1px;
+    font-size: 22px;
+}
+
+/**
+ * Hover
+ */
+#Btn-br:hover,
+#Btn-btr:hover,
+#Btn-bbr:hover,
+#Btn-blr:hover,
+#Btn-brr:hover,
+#Btn-btlr:hover,
+#Btn-btrr:hover,
+#Btn-bblr:hover,
+#Btn-bbrr:hover,
+#Btn-nbr:hover,
+#Btn-nbr-bisected:hover {
+    background-color: #555555;
+}
+
+/**
+ * MenuBar
+ */
+#MenuBar #Btn-btlr[value="1"],
+#MenuBar #Btn-bblr[value="1"],
+#MenuBar #Btn-btrr[value="1"],
+#MenuBar #Btn-bbrr[value="1"],
+#MenuBar #Btn-nbr-bisected[value="1"] {
+    background-color: #5cff2e;
+}
+
+#MenuBar #Btn-btlr[value="1"]:hover,
+#MenuBar #Btn-bblr[value="1"]:hover,
+#MenuBar #Btn-btrr[value="1"]:hover,
+#MenuBar #Btn-bbrr[value="1"]:hover,
+#MenuBar #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #44dd55;
+}
+
+/**
+ * InternalClock
+ */
+#InternalClock #Btn-blr[value="1"],
+#InternalClock #Btn-btrr[value="1"]
+#InternalClock #Btn-bbrr[value="1"] {
+    background-color: #5cff2e;
+}
+
+#InternalClock #Btn-blr[value="1"]:hover,
+#InternalClock #Btn-btrr[value="1"]:hover,
+#InternalClock #Btn-bbrr[value="1"]:hover {
+    background-color: #44dd55;
+}
+
+/**
+ * Headphone
+ */
+#Headphone #Btn-br[value="1"] {
+    background-color: #5cff2e;
+}
+
+#Headphone #Btn-br[value="1"]:hover {
+    background-color: #44dd55;
+}
+
+/**
+ * Main/Recording
+ */
+#Main #Btn-br[value="2"] {
+    background-color: #5cff2e;
+}
+
+#Main #Btn-br[value="2"]:hover {
+    background-color: #44dd55;
+}
+
+/**
+ * Deck1
+ */
+#Deck1 #Btn-br[value="1"],
+#Deck1 #Btn-btr[value="1"],
+#Deck1 #Btn-bbr[value="1"],
+#Deck1 #Btn-blr[value="1"],
+#Deck1 #Btn-brr[value="1"],
+#Deck1 #Btn-btlr[value="1"],
+#Deck1 #Btn-btrr[value="1"],
+#Deck1 #Btn-bblr[value="1"],
+#Deck1 #Btn-bbrr[value="1"],
+#Deck1 #Btn-nbr[value="1"],
+#Deck1 #Btn-nbr-bisected[value="1"] {
+    background-color: #5cff2e;
+}
+
+#Deck1 #Btn-br[value="1"]:hover,
+#Deck1 #Btn-btr[value="1"]:hover,
+#Deck1 #Btn-bbr[value="1"]:hover,
+#Deck1 #Btn-blr[value="1"]:hover,
+#Deck1 #Btn-brr[value="1"]:hover,
+#Deck1 #Btn-btlr[value="1"]:hover,
+#Deck1 #Btn-btrr[value="1"]:hover,
+#Deck1 #Btn-bblr[value="1"]:hover,
+#Deck1 #Btn-bbrr[value="1"]:hover,
+#Deck1 #Btn-nbr[value="1"]:hover,
+#Deck1 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #44dd55;
+}
+
+/**
+ * Deck2
+ */
+#Deck2 #Btn-br[value="1"],
+#Deck2 #Btn-btr[value="1"],
+#Deck2 #Btn-bbr[value="1"],
+#Deck2 #Btn-blr[value="1"],
+#Deck2 #Btn-brr[value="1"],
+#Deck2 #Btn-btlr[value="1"],
+#Deck2 #Btn-btrr[value="1"],
+#Deck2 #Btn-bblr[value="1"],
+#Deck2 #Btn-bbrr[value="1"],
+#Deck2 #Btn-nbr[value="1"],
+#Deck2 #Btn-nbr-bisected[value="1"] {
+    background-color: #5cff2e;
+}
+
+#Deck2 #Btn-br[value="1"]:hover,
+#Deck2 #Btn-btr[value="1"]:hover,
+#Deck2 #Btn-bbr[value="1"]:hover,
+#Deck2 #Btn-blr[value="1"]:hover,
+#Deck2 #Btn-brr[value="1"]:hover,
+#Deck2 #Btn-btlr[value="1"]:hover,
+#Deck2 #Btn-btrr[value="1"]:hover,
+#Deck2 #Btn-bblr[value="1"]:hover,
+#Deck2 #Btn-bbrr[value="1"]:hover,
+#Deck2 #Btn-nbr[value="1"]:hover,
+#Deck2 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #44dd55;
+}
+
+/**
+ * Deck3
+ */
+#Deck3 #Btn-br[value="1"],
+#Deck3 #Btn-btr[value="1"],
+#Deck3 #Btn-bbr[value="1"],
+#Deck3 #Btn-blr[value="1"],
+#Deck3 #Btn-brr[value="1"],
+#Deck3 #Btn-btlr[value="1"],
+#Deck3 #Btn-btrr[value="1"],
+#Deck3 #Btn-bblr[value="1"],
+#Deck3 #Btn-bbrr[value="1"],
+#Deck3 #Btn-nbr[value="1"],
+#Deck3 #Btn-nbr-bisected[value="1"] {
+    background-color: #88cc66;
+}
+
+#Deck3 #Btn-br[value="1"]:hover,
+#Deck3 #Btn-btr[value="1"]:hover,
+#Deck3 #Btn-bbr[value="1"]:hover,
+#Deck3 #Btn-blr[value="1"]:hover,
+#Deck3 #Btn-brr[value="1"]:hover,
+#Deck3 #Btn-btlr[value="1"]:hover,
+#Deck3 #Btn-btrr[value="1"]:hover,
+#Deck3 #Btn-bblr[value="1"]:hover,
+#Deck3 #Btn-bbrr[value="1"]:hover,
+#Deck3 #Btn-nbr[value="1"]:hover,
+#Deck3 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #77bb55;
+}
+
+/**
+ * Deck4
+ */
+#Deck4 #Btn-br[value="1"],
+#Deck4 #Btn-btr[value="1"],
+#Deck4 #Btn-bbr[value="1"],
+#Deck4 #Btn-blr[value="1"],
+#Deck4 #Btn-brr[value="1"],
+#Deck4 #Btn-btlr[value="1"],
+#Deck4 #Btn-btrr[value="1"],
+#Deck4 #Btn-bblr[value="1"],
+#Deck4 #Btn-bbrr[value="1"],
+#Deck4 #Btn-nbr[value="1"],
+#Deck4 #Btn-nbr-bisected[value="1"] {
+    background-color: #77bb55;
+}
+
+#Deck4 #Btn-br[value="1"]:hover,
+#Deck4 #Btn-btr[value="1"]:hover,
+#Deck4 #Btn-bbr[value="1"]:hover,
+#Deck4 #Btn-blr[value="1"]:hover,
+#Deck4 #Btn-brr[value="1"]:hover,
+#Deck4 #Btn-btlr[value="1"]:hover,
+#Deck4 #Btn-btrr[value="1"]:hover,
+#Deck4 #Btn-bblr[value="1"]:hover,
+#Deck4 #Btn-bbrr[value="1"]:hover,
+#Deck4 #Btn-nbr[value="1"]:hover,
+#Deck4 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #669933;
+}
+
+/**
+ * Sampler1
+ */
+#Sampler1 #Btn-br[value="1"],
+#Sampler1 #Btn-btr[value="1"],
+#Sampler1 #Btn-bbr[value="1"],
+#Sampler1 #Btn-blr[value="1"],
+#Sampler1 #Btn-brr[value="1"],
+#Sampler1 #Btn-btlr[value="1"],
+#Sampler1 #Btn-btrr[value="1"],
+#Sampler1 #Btn-bblr[value="1"],
+#Sampler1 #Btn-bbrr[value="1"],
+#Sampler1 #Btn-nbr[value="1"],
+#Sampler1 #Btn-nbr-bisected[value="1"] {
+    background-color: #5cff2e;
+}
+
+#Sampler1 #Btn-br[value="1"]:hover,
+#Sampler1 #Btn-btr[value="1"]:hover,
+#Sampler1 #Btn-bbr[value="1"]:hover,
+#Sampler1 #Btn-blr[value="1"]:hover,
+#Sampler1 #Btn-brr[value="1"]:hover,
+#Sampler1 #Btn-btlr[value="1"]:hover,
+#Sampler1 #Btn-btrr[value="1"]:hover,
+#Sampler1 #Btn-bblr[value="1"]:hover,
+#Sampler1 #Btn-bbrr[value="1"]:hover,
+#Sampler1 #Btn-nbr[value="1"]:hover,
+#Sampler1 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #44dd55;
+}
+
+/**
+ * Sampler2
+ */
+#Sampler2 #Btn-br[value="1"],
+#Sampler2 #Btn-btr[value="1"],
+#Sampler2 #Btn-bbr[value="1"],
+#Sampler2 #Btn-blr[value="1"],
+#Sampler2 #Btn-brr[value="1"],
+#Sampler2 #Btn-btlr[value="1"],
+#Sampler2 #Btn-btrr[value="1"],
+#Sampler2 #Btn-bblr[value="1"],
+#Sampler2 #Btn-bbrr[value="1"],
+#Sampler2 #Btn-nbr[value="1"],
+#Sampler2 #Btn-nbr-bisected[value="1"] {
+    background-color: #55ee88;
+}
+
+#Sampler2 #Btn-br[value="1"]:hover,
+#Sampler2 #Btn-btr[value="1"]:hover,
+#Sampler2 #Btn-bbr[value="1"]:hover,
+#Sampler2 #Btn-blr[value="1"]:hover,
+#Sampler2 #Btn-brr[value="1"]:hover,
+#Sampler2 #Btn-btlr[value="1"]:hover,
+#Sampler2 #Btn-btrr[value="1"]:hover,
+#Sampler2 #Btn-bblr[value="1"]:hover,
+#Sampler2 #Btn-bbrr[value="1"]:hover,
+#Sampler2 #Btn-nbr[value="1"]:hover,
+#Sampler2 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #44cc66;
+}
+
+/**
+ * Sampler3
+ */
+#Sampler3 #Btn-br[value="1"],
+#Sampler3 #Btn-btr[value="1"],
+#Sampler3 #Btn-bbr[value="1"],
+#Sampler3 #Btn-blr[value="1"],
+#Sampler3 #Btn-brr[value="1"],
+#Sampler3 #Btn-btlr[value="1"],
+#Sampler3 #Btn-btrr[value="1"],
+#Sampler3 #Btn-bblr[value="1"],
+#Sampler3 #Btn-bbrr[value="1"],
+#Sampler3 #Btn-nbr[value="1"],
+#Sampler3 #Btn-nbr-bisected[value="1"] {
+    background-color: #88cc66;
+}
+
+#Sampler3 #Btn-br[value="1"]:hover,
+#Sampler3 #Btn-btr[value="1"]:hover,
+#Sampler3 #Btn-bbr[value="1"]:hover,
+#Sampler3 #Btn-blr[value="1"]:hover,
+#Sampler3 #Btn-brr[value="1"]:hover,
+#Sampler3 #Btn-btlr[value="1"]:hover,
+#Sampler3 #Btn-btrr[value="1"]:hover,
+#Sampler3 #Btn-bblr[value="1"]:hover,
+#Sampler3 #Btn-bbrr[value="1"]:hover,
+#Sampler3 #Btn-nbr[value="1"]:hover,
+#Sampler3 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #77bb55;
+}
+
+/**
+ * Sampler4
+ */
+#Sampler4 #Btn-br[value="1"],
+#Sampler4 #Btn-btr[value="1"],
+#Sampler4 #Btn-bbr[value="1"],
+#Sampler4 #Btn-blr[value="1"],
+#Sampler4 #Btn-brr[value="1"],
+#Sampler4 #Btn-btlr[value="1"],
+#Sampler4 #Btn-btrr[value="1"],
+#Sampler4 #Btn-bblr[value="1"],
+#Sampler4 #Btn-bbrr[value="1"],
+#Sampler4 #Btn-nbr[value="1"],
+#Sampler4 #Btn-nbr-bisected[value="1"] {
+    background-color: #77bb55;
+}
+
+#Sampler4 #Btn-br[value="1"]:hover,
+#Sampler4 #Btn-btr[value="1"]:hover,
+#Sampler4 #Btn-bbr[value="1"]:hover,
+#Sampler4 #Btn-blr[value="1"]:hover,
+#Sampler4 #Btn-brr[value="1"]:hover,
+#Sampler4 #Btn-btlr[value="1"]:hover,
+#Sampler4 #Btn-btrr[value="1"]:hover,
+#Sampler4 #Btn-bblr[value="1"]:hover,
+#Sampler4 #Btn-bbrr[value="1"]:hover,
+#Sampler4 #Btn-nbr[value="1"]:hover,
+#Sampler4 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #669933;
+}
+
+/**
+ * Auxiliary1
+ */
+#Auxiliary1 #Btn-br[value="1"],
+#Auxiliary1 #Btn-btr[value="1"],
+#Auxiliary1 #Btn-bbr[value="1"],
+#Auxiliary1 #Btn-blr[value="1"],
+#Auxiliary1 #Btn-brr[value="1"],
+#Auxiliary1 #Btn-btlr[value="1"],
+#Auxiliary1 #Btn-btrr[value="1"],
+#Auxiliary1 #Btn-bblr[value="1"],
+#Auxiliary1 #Btn-bbrr[value="1"],
+#Auxiliary1 #Btn-nbr[value="1"],
+#Auxiliary1 #Btn-nbr-bisected[value="1"] {
+    background-color: #5cff2e;
+}
+
+#Auxiliary1 #Btn-br[value="1"]:hover,
+#Auxiliary1 #Btn-btr[value="1"]:hover,
+#Auxiliary1 #Btn-bbr[value="1"]:hover,
+#Auxiliary1 #Btn-blr[value="1"]:hover,
+#Auxiliary1 #Btn-brr[value="1"]:hover,
+#Auxiliary1 #Btn-btlr[value="1"]:hover,
+#Auxiliary1 #Btn-btrr[value="1"]:hover,
+#Auxiliary1 #Btn-bblr[value="1"]:hover,
+#Auxiliary1 #Btn-bbrr[value="1"]:hover,
+#Auxiliary1 #Btn-nbr[value="1"]:hover,
+#Auxiliary1 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #44dd55;
+}
+
+/**
+ * Auxiliary2
+ */
+#Auxiliary2 #Btn-br[value="1"],
+#Auxiliary2 #Btn-btr[value="1"],
+#Auxiliary2 #Btn-bbr[value="1"],
+#Auxiliary2 #Btn-blr[value="1"],
+#Auxiliary2 #Btn-brr[value="1"],
+#Auxiliary2 #Btn-btlr[value="1"],
+#Auxiliary2 #Btn-btrr[value="1"],
+#Auxiliary2 #Btn-bblr[value="1"],
+#Auxiliary2 #Btn-bbrr[value="1"],
+#Auxiliary2 #Btn-nbr[value="1"],
+#Auxiliary2 #Btn-nbr-bisected[value="1"] {
+    background-color: #55ee88;
+}
+
+#Auxiliary2 #Btn-br[value="1"]:hover,
+#Auxiliary2 #Btn-btr[value="1"]:hover,
+#Auxiliary2 #Btn-bbr[value="1"]:hover,
+#Auxiliary2 #Btn-blr[value="1"]:hover,
+#Auxiliary2 #Btn-brr[value="1"]:hover,
+#Auxiliary2 #Btn-btlr[value="1"]:hover,
+#Auxiliary2 #Btn-btrr[value="1"]:hover,
+#Auxiliary2 #Btn-bblr[value="1"]:hover,
+#Auxiliary2 #Btn-bbrr[value="1"]:hover,
+#Auxiliary2 #Btn-nbr[value="1"]:hover,
+#Auxiliary2 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #44cc66;
+}
+
+/**
+ * Auxiliary3
+ */
+#Auxiliary3 #Btn-br[value="1"],
+#Auxiliary3 #Btn-btr[value="1"],
+#Auxiliary3 #Btn-bbr[value="1"],
+#Auxiliary3 #Btn-blr[value="1"],
+#Auxiliary3 #Btn-brr[value="1"],
+#Auxiliary3 #Btn-btlr[value="1"],
+#Auxiliary3 #Btn-btrr[value="1"],
+#Auxiliary3 #Btn-bblr[value="1"],
+#Auxiliary3 #Btn-bbrr[value="1"],
+#Auxiliary3 #Btn-nbr[value="1"],
+#Auxiliary3 #Btn-nbr-bisected[value="1"] {
+    background-color: #88cc66;
+}
+
+#Auxiliary3 #Btn-br[value="1"]:hover,
+#Auxiliary3 #Btn-btr[value="1"]:hover,
+#Auxiliary3 #Btn-bbr[value="1"]:hover,
+#Auxiliary3 #Btn-blr[value="1"]:hover,
+#Auxiliary3 #Btn-brr[value="1"]:hover,
+#Auxiliary3 #Btn-btlr[value="1"]:hover,
+#Auxiliary3 #Btn-btrr[value="1"]:hover,
+#Auxiliary3 #Btn-bblr[value="1"]:hover,
+#Auxiliary3 #Btn-bbrr[value="1"]:hover,
+#Auxiliary3 #Btn-nbr[value="1"]:hover,
+#Auxiliary3 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #77bb55;
+}
+
+/**
+ * Auxiliary4
+ */
+#Auxiliary4 #Btn-br[value="1"],
+#Auxiliary4 #Btn-btr[value="1"],
+#Auxiliary4 #Btn-bbr[value="1"],
+#Auxiliary4 #Btn-blr[value="1"],
+#Auxiliary4 #Btn-brr[value="1"],
+#Auxiliary4 #Btn-btlr[value="1"],
+#Auxiliary4 #Btn-btrr[value="1"],
+#Auxiliary4 #Btn-bblr[value="1"],
+#Auxiliary4 #Btn-bbrr[value="1"],
+#Auxiliary4 #Btn-nbr[value="1"],
+#Auxiliary4 #Btn-nbr-bisected[value="1"] {
+    background-color: #77bb55;
+}
+
+#Auxiliary4 #Btn-br[value="1"]:hover,
+#Auxiliary4 #Btn-btr[value="1"]:hover,
+#Auxiliary4 #Btn-bbr[value="1"]:hover,
+#Auxiliary4 #Btn-blr[value="1"]:hover,
+#Auxiliary4 #Btn-brr[value="1"]:hover,
+#Auxiliary4 #Btn-btlr[value="1"]:hover,
+#Auxiliary4 #Btn-btrr[value="1"]:hover,
+#Auxiliary4 #Btn-bblr[value="1"]:hover,
+#Auxiliary4 #Btn-bbrr[value="1"]:hover,
+#Auxiliary4 #Btn-nbr[value="1"]:hover,
+#Auxiliary4 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #669933;
+}
+
+/**
+ * Microphone1
+ */
+#Microphone1 #Btn-br[value="1"],
+#Microphone1 #Btn-btr[value="1"],
+#Microphone1 #Btn-bbr[value="1"],
+#Microphone1 #Btn-blr[value="1"],
+#Microphone1 #Btn-brr[value="1"],
+#Microphone1 #Btn-btlr[value="1"],
+#Microphone1 #Btn-btrr[value="1"],
+#Microphone1 #Btn-bblr[value="1"],
+#Microphone1 #Btn-bbrr[value="1"],
+#Microphone1 #Btn-nbr[value="1"],
+#Microphone1 #Btn-nbr-bisected[value="1"] {
+    background-color: #5cff2e;
+}
+
+#Microphone1 #Btn-br[value="1"]:hover,
+#Microphone1 #Btn-btr[value="1"]:hover,
+#Microphone1 #Btn-bbr[value="1"]:hover,
+#Microphone1 #Btn-blr[value="1"]:hover,
+#Microphone1 #Btn-brr[value="1"]:hover,
+#Microphone1 #Btn-btlr[value="1"]:hover,
+#Microphone1 #Btn-btrr[value="1"]:hover,
+#Microphone1 #Btn-bblr[value="1"]:hover,
+#Microphone1 #Btn-bbrr[value="1"]:hover,
+#Microphone1 #Btn-nbr[value="1"]:hover,
+#Microphone1 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #44dd55;
+}
+
+/**
+ * Microphone2
+ */
+#Microphone2 #Btn-br[value="1"],
+#Microphone2 #Btn-btr[value="1"],
+#Microphone2 #Btn-bbr[value="1"],
+#Microphone2 #Btn-blr[value="1"],
+#Microphone2 #Btn-brr[value="1"],
+#Microphone2 #Btn-btlr[value="1"],
+#Microphone2 #Btn-btrr[value="1"],
+#Microphone2 #Btn-bblr[value="1"],
+#Microphone2 #Btn-bbrr[value="1"],
+#Microphone2 #Btn-nbr[value="1"],
+#Microphone2 #Btn-nbr-bisected[value="1"] {
+    background-color: #55ee88;
+}
+
+#Microphone2 #Btn-br[value="1"]:hover,
+#Microphone2 #Btn-btr[value="1"]:hover,
+#Microphone2 #Btn-bbr[value="1"]:hover,
+#Microphone2 #Btn-blr[value="1"]:hover,
+#Microphone2 #Btn-brr[value="1"]:hover,
+#Microphone2 #Btn-btlr[value="1"]:hover,
+#Microphone2 #Btn-btrr[value="1"]:hover,
+#Microphone2 #Btn-bblr[value="1"]:hover,
+#Microphone2 #Btn-bbrr[value="1"]:hover,
+#Microphone2 #Btn-nbr[value="1"]:hover,
+#Microphone2 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #44cc66;
+}
+
+/**
+ * Microphone3
+ */
+#Microphone3 #Btn-br[value="1"],
+#Microphone3 #Btn-btr[value="1"],
+#Microphone3 #Btn-bbr[value="1"],
+#Microphone3 #Btn-blr[value="1"],
+#Microphone3 #Btn-brr[value="1"],
+#Microphone3 #Btn-btlr[value="1"],
+#Microphone3 #Btn-btrr[value="1"],
+#Microphone3 #Btn-bblr[value="1"],
+#Microphone3 #Btn-bbrr[value="1"],
+#Microphone3 #Btn-nbr[value="1"],
+#Microphone3 #Btn-nbr-bisected[value="1"] {
+    background-color: #88cc66;
+}
+
+#Microphone3 #Btn-br[value="1"]:hover,
+#Microphone3 #Btn-btr[value="1"]:hover,
+#Microphone3 #Btn-bbr[value="1"]:hover,
+#Microphone3 #Btn-blr[value="1"]:hover,
+#Microphone3 #Btn-brr[value="1"]:hover,
+#Microphone3 #Btn-btlr[value="1"]:hover,
+#Microphone3 #Btn-btrr[value="1"]:hover,
+#Microphone3 #Btn-bblr[value="1"]:hover,
+#Microphone3 #Btn-bbrr[value="1"]:hover,
+#Microphone3 #Btn-nbr[value="1"]:hover,
+#Microphone3 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #77bb55;
+}
+
+/**
+ * Microphone4
+ */
+#Microphone4 #Btn-br[value="1"],
+#Microphone4 #Btn-btr[value="1"],
+#Microphone4 #Btn-bbr[value="1"],
+#Microphone4 #Btn-blr[value="1"],
+#Microphone4 #Btn-brr[value="1"],
+#Microphone4 #Btn-btlr[value="1"],
+#Microphone4 #Btn-btrr[value="1"],
+#Microphone4 #Btn-bblr[value="1"],
+#Microphone4 #Btn-bbrr[value="1"],
+#Microphone4 #Btn-nbr[value="1"],
+#Microphone4 #Btn-nbr-bisected[value="1"] {
+    background-color: #77bb55;
+}
+
+#Microphone4 #Btn-br[value="1"]:hover,
+#Microphone4 #Btn-btr[value="1"]:hover,
+#Microphone4 #Btn-bbr[value="1"]:hover,
+#Microphone4 #Btn-blr[value="1"]:hover,
+#Microphone4 #Btn-brr[value="1"]:hover,
+#Microphone4 #Btn-btlr[value="1"]:hover,
+#Microphone4 #Btn-btrr[value="1"]:hover,
+#Microphone4 #Btn-bblr[value="1"]:hover,
+#Microphone4 #Btn-bbrr[value="1"]:hover,
+#Microphone4 #Btn-nbr[value="1"]:hover,
+#Microphone4 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #669933;
+}
+
+/**
+ * EffectUnit1
+ */
+#EffectUnit1 #Btn-br[value="1"],
+#EffectUnit1 #Btn-btr[value="1"],
+#EffectUnit1 #Btn-bbr[value="1"],
+#EffectUnit1 #Btn-blr[value="1"],
+#EffectUnit1 #Btn-brr[value="1"],
+#EffectUnit1 #Btn-btlr[value="1"],
+#EffectUnit1 #Btn-btrr[value="1"],
+#EffectUnit1 #Btn-bblr[value="1"],
+#EffectUnit1 #Btn-bbrr[value="1"],
+#EffectUnit1 #Btn-nbr[value="1"],
+#EffectUnit1 #Btn-nbr-bisected[value="1"] {
+    background-color: #5cff2e;
+}
+
+#EffectUnit1 #Btn-br[value="1"]:hover,
+#EffectUnit1 #Btn-btr[value="1"]:hover,
+#EffectUnit1 #Btn-bbr[value="1"]:hover,
+#EffectUnit1 #Btn-blr[value="1"]:hover,
+#EffectUnit1 #Btn-brr[value="1"]:hover,
+#EffectUnit1 #Btn-btlr[value="1"]:hover,
+#EffectUnit1 #Btn-btrr[value="1"]:hover,
+#EffectUnit1 #Btn-bblr[value="1"]:hover,
+#EffectUnit1 #Btn-bbrr[value="1"]:hover,
+#EffectUnit1 #Btn-nbr[value="1"]:hover,
+#EffectUnit1 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #44dd55;
+}
+
+/**
+ * EffectUnit2
+ */
+#EffectUnit2 #Btn-br[value="1"],
+#EffectUnit2 #Btn-btr[value="1"],
+#EffectUnit2 #Btn-bbr[value="1"],
+#EffectUnit2 #Btn-blr[value="1"],
+#EffectUnit2 #Btn-brr[value="1"],
+#EffectUnit2 #Btn-btlr[value="1"],
+#EffectUnit2 #Btn-btrr[value="1"],
+#EffectUnit2 #Btn-bblr[value="1"],
+#EffectUnit2 #Btn-bbrr[value="1"],
+#EffectUnit2 #Btn-nbr[value="1"],
+#EffectUnit2 #Btn-nbr-bisected[value="1"] {
+    background-color: #5cff2e;
+}
+
+#EffectUnit2 #Btn-br[value="1"]:hover,
+#EffectUnit2 #Btn-btr[value="1"]:hover,
+#EffectUnit2 #Btn-bbr[value="1"]:hover,
+#EffectUnit2 #Btn-blr[value="1"]:hover,
+#EffectUnit2 #Btn-brr[value="1"]:hover,
+#EffectUnit2 #Btn-btlr[value="1"]:hover,
+#EffectUnit2 #Btn-btrr[value="1"]:hover,
+#EffectUnit2 #Btn-bblr[value="1"]:hover,
+#EffectUnit2 #Btn-bbrr[value="1"]:hover,
+#EffectUnit2 #Btn-nbr[value="1"]:hover,
+#EffectUnit2 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #44dd55;
+}
+
+/**
+ * EffectUnit3
+ */
+#EffectUnit3 #Btn-br[value="1"],
+#EffectUnit3 #Btn-btr[value="1"],
+#EffectUnit3 #Btn-bbr[value="1"],
+#EffectUnit3 #Btn-blr[value="1"],
+#EffectUnit3 #Btn-brr[value="1"],
+#EffectUnit3 #Btn-btlr[value="1"],
+#EffectUnit3 #Btn-btrr[value="1"],
+#EffectUnit3 #Btn-bblr[value="1"],
+#EffectUnit3 #Btn-bbrr[value="1"],
+#EffectUnit3 #Btn-nbr[value="1"],
+#EffectUnit3 #Btn-nbr-bisected[value="1"] {
+    background-color: #88cc66;
+}
+
+#EffectUnit3 #Btn-br[value="1"]:hover,
+#EffectUnit3 #Btn-btr[value="1"]:hover,
+#EffectUnit3 #Btn-bbr[value="1"]:hover,
+#EffectUnit3 #Btn-blr[value="1"]:hover,
+#EffectUnit3 #Btn-brr[value="1"]:hover,
+#EffectUnit3 #Btn-btlr[value="1"]:hover,
+#EffectUnit3 #Btn-btrr[value="1"]:hover,
+#EffectUnit3 #Btn-bblr[value="1"]:hover,
+#EffectUnit3 #Btn-bbrr[value="1"]:hover,
+#EffectUnit3 #Btn-nbr[value="1"]:hover,
+#EffectUnit3 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #77bb55;
+}
+
+/**
+ * EffectUnit4
+ */
+#EffectUnit4 #Btn-br[value="1"],
+#EffectUnit4 #Btn-btr[value="1"],
+#EffectUnit4 #Btn-bbr[value="1"],
+#EffectUnit4 #Btn-blr[value="1"],
+#EffectUnit4 #Btn-brr[value="1"],
+#EffectUnit4 #Btn-btlr[value="1"],
+#EffectUnit4 #Btn-btrr[value="1"],
+#EffectUnit4 #Btn-bblr[value="1"],
+#EffectUnit4 #Btn-bbrr[value="1"],
+#EffectUnit4 #Btn-nbr[value="1"],
+#EffectUnit4 #Btn-nbr-bisected[value="1"] {
+    background-color: #77bb55;
+}
+
+#EffectUnit4 #Btn-br[value="1"]:hover,
+#EffectUnit4 #Btn-btr[value="1"]:hover,
+#EffectUnit4 #Btn-bbr[value="1"]:hover,
+#EffectUnit4 #Btn-blr[value="1"]:hover,
+#EffectUnit4 #Btn-brr[value="1"]:hover,
+#EffectUnit4 #Btn-btlr[value="1"]:hover,
+#EffectUnit4 #Btn-btrr[value="1"]:hover,
+#EffectUnit4 #Btn-bblr[value="1"]:hover,
+#EffectUnit4 #Btn-bbrr[value="1"]:hover,
+#EffectUnit4 #Btn-nbr[value="1"]:hover,
+#EffectUnit4 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #669933;
+}
+
+/**
+ * VinylControl1
+ */
+#VinylControl1 #Btn-br[value="1"],
+#VinylControl1 #Btn-btr[value="1"],
+#VinylControl1 #Btn-bbr[value="1"],
+#VinylControl1 #Btn-blr[value="1"],
+#VinylControl1 #Btn-brr[value="1"],
+#VinylControl1 #Btn-btlr[value="1"],
+#VinylControl1 #Btn-btrr[value="1"],
+#VinylControl1 #Btn-bblr[value="1"],
+#VinylControl1 #Btn-bbrr[value="1"],
+#VinylControl1 #Btn-nbr[value="1"],
+#VinylControl1 #Btn-nbr-bisected[value="1"] {
+    background-color: #5cff2e;
+}
+
+#Vinylcontrol1 #Btn-br[value="1"]:hover,
+#Vinylcontrol1 #Btn-btr[value="1"]:hover,
+#Vinylcontrol1 #Btn-bbr[value="1"]:hover,
+#Vinylcontrol1 #Btn-blr[value="1"]:hover,
+#Vinylcontrol1 #Btn-brr[value="1"]:hover,
+#Vinylcontrol1 #Btn-btlr[value="1"]:hover,
+#Vinylcontrol1 #Btn-btrr[value="1"]:hover,
+#Vinylcontrol1 #Btn-bblr[value="1"]:hover,
+#Vinylcontrol1 #Btn-bbrr[value="1"]:hover,
+#Vinylcontrol1 #Btn-nbr[value="1"]:hover,
+#Vinylcontrol1 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #44dd55;
+}
+
+/**
+ * VinylControl2
+ */
+#VinylControl2 #Btn-br[value="1"],
+#VinylControl2 #Btn-btr[value="1"],
+#VinylControl2 #Btn-bbr[value="1"],
+#VinylControl2 #Btn-blr[value="1"],
+#VinylControl2 #Btn-brr[value="1"],
+#VinylControl2 #Btn-btlr[value="1"],
+#VinylControl2 #Btn-btrr[value="1"],
+#VinylControl2 #Btn-bblr[value="1"],
+#VinylControl2 #Btn-bbrr[value="1"],
+#VinylControl2 #Btn-nbr[value="1"],
+#VinylControl2 #Btn-nbr-bisected[value="1"] {
+    background-color: #55ee88;
+}
+
+#Vinylcontrol2 #Btn-br[value="1"]:hover,
+#Vinylcontrol2 #Btn-btr[value="1"]:hover,
+#Vinylcontrol2 #Btn-bbr[value="1"]:hover,
+#Vinylcontrol2 #Btn-blr[value="1"]:hover,
+#Vinylcontrol2 #Btn-brr[value="1"]:hover,
+#Vinylcontrol2 #Btn-btlr[value="1"]:hover,
+#Vinylcontrol2 #Btn-btrr[value="1"]:hover,
+#Vinylcontrol2 #Btn-bblr[value="1"]:hover,
+#Vinylcontrol2 #Btn-bbrr[value="1"]:hover,
+#Vinylcontrol2 #Btn-nbr[value="1"]:hover,
+#Vinylcontrol2 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #44cc66;
+}
+
+/**
+ * VinylControl3
+ */
+#VinylControl3 #Btn-br[value="1"],
+#VinylControl3 #Btn-btr[value="1"],
+#VinylControl3 #Btn-bbr[value="1"],
+#VinylControl3 #Btn-blr[value="1"],
+#VinylControl3 #Btn-brr[value="1"],
+#VinylControl3 #Btn-btlr[value="1"],
+#VinylControl3 #Btn-btrr[value="1"],
+#VinylControl3 #Btn-bblr[value="1"],
+#VinylControl3 #Btn-bbrr[value="1"],
+#VinylControl3 #Btn-nbr[value="1"],
+#VinylControl3 #Btn-nbr-bisected[value="1"] {
+    background-color: #88cc66;
+}
+
+#Vinylcontrol3 #Btn-br[value="1"]:hover,
+#Vinylcontrol3 #Btn-btr[value="1"]:hover,
+#Vinylcontrol3 #Btn-bbr[value="1"]:hover,
+#Vinylcontrol3 #Btn-blr[value="1"]:hover,
+#Vinylcontrol3 #Btn-brr[value="1"]:hover,
+#Vinylcontrol3 #Btn-btlr[value="1"]:hover,
+#Vinylcontrol3 #Btn-btrr[value="1"]:hover,
+#Vinylcontrol3 #Btn-bblr[value="1"]:hover,
+#Vinylcontrol3 #Btn-bbrr[value="1"]:hover,
+#Vinylcontrol3 #Btn-nbr[value="1"]:hover,
+#Vinylcontrol3 #Btn-nbr-bisected[value="1"]:hover {
+    background-color: #77bb55;
+}
+
