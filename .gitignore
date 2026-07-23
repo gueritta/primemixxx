@@ -56,3 +56,4 @@ mixxx-bundle/skins/*
 !mixxx-bundle/qt-plugins/imageformats/libqjpeg.so
 !mixxx-bundle/qt-plugins/imageformats/libqtiff.so
 !mixxx-bundle/qt-plugins/imageformats/libqwebp.so
+profiling-results/
