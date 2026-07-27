@@ -1,5 +1,6 @@
 #!/bin/sh
-# MIXXX Launcher — Denon Prime Go (SD card)
+# MIXXX Launcher — Denon Prime Go / Prime 4 (SD card)
+# Auto-detects device model via DRM connector and applies correct display settings.
 # Sets env for SD card's bundled Qt 5.15.8 + eglfs_mali, CPU shielding,
 # and USB music library mount.
 
@@ -8,6 +9,24 @@ if pidof mixxx > /dev/null 2>&1; then
     echo "Mixxx already running, exiting."
     exit 0
 fi
+
+# Detect device model from DRM connector
+# Prime Go  = LVDS-1 (rotation 90,  no vsync needed)
+# Prime 4   = DSI-1  (rotation 270, needs SWAPINTERVAL=1)
+detect_device() {
+    if [ -f /sys/class/drm/card0-DSI-1/status ] && \
+       grep -q connected /sys/class/drm/card0-DSI-1/status 2>/dev/null; then
+        DEVICE="prime4"
+        ROTATION=270
+        SWAPINTERVAL=1
+    else
+        DEVICE="primego"
+        ROTATION=90
+        SWAPINTERVAL=0
+    fi
+    echo "[launcher] detected device: $DEVICE (rotation=$ROTATION swapinterval=$SWAPINTERVAL)"
+}
+detect_device
 
 BUNDLE=/media/az01-internal/mixxx
 MUSIC_DIR="$BUNDLE/music"
@@ -34,14 +53,16 @@ export LD_LIBRARY_PATH="$BUNDLE/lib:/usr/qt/lib:/usr/lib"
 export QT_QPA_PLATFORM=eglfs
 # Mali GPU integration (r1p0 DDK via /usr/lib/libmali.so.14.0 symlinks)
 export QT_QPA_EGLFS_INTEGRATION=eglfs_mali
-# Display controller rotates 800×1280 portrait framebuffer to 1280×800 landscape
-export QT_QPA_EGLFS_ROTATION=90
+# Vsync: Prime 4 DSI-1 needs it to prevent tearing; Prime Go LVDS-1 doesn't
+export QT_QPA_EGLFS_SWAPINTERVAL="$SWAPINTERVAL"
+# Display rotation: Prime Go LVDS-1=90°, Prime 4 DSI-1=270°
+export QT_QPA_EGLFS_ROTATION="$ROTATION"
 # System fonts from device rootfs (not bundled on SD card)
 export QT_QPA_FONTDIR=/usr/share/fonts
 # Touchscreen on /dev/input/event0, hardware keyboard on /dev/input/event1
 export QT_QPA_GENERIC_PLUGINS="evdevtouch:/dev/input/event0 evdevkeyboard:/dev/input/event1"
 # Touch calibration: rotate matches display rotation, min/max match ILI2117 sensor bounds
-export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=/dev/input/event0:rotate=90:minX=0:maxX=1280:minY=0:maxY=800
+export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS="/dev/input/event0:rotate=$ROTATION:minX=0:maxX=1280:minY=0:maxY=800"
 # Physical screen dimensions in mm (Prime Go 5" display)
 export QT_QPA_EGLFS_PHYSICAL_WIDTH=155
 export QT_QPA_EGLFS_PHYSICAL_HEIGHT=98

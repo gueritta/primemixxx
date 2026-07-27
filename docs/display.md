@@ -1,4 +1,4 @@
-# Display & GPU — Denon Prime Go + MIXXX
+# Display & GPU — Denon Prime Go / Prime 4 + MIXXX
 
 ## Mali-T76x GPU
 
@@ -60,6 +60,41 @@ export HOME=/tmp
 - **KMS/DRM**: The GPU drives the built-in 7-inch display via `/dev/dri/card0` (DRM connector status: "connected"). fbcon may still hold DRM plane-4 but Mali GPU outputs via hardware overlay.
 - **Touchscreen**: ILI2117 detected on `/dev/input/event0`, works with evdev input plugin with `QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS="/dev/input/event0:rotate=90"`.
 - **Dialog suppression:** The SD card's MIXXX binary (10 MB at `lib/bin/mixxx`) handles EGLFS gracefully. The `mixxx.real` binary (17 MB) is a different build that crashes with `EGLFS: OpenGL windows cannot be mixed with others`. Only `lib/bin/mixxx` should be used. `nodialog.so` exists at `lib/nodialog.so` as a fallback for other Qt builds but is NOT used in the default launcher.
+
+## Prime 4 Differences
+
+The Prime 4 uses a **DSI-1** display connector (vs LVDS-1 on Prime Go). Both share the same Mali-T76x r1p0 GPU, Rockchip RK3288 SoC, and 800×1280 portrait framebuffer, but the display controller differences affect rotation and vsync behavior.
+
+### Rotation
+
+| Setting | Prime Go (LVDS-1) | Prime 4 (DSI-1) |
+|---|---|---|
+| `QT_QPA_EGLFS_ROTATION` | **90** | **270** |
+| `QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS` rotate | **90** | **270** |
+
+**Critical:** Display and touchscreen rotation MUST match. Mismatch causes confusing "upside down" or "nope" behavior where neither looks correct.
+
+On Prime 4, all rotation values were tested (0, 90, 180, 270). Only 270 produced the correct orientation. The DSI-1 controller applies rotation in the opposite direction compared to LVDS-1.
+
+### Screen Tearing
+
+Prime 4 with DSI-1 exhibits screen tearing by default. Fix with vsync:
+
+```bash
+export QT_QPA_EGLFS_SWAPINTERVAL=1
+```
+
+This was **not needed** on Prime Go (LVDS-1), which synced correctly without it. The DSI-1 DRM path (`rockchipdrmfb`) appears to handle page-flip timing differently.
+
+### Display Hardware
+
+```
+Connector:  DSI-1 (vs LVDS-1 on Prime Go)
+DRM card:   /sys/class/drm/card0-DSI-1
+Framebuffer: rockchipdrmfb (DRM-based, not legacy fbdev)
+Mode:       800x1280@0 (same portrait resolution as Prime Go)
+Virtual:    800x3840
+```
 
 ### GPU Performance
 
