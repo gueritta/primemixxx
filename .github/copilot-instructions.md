@@ -108,6 +108,14 @@ Custom firmware + MIXXX deployment for **Denon DJ Prime Go** hardware (Rockchip 
 - FIX: `DEVICE_IP=... bash scripts/dev-install-device-services.sh` — this deploys `fix-mdns.sh` + `fix-mdns.service` which run at boot and are idempotent.
 - VIOLATION: Avahi defaults to `buildroot.local` → mDNS doesn't resolve `primego.local`.
 
+- RULE_ID: "ETC-OVERLAY-COLD-BOOT"
+- ASSERTION: NEVER rely on `/etc/systemd/system/` unit files, drop-ins, or `.target.wants/` symlinks being visible at COLD BOOT.
+- CHECK: `mount | grep '/etc type overlay'` returns `upperdir=/data/system/etc/overlay`. The `/data` partition (mmcblk0p7 ext4) mounts AFTER systemd reads unit files. At cold boot, systemd sees ONLY the read-only lowerdir (`/etc` from ROM).
+- VIOLATION: Any new systemd service (e.g. `usb-gadget-eth.service`, `fix-mdns.service`) placed in `/etc/systemd/system/` will be SILENTLY ABSENT at cold boot — systemd can't find the unit file. Symlinks in `multi-user.target.wants/` pointing to missing files resolve to nothing. Drop-ins in `.d/` directories are invisible. No error is logged — the service simply never starts.
+- WORKAROUND: All cold-boot hooks MUST go through `/data/tkgl-bootstrap-launcher` (ext4, mounted before systemd reads units). `engine.service` is the ONLY service guaranteed to run at cold boot because it has a counterpart in `/usr/lib/systemd/system/` (ROM). Add early-boot commands to the bootstrap stub, not to systemd units.
+- POST-BOOT: After the device is fully booted, run `systemctl daemon-reload && systemctl reenable <service>` to make unit files visible. Services started this way persist until next cold boot.
+- FIX PATTERN: See `scripts/device/tkgl-bootstrap-stub.sh` — the USB Ethernet gadget is started via `/usr/sbin/usb-gadget-eth.sh 2>/dev/null &` at the top of the stub, bypassing systemd entirely.
+
 ### Constraints
 
 - CONSTRAINT_ID: "QT-KMS-ATOMIC"

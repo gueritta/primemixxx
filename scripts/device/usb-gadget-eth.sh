@@ -41,4 +41,19 @@ if [ -d /sys/class/net/usb0 ]; then
     ip link set usb0 up 2>/dev/null
     ip addr add 192.168.42.1/24 dev usb0 2>/dev/null || true
 fi
+
+# connman-bypass: at cold boot, connman's Gadget technology steals usb0 ~500ms
+# after creation, removing the IP and setting the link DOWN. Spawn a background
+# keepalive that fights connman for the first 60 seconds of boot.
+(
+    for i in $(seq 1 12); do
+        sleep 5
+        # Check if usb0 lost its IP (connman interference)
+        if ! ip addr show usb0 2>/dev/null | grep -q "192.168.42.1"; then
+            ip link set usb0 up 2>/dev/null
+            ip addr add 192.168.42.1/24 dev usb0 2>/dev/null || true
+        fi
+    done
+) &
+
 exit 0

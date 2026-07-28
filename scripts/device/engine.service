@@ -1,0 +1,14 @@
+[Unit]
+Description=Engine (TKGL bootstrap host)
+After=touch-fw-update.service xmos-update.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=-/bin/sh -c 'test -x /data/tkgl-bootstrap-launcher && exec /data/tkgl-bootstrap-launcher || true'
+ExecStart=/bin/sh -c 'systemctl is-active --quiet mixxx-app.service || exec /usr/Engine/Scripts/runengine'
+TimeoutStopSec=30
+LimitCORE=infinity
+
+[Install]
+WantedBy=multi-user.target
