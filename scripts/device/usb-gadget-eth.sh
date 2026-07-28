@@ -9,6 +9,7 @@ if [ ! -d "$GADGET_DIR" ]; then
     echo 0x1d6b > "$GADGET_DIR/idVendor"
     echo 0x0104 > "$GADGET_DIR/idProduct"
     echo 0x0200 > "$GADGET_DIR/bcdDevice"
+    echo high-speed > "$GADGET_DIR/max_speed"
     mkdir -p "$GADGET_DIR/strings/0x409"
     echo "DenonDJ" > "$GADGET_DIR/strings/0x409/manufacturer"
     echo "PRIME GO USB Ethernet" > "$GADGET_DIR/strings/0x409/product"
@@ -18,8 +19,15 @@ if [ ! -d "$GADGET_DIR" ]; then
     mkdir -p "$GADGET_DIR/functions/ecm.usb0"
     echo "02:00:42:00:00:01" > "$GADGET_DIR/functions/ecm.usb0/dev_addr"
     echo "02:00:42:00:00:02" > "$GADGET_DIR/functions/ecm.usb0/host_addr"
-    ln -s "$GADGET_DIR/functions/ecm.usb0" "$GADGET_DIR/configs/c.1/"
 fi
+
+# Ensure function symlink exists (idempotent)
+if [ ! -L "$GADGET_DIR/configs/c.1/ecm.usb0" ]; then
+    ln -s "$GADGET_DIR/functions/ecm.usb0" "$GADGET_DIR/configs/c.1/ecm.usb0" 2>/dev/null || true
+fi
+
+# Ensure max_speed is high-speed
+echo high-speed > "$GADGET_DIR/max_speed" 2>/dev/null || true
 
 # Bind UDC if not bound
 CURRENT_UDC=$(cat "$GADGET_DIR/UDC" 2>/dev/null)
