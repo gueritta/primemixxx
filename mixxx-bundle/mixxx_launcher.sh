@@ -19,12 +19,16 @@ detect_device() {
         DEVICE="primego"
         ROTATION=90
         SWAPINTERVAL=0
+        PHYSICAL_WIDTH=152
+        PHYSICAL_HEIGHT=91
     else
         DEVICE="prime4"
         ROTATION=270
         SWAPINTERVAL=1
+        PHYSICAL_WIDTH=155
+        PHYSICAL_HEIGHT=98
     fi
-    echo "[launcher] detected device: $DEVICE (rotation=$ROTATION swapinterval=$SWAPINTERVAL)"
+    echo "[launcher] detected device: $DEVICE (rotation=$ROTATION swapinterval=$SWAPINTERVAL phys=${PHYSICAL_WIDTH}x${PHYSICAL_HEIGHT}mm)"
 }
 detect_device
 
@@ -78,9 +82,9 @@ export QT_QPA_FONTDIR=/usr/share/fonts
 export QT_QPA_GENERIC_PLUGINS="evdevtouch:/dev/input/event0 evdevkeyboard:/dev/input/event1"
 # Touch calibration: rotate matches display rotation, min/max match ILI2117 sensor bounds
 export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS="/dev/input/event0:rotate=$ROTATION:minX=0:maxX=1280:minY=0:maxY=800"
-# Physical screen dimensions in mm (Prime Go 5" display)
-export QT_QPA_EGLFS_PHYSICAL_WIDTH=155
-export QT_QPA_EGLFS_PHYSICAL_HEIGHT=98
+# Physical screen dimensions in mm (per-device, set by detect_device)
+export QT_QPA_EGLFS_PHYSICAL_WIDTH="$PHYSICAL_WIDTH"
+export QT_QPA_EGLFS_PHYSICAL_HEIGHT="$PHYSICAL_HEIGHT"
 # MIXXX config/cache in tmpfs (avoids SD card wear from constant writes)
 export HOME=/tmp
 export XDG_RUNTIME_DIR=/tmp
