@@ -209,10 +209,25 @@ PATHEOF
 # ── Step 10b: Include boot hook files for one-time internal eMMC install ─────
 echo "--- Including boot hook files ---"
 cp "$REPO_ROOT/scripts/device/tkgl-bootstrap-stub.sh" "$TKGL_ROOT_STAGING/tkgl-bootstrap-stub.sh"
-cp "$REPO_ROOT/scripts/device/install-boot-hook.sh" "$TKGL_ROOT_STAGING/install-boot-hook.sh"
+cp "$REPO_ROOT/scripts/device/install-device.sh" "$TKGL_ROOT_STAGING/install-device.sh"
+cp "$REPO_ROOT/scripts/device/uninstall-device.sh" "$TKGL_ROOT_STAGING/uninstall-device.sh"
 cp "$REPO_ROOT/tkgl-bootstrap/engine.service" "$TKGL_ROOT_STAGING/engine.service"
-chmod +x "$TKGL_ROOT_STAGING/install-boot-hook.sh"
-echo "  Boot hook files included (run install-boot-hook.sh once on device)"
+
+# Optional services (install-device.sh offers them interactively)
+cp "$REPO_ROOT/scripts/device/usb-gadget-eth.sh" "$TKGL_ROOT_STAGING/usb-gadget-eth.sh"
+cp "$REPO_ROOT/scripts/device/usb-gadget-eth.service" "$TKGL_ROOT_STAGING/usb-gadget-eth.service"
+cp "$REPO_ROOT/scripts/device/powerbutton-monitor" "$TKGL_ROOT_STAGING/powerbutton-monitor"
+cp "$REPO_ROOT/scripts/device/powerbutton-monitor.service" "$TKGL_ROOT_STAGING/powerbutton-monitor.service"
+cp "$REPO_ROOT/scripts/device/fix-mdns.sh" "$TKGL_ROOT_STAGING/fix-mdns.sh"
+cp "$REPO_ROOT/scripts/device/fix-mdns.service" "$TKGL_ROOT_STAGING/fix-mdns.service"
+cp "$REPO_ROOT/scripts/device/99-wifi-power-save.rules" "$TKGL_ROOT_STAGING/99-wifi-power-save.rules"
+
+chmod +x "$TKGL_ROOT_STAGING/install-device.sh"
+chmod +x "$TKGL_ROOT_STAGING/uninstall-device.sh"
+chmod +x "$TKGL_ROOT_STAGING/usb-gadget-eth.sh"
+chmod +x "$TKGL_ROOT_STAGING/powerbutton-monitor"
+chmod +x "$TKGL_ROOT_STAGING/fix-mdns.sh"
+echo "  Boot hook files included (run install-device.sh once on device)"
 
 # ── Step 11: Verify assertions ────────────────────────────────────────────────
 if [ "$SKIP_ASSERTIONS" != "1" ]; then

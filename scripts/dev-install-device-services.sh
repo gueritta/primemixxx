@@ -51,6 +51,8 @@ ssh_cmd "mount -o remount,rw /" || { echo "WARN: remount failed, continuing...";
 # ── 3. engine.service — TKGL bootstrap host (internal eMMC) ────────────────
 echo ""
 echo "--- Installing engine.service (TKGL bootstrap host) ---"
+# Back up original if it exists and hasn't been backed up yet
+ssh_cmd 'if [ -f /etc/systemd/system/engine.service ] && [ ! -f /etc/systemd/system/engine.service.orig ]; then cp /etc/systemd/system/engine.service /etc/systemd/system/engine.service.orig; echo "  Backed up original: engine.service.orig"; fi'
 # engine.service lives in tkgl-bootstrap/, not scripts/device/
 cat "$REPO_ROOT/tkgl-bootstrap/engine.service" | ssh_cmd "cat > /etc/systemd/system/engine.service"
 ssh_cmd "systemctl enable engine.service"
@@ -128,6 +130,7 @@ echo ""
 echo "=== Device services installed successfully ==="
 echo ""
 echo "  engine.service:           installed (TKGL bootstrap host — internal eMMC)"
+echo "  engine.service.orig:      backed up (original Engine OS service)"
 echo "  tkgl-bootstrap-stub:      installed (/data/tkgl-bootstrap-launcher)"
 echo "  mixxx.service:            installed (disabled — use switch-to-mixxx)"
 echo "  usb-gadget-eth.service:   enabled (boots on USB connect)"

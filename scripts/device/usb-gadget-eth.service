@@ -2,10 +2,11 @@
 Description=USB Ethernet Gadget
 After=sys-kernel-config.mount
 Before=network.target
+Wants=sys-kernel-config.mount
 [Service]
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=/usr/sbin/usb-gadget-eth.sh
 ExecStop=-/bin/sh -c 'echo "" > /sys/kernel/config/usb_gadget/g_ether/UDC 2>/dev/null; rm -rf /sys/kernel/config/usb_gadget/g_ether 2>/dev/null'
 [Install]
-WantedBy=multi-user.target
+WantedBy=basic.target

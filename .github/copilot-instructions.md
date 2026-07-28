@@ -446,7 +446,21 @@ DEVICE_IP=primego.local ./scripts/dev-deploy-to-device.sh  # SCP to device
 
 ### User-facing scripts
 
-These two scripts are for end users — no Buildroot or dev tooling needed:
+**Device scripts** — run ON the device from the TKGL SD card, no Buildroot or host needed:
+
+```bash
+sh /media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/install-device.sh     # Install TKGL boot hook + optional services
+sh /media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/uninstall-device.sh   # Remove boot hook, restore Engine OS
+```
+
+`install-device.sh` backs up the original `engine.service` to `engine.service.orig`,
+then installs the TKGL stub, engine.service, and interactively offers USB gadget,
+power button monitor, mDNS fix, and WiFi powersave rule.
+
+`uninstall-device.sh` is the inverse — stops MIXXX, removes the stub, restores
+`engine.service.orig`, and interactively asks which optional services to keep.
+
+**Host scripts** — run on your computer to create SD cards (no Buildroot required):
 
 ```bash
 ./scripts/dev-create-sdcard-bundle.sh        # Assemble a complete SD card tarball (from prebuilt mixxx-bundle/)

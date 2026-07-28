@@ -9,12 +9,12 @@
 set -e
 
 DEV="${1:-root@${DEVICE_IP:-primego.local}}"
-BUNDLE="/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle"
+BUNDLE="/media/az01-internal/mixxx"
 SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 LOCAL_DEVICE="$REPO_ROOT/scripts/device"
 LOCAL_BUNDLE="$REPO_ROOT/mixxx-bundle"
-LOCAL_MAPPINGS="$REPO_ROOT/mixxx-bundle/mixxx-mapping/prime-go"
+LOCAL_MAPPINGS="$REPO_ROOT/mixxx-bundle/mixxx-mapping"
 LOCAL_SKINS="$REPO_ROOT/mixxx-bundle/skins"
 LOCAL_SETTINGS="$REPO_ROOT/mixxx-bundle/settings"
 

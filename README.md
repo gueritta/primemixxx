@@ -50,7 +50,17 @@ ssh root@192.168.42.1   # password: denonprime4
 ssh root@<device-ip>
 
 # Run the one-time install (flashes stub + engine.service to internal eMMC)
-sh /media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/install-boot-hook.sh
+sh /media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/install-device.sh
+```
+
+The installer backs up your original Engine OS service and interactively
+offers optional features (USB Ethernet gadget, power button shutdown, mDNS fix,
+WiFi stability).
+
+**To uninstall** and return to stock Engine OS:
+
+```bash
+sh /media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/uninstall-device.sh
 ```
 
 ### 4. Reboot & enjoy
