@@ -230,6 +230,17 @@ WSearchLineEdit {
     border: 1px solid yellow;
   }
 
+#LatencyLed {
+  border-radius: 8px;
+  background-color: #000000;
+}
+#LatencyLed[highlight="1"] {
+  background-color: #ffff00;
+}
+#XrunZigzag {
+  image: url(skin:/misc_res/xrun_zigzag.svg);
+}
+
 #WaveformsContainer {
   border-bottom: 1px solid #0c0c0c;
 }
@@ -423,10 +434,6 @@ WTrackProperty[selected="true"],
   #Battery {
     margin-left: 7px;
   }
-  #LatencyLabel {
-    margin-top: 1px;
-  }
-
 #Deck1, #DeckCompact1, #DeckMini1,
 #Deck2, #DeckCompact2, #DeckMini2,
 #MixerContainer,
@@ -1400,7 +1407,6 @@ WEffectSelector QAbstractScrollArea,
 WEffectChainPresetSelector QAbstractScrollArea,
 #fadeModeCombobox QAbstractScrollArea,
 #GuiToggleButton[displayValue="0"],
-#RecDuration[highlight="0"],
 #BroadcastButton[displayValue="0"],
 #SkinSettingsToggle[displayValue="0"],
 #LibraryFeatureControls QLabel {
@@ -1442,9 +1448,7 @@ WPushButton#VinylStatus[displayValue="0"],
   color: #555;
 }
 
-#LatencyLabel {
-  color: #444;
-}
+/* LatencyLabel removed — latency bar only */
 
 WPushButton#VinylStatus[displayValue="1"], /* enabled (green bg) */
 WPushButton#VinylStatus[displayValue="2"], /* end of record (blinking yellow bg) */
@@ -1459,8 +1463,6 @@ WPushButton#VinylStatus[displayValue="3"], /* needle skip detected (pink bg) */
 #BroadcastButton[displayValue="2"], /* broadcasting */
 #BroadcastButton[displayValue="3"], /* failure */
 #BroadcastButton[displayValue="4"], /* warning */
-#RecDuration[highlight="1"],  /* initializing */
-#RecDuration[highlight="2"],  /* recording */
 #SkinSettingsToggle[displayValue="1"],
 QPushButton#pushButtonAutoDJ:checked,
 QPushButton#pushButtonRepeatPlaylist:checked,

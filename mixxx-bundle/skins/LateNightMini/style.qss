@@ -48,13 +48,12 @@ WLabel#MicAuxLabel, WLabel#MicAuxLabelUnconfigured,
 #VinylControls WPushButton,
 #FxAssignButtons WPushButton,
 WPushButton#GuiToggleButton,
-WLabel#RecFeedback, WLabel#RecDuration,
+WLabel#RecFeedback,
 WPushButton#BroadcastButton,
 WPushButton#SkinSettingsToggle,
 #LibraryFeatureControls QPushButton,
 /* Passthrough label on overview waveform */
 WPushButton#EQKillButton,
-WLabel#LatencyLabel,
 WLabel#SamplerTitleMini,
 /* SKin settings & Library */
 WPushButton#SkinSettingsNumToggle[value="1"],
@@ -70,7 +69,7 @@ QLabel#labelRecFilename {
 #VinylControls WPushButton,
 #FxAssignButtons WPushButton,
 #GuiToggleButton,
-#RecFeedback, #RecDuration,
+#RecFeedback,
 #BroadcastButton,
 #SkinSettingsToggle,
 #LibraryFeatureControls QPushButton {
@@ -214,29 +213,41 @@ WSearchLineEdit::item:selected,
 #KnobLabel,
 #FxKnobLabel,
 #FxButtonLabel,
-#RateRangeText,
-#LatencyMeter {
+#RateRangeText {
   border: 1px solid #555;
   border-radius: 2px;
   background-color: #1a1a1a;
 }
-#LatencyLabel {
-  font-size: 11px;
+#ToolbarLibraryBtn,
+#ToolbarWaveformBtn,
+#ToolbarEffectsBtn,
+#ToolbarSamplerBtn,
+#ToolbarDecksBtn {
+  border: none;
+  background: transparent;
+  padding: 0px;
+  color: #ffffff;
+  font-size: 16px;
   font-weight: bold;
-  text-align: right;
-  qproperty-alignment: 'AlignRight | AlignVCenter';
-  color: #ccc;
+}
+#ToolbarLibraryBtn[highlight="1"],
+#ToolbarWaveformBtn[highlight="1"],
+#ToolbarEffectsBtn[highlight="1"],
+#ToolbarSamplerBtn[highlight="1"],
+#ToolbarDecksBtn[highlight="1"] {
+  color: #ff6600;
+}
+
+#XrunBolt {
+  color: #ffff00;
+  font-size: 20px;
+  font-weight: bold;
 }
 
 WPushButton,
 #LibraryFeatureControls QPushButton,
-#RecDuration[highlight="0"],
-#RecDuration[highlight="1"] {
-  font-size: 11px;
-}
 
 #RateRangePrefix,
-#RecDuration[highlight="2"],
 #SamplerTitleMini,
 #EQKillButton,
 #SamplerBpmMini,
@@ -282,7 +293,9 @@ WBeatSpinBox,
 #FxUnitLabel,
 #SamplerTitle,
 WTrackPropertyEditor,
-WTime,
+WTime {
+  font-size: 20px;
+}
 WRecordingDuration {
   font-size: 16px;
 }
@@ -425,12 +438,26 @@ WOverview QLabel {
   }
   #RecBox {
     qproperty-layoutAlignment: 'AlignCenter';
+    border: none;
+    background: transparent;
+    }
+  #RecButton {
+    border: none;
+    background: transparent;
+    }
+  #RecDot {
+    qproperty-alignment: 'AlignCenter';
+    border: none;
+    background: transparent;
+    color: #444444;
+    font-size: 14px;
+    }
+  #RecDot[highlight="1"] {
+    color: #ff0000;
     }
   #ClockWidget {
     qproperty-layoutAlignment: 'AlignVCenter | AlignHCenter';
     }
-  #LatencyLabel {
-  }
 /************** ToolBar *******************************************************/
 
 

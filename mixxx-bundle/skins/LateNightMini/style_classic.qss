@@ -192,6 +192,17 @@ WSearchLineEdit,
     border: 1px solid red;
   }
 
+#LatencyLed {
+  border-radius: 8px;
+  background-color: #000000;
+}
+#LatencyLed[highlight="1"] {
+  background-color: #ffff00;
+}
+#XrunZigzag {
+  image: url(skin:/misc_res/xrun_zigzag.svg);
+}
+
 #BeatgridControls,
 #StemControls {
   border-top: 1px solid #222;
@@ -249,10 +260,6 @@ WSearchLineEdit,
   #ClockWidget {
     margin-bottom: 0px;
   }
-  #LatencyLabel {
-    margin-top: 1px;
-  }
-
 #DeckRateSeparator,
 #DeckRateSeparatorCompact,
 #MainMixerSeparator,
@@ -1206,7 +1213,7 @@ WCoverArtMenu,
 WCueMenuPopup,
 WCueMenuPopup QLabel,
 #CueLabelEdit,
-#LatencyLabel, WTime {
+WTime {
   color: #f0bb2b;
 }
 /* Override the 'missing' color in Tracks > Missing,
@@ -1305,8 +1312,7 @@ WPushButton#VinylStatus[displayValue="0"], /* off */
 #FxAssignButtons WPushButton[displayValue="0"],
 #GuiToggleButton[displayValue="0"],
 #BroadcastButton[displayValue="0"],
-#SkinSettingsToggle[displayValue="0"],
-#RecDuration[highlight="0"] {
+#SkinSettingsToggle[displayValue="0"] {
   color: #d2d2d1;
   }
 
@@ -1323,8 +1329,6 @@ WPushButton#VinylStatus[displayValue="3"], /* needle skip detected (pink bg) */
 #BroadcastButton[displayValue="2"],
 #BroadcastButton[displayValue="3"],
 #BroadcastButton[displayValue="4"],
-#RecDuration[highlight="1"],
-#RecDuration[highlight="2"],
 #SkinSettingsToggle[displayValue="1"],
 QPushButton#pushButtonAutoDJ:checked,
 QPushButton#pushButtonRepeatPlaylist:checked,

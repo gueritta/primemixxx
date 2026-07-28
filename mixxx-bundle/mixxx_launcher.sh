@@ -121,6 +121,26 @@ for mp in /data /media/az01-internal /media/TKGL_BOOTSTRAP; do
     mountpoint -q "$mp" 2>/dev/null && mount -o remount,noatime,nodiratime,commit=60 "$mp" 2>/dev/null
 done
 
+# Start UPower daemon for battery monitoring (powers WBattery widget in skin).
+# UPower needs D-Bus name ownership — D-Bus policy must already be installed
+# (see scripts/dev-install-device-services.sh or scripts/device/org.freedesktop.UPower.conf).
+# upowerd is bundled on SD card alongside MIXXX.
+if [ -x "$LIB_PATH/../bin/upowerd" ]; then
+    echo "[launcher] starting upowerd..."
+    LD_LIBRARY_PATH="$LIB_PATH:/usr/lib" "$LIB_PATH/../bin/upowerd" &
+    UPOWERD_PID=$!
+    # Wait for upowerd to register on D-Bus (must own org.freedesktop.UPower)
+    for i in $(seq 1 30); do
+        sleep 1
+        if dbus-send --system --dest=org.freedesktop.UPower --type=method_call \
+            --print-reply /org/freedesktop/UPower org.freedesktop.DBus.Introspectable.Introspect \
+            > /dev/null 2>&1; then
+            echo "[launcher] upowerd ready (pid=$UPOWERD_PID)"
+            break
+        fi
+    done
+fi
+
 # Launch MIXXX pinned to CPU cores 2-3 (audio-dedicated cores).
 # We do NOT set RT priority on the main process — that would cause ALL
 # 44+ child threads to inherit SCHED_FIFO and compete with audio.

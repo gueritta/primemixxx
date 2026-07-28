@@ -213,7 +213,25 @@ else
   echo "  \$CC -shared -fPIC -o helpers/no_hid_poll.so helpers/no_hid_poll.c -ldl"
 fi
 
-# ── Step 7: Ensure launcher is executable (hand-crafted, not generated) ──────
+# ── Step 7: Copy UPower daemon (battery monitoring for Battery widget) ──────
+echo ""
+echo "--- Copying UPower daemon ---"
+if [ -f "$BUILDROOT_TARGET/usr/libexec/upowerd" ]; then
+  mkdir -p "$BUNDLE_DIR/bin"
+  cp -v "$BUILDROOT_TARGET/usr/libexec/upowerd" "$BUNDLE_DIR/bin/upowerd"
+else
+  echo "WARNING: upowerd not found in Buildroot output"
+fi
+
+# ── Step 7b: Copy libgudev (upowerd dependency) ───────────────────────────
+if [ -f "$BUILDROOT_TARGET/usr/lib/libgudev-1.0.so.0.3.0" ]; then
+  cp -v "$BUILDROOT_TARGET/usr/lib/libgudev-1.0.so.0.3.0" "$BUNDLE_DIR/lib/libgudev-1.0.so.0.3.0"
+  ln -sf "libgudev-1.0.so.0.3.0" "$BUNDLE_DIR/lib/libgudev-1.0.so.0"
+else
+  echo "WARNING: libgudev not found in Buildroot output"
+fi
+
+# ── Step 8: Ensure launcher is executable (hand-crafted, not generated) ──────
 echo ""
 echo "--- Ensuring launcher is executable ---"
 chmod +x "$BUNDLE_DIR/mixxx_launcher.sh"

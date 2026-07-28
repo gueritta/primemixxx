@@ -116,7 +116,45 @@ ssh_cmd "systemctl enable fix-mdns.service"
 ssh_cmd "/usr/sbin/fix-mdns.sh"
 echo "  mDNS fix: enabled (advertises primego.local)"
 
-# ── 11. Fix stale settings/controllers ─────────────────────────────────────
+# ── 11. UPower — battery monitoring for MIXXX skin ─────────────────────────
+echo ""
+echo "--- Installing UPower (battery monitoring) ---"
+
+# 11a. D-Bus policy — allows root to own org.freedesktop.UPower name
+# Device D-Bus config has <deny own="*"/> by default; UPower needs explicit allow
+mkdir -p /tmp/upower-etc
+deploy_file "org.freedesktop.UPower.conf" "/etc/dbus-1/system.d/org.freedesktop.UPower.conf"
+ssh_cmd "dbus-send --system --type=method_call --dest=org.freedesktop.DBus /org/freedesktop/DBus org.freedesktop.DBus.ReloadConfig"
+echo "  D-Bus policy: installed"
+
+# 11b. UPower daemon config
+ssh_cmd "mkdir -p /etc/UPower"
+deploy_file "UPower.conf" "/etc/UPower/UPower.conf"
+echo "  UPower.conf: installed"
+
+# 11c. upowerd binary — deploy to SD card bundle (needs libgudev in lib/)
+UPOWERD_SRC="$REPO_ROOT/buildroot/2023.02.11/output/target/usr/libexec/upowerd"
+if [ -f "$UPOWERD_SRC" ]; then
+    cat "$UPOWERD_SRC" | ssh_cmd "cat > $DEVICE_MIXXX_DIR/bin/upowerd"
+    ssh_cmd "chmod +x $DEVICE_MIXXX_DIR/bin/upowerd"
+    echo "  upowerd: installed to SD card"
+else
+    echo "  WARNING: upowerd not found in Buildroot output (expected at $UPOWERD_SRC)"
+fi
+
+# 11d. libgudev — upowerd dependency
+LIBGUDEV_SRC="$REPO_ROOT/buildroot/2023.02.11/output/target/usr/lib/libgudev-1.0.so.0.3.0"
+if [ -f "$LIBGUDEV_SRC" ]; then
+    cat "$LIBGUDEV_SRC" | ssh_cmd "cat > $DEVICE_MIXXX_DIR/lib/libgudev-1.0.so.0.3.0"
+    ssh_cmd "ln -sf libgudev-1.0.so.0.3.0 $DEVICE_MIXXX_DIR/lib/libgudev-1.0.so.0"
+    echo "  libgudev: installed to SD card"
+else
+    echo "  WARNING: libgudev not found in Buildroot output"
+fi
+
+echo "  UPower: deployed (upowerd starts via mixxx_launcher.sh)"
+
+# ── 12. Fix stale settings/controllers ─────────────────────────────────────
 echo ""
 echo "--- Cleaning stale paths ---"
 ssh_cmd "
@@ -133,7 +171,8 @@ echo "  engine.service:           installed (TKGL bootstrap host — internal eM
 echo "  engine.service.orig:      backed up (original Engine OS service)"
 echo "  tkgl-bootstrap-stub:      installed (/data/tkgl-bootstrap-launcher)"
 echo "  mixxx.service:            installed (disabled — use switch-to-mixxx)"
-echo "  usb-gadget-eth.service:   enabled (boots on USB connect)"
+echo "  usb-gadget-eth.service:   enabled (boots on USB connect)
+upowerd + D-Bus policy:   installed (battery monitoring for MIXXX skin)"
 echo "  powerbutton-monitor:      enabled (graceful shutdown on power button)"
 echo "  switch-to-mixxx/engine:   installed in /usr/bin/"
 echo "  udev rules:               USB automount + WiFi power save active"
