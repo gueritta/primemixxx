@@ -11,18 +11,18 @@ if pidof mixxx > /dev/null 2>&1; then
 fi
 
 # Detect device model from DRM connector
-# Prime Go  = LVDS-1 (rotation 90,  no vsync needed)
-# Prime 4   = DSI-1  (rotation 270, needs SWAPINTERVAL=1)
+# Prime Go  = DSI-1  (rotation 90,  no vsync needed)
+# Prime 4   = LVDS-1 (rotation 270, needs SWAPINTERVAL=1)
 detect_device() {
     if [ -f /sys/class/drm/card0-DSI-1/status ] && \
        grep -q connected /sys/class/drm/card0-DSI-1/status 2>/dev/null; then
-        DEVICE="prime4"
-        ROTATION=270
-        SWAPINTERVAL=1
-    else
         DEVICE="primego"
         ROTATION=90
         SWAPINTERVAL=0
+    else
+        DEVICE="prime4"
+        ROTATION=270
+        SWAPINTERVAL=1
     fi
     echo "[launcher] detected device: $DEVICE (rotation=$ROTATION swapinterval=$SWAPINTERVAL)"
 }
