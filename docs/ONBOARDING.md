@@ -308,12 +308,22 @@ DEVICE_IP=primego.local ./scripts/dev-deploy-to-device.sh
 
 | Property | Value |
 |---|---|
-| SSH | `root@primego.local` |
-| SD card mount | `/media/az01-internal/` |
-| Internal storage | `/data/` |
+| SSH | `root@192.168.42.1` (USB) or `root@primego.local` (WiFi/mDNS) |
+| Password | `denonprime4` |
+
+**Connectivity preference:** Use **USB Ethernet gadget** (`192.168.42.1`) for
+large file transfers (SCP) and long debugging sessions — no WiFi dropouts,
+no keepalive ping needed. WiFi (`DEVICE_IP` / `primego.local`) is fine for
+quick commands but drops after ~30s of silence.
 
 **IP discovery:** The device advertises via mDNS as `primego.local`. Static IP may
 vary by network. Use `DEVICE_IP` env var in all deployment scripts — never hardcode.
+
+| Path | Purpose |
+|---|---|
+| SD card mount | `/media/az01-internal/` |
+| Internal storage | `/data/` |
+| TKGL SD card | `/media/TKGL_BOOTSTRAP/` |
 
 ---
 

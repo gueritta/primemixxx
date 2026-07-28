@@ -22,6 +22,15 @@ audio threads. Early testing shows stable playback at this latency, but
 **deeper stress testing is needed** — run with heavy FX chains, pitch
 bend, and USB library scanning to validate under load.
 
+### Recent Improvements (2026-07)
+
+- **Per-thread CPU pinning** — EngineWorkerSch/EngineSideChain isolated on cores 2-3, all 40+ other threads (CachingReader, Mali, Qt pool, touchscreen) banished to 0-1
+- **I/O scheduler** — BFQ → `none` on both MMC blocks, read-ahead 128→512KB, nr_requests 128→64
+- **VM tuning** — dirty_background_bytes 50→20MB, swappiness 60→1, vfs_cache_pressure 100→200, stat_interval 1→10s
+- **Filesystem** — all ext4 mounts with `noatime,nodiratime,commit=60`
+- **systemd limits** — LimitMEMLOCK=infinity, LimitRTPRIO=99 for audio DMA safety
+- **USB gadget** — Ethernet gadget auto-starts at boot for reliable SSH access
+
 ## Quick Start (End Users)
 
 You need: a Denon Prime Go or Prime 4, a microSD card (≥ 32 GB), and a computer.

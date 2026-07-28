@@ -1,8 +1,30 @@
 # Denon Prime 4 — Global TODO & Audit
 
-Last updated: 2026-07-14
+Last updated: 2026-07-28
 
 ---
+
+## Active Tasks
+
+- [ ] **USB gadget cold boot test** — verify `WantedBy=multi-user.target` works after reboot
+- [ ] **Cold boot verification** — confirm all 10 I/O & VM optimizations persist across reboot
+- [ ] **Process trimming** — audit and disable unnecessary systemd units (149 processes is high)
+- [ ] **Keylock MIDI mapping** — debug keylock behavior (possibly MIDI mapping bug)
+
+## Deferred (requires kernel/DTS rebuild)
+
+- [ ] `CONFIG_NO_HZ_FULL` — suppress arch_timer ticks on audio cores (1000×/sec preemption overhead)
+- [ ] SD card at SDR25/SDR50 — currently locked at 25 MHz legacy mode
+- [ ] CPU OPP step above 1.608 GHz — hardware-capped by InMusic, not thermal
+- [ ] cgroups cpuset — prevent late-spawning threads from inheriting audio-core affinity
+
+## Recently Completed
+
+- [x] **10 I/O & VM optimizations** — scheduler none, read-ahead 512KB, dirty tuning, noatime, systemd limits
+- [x] **Per-thread CPU pinning** — EngineWorkerSch/EngineSideChain on 2-3, all others banished to 0-1
+- [x] **USB gadget boot fix** — `WantedBy=multi-user.target` (no `Before=`)
+- [x] **TKGL soundconfig fix** — was latency=3 with wrong device, now latency=5 with hw:1,0
+- [x] **5.8ms ALSA buffer stability** — verified stable at 256/512 period/buffer
 
 ## 🎨 SKIN (RoundCorners)
 
