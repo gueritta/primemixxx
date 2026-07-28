@@ -2643,6 +2643,46 @@
 
           </controls>
         <outputs>
+            <output> <!-- FX Select LED (note 0x07) — Lights when any effect is enabled in the unit -->
+              <group>[EffectRack1_EffectUnit1]</group>
+              <key>enabled</key>
+              <description>FX Select LED</description>
+              <status>0x94</status>
+              <midino>0x07</midino>
+              <on>0x3F</on>
+              <off>0x00</off>
+              <minimum>0.5</minimum>
+            </output>
+            <output> <!-- FX Activate LED (note 0x06) — Lights when FX section is expanded -->
+              <group>[EffectRack1_EffectUnit1]</group>
+              <key>show_parameters</key>
+              <description>FX Activate LED</description>
+              <status>0x94</status>
+              <midino>0x06</midino>
+              <on>0x3F</on>
+              <off>0x00</off>
+              <minimum>0.5</minimum>
+            </output>
+            <output> <!-- FX Assign 1 LED (note 0x0B) -->
+              <group>[EffectRack1_EffectUnit1]</group>
+              <key>group_[Channel1]_enable</key>
+              <description>FX Assign Channel 1 LED</description>
+              <status>0x94</status>
+              <midino>0x0B</midino>
+              <on>0x3F</on>
+              <off>0x00</off>
+              <minimum>0.5</minimum>
+            </output>
+            <output> <!-- FX Assign 2 LED (note 0x0C) -->
+              <group>[EffectRack1_EffectUnit1]</group>
+              <key>group_[Channel2]_enable</key>
+              <description>FX Assign Channel 2 LED</description>
+              <status>0x94</status>
+              <midino>0x0C</midino>
+              <on>0x3F</on>
+              <off>0x00</off>
+              <minimum>0.5</minimum>
+            </output>
         </outputs>
     </controller>
 </MixxxControllerPreset>
