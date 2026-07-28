@@ -1,10 +1,10 @@
 #!/bin/sh
-# sync-all-back.sh — Pull ALL runtime-modifiable files from device back to local repo.
+# dev-sync-all-back.sh — Pull ALL runtime-modifiable files from device back to local repo.
 # Covers: controller mappings, skin files, runtime configs, system files, launcher,
 # profiling tools. Run after any on-device editing session before committing.
 #
-# Usage: DEVICE_IP=10.128.54.244 ./scripts/sync-all-back.sh
-#        ./scripts/sync-all-back.sh root@192.168.42.1
+# Usage: DEVICE_IP=10.128.54.244 ./scripts/dev-sync-all-back.sh
+#        ./scripts/dev-sync-all-back.sh root@192.168.42.1
 
 set -e
 
@@ -138,6 +138,6 @@ git status --short 2>/dev/null || echo "  (not a git repo or no changes)"
 echo ""
 echo "# 3. Next steps:"
 echo "   - Review git diff for each changed file"
-echo "   - Run: ./scripts/verify-launcher.sh"
-echo "   - Run: ./scripts/check-duplicates.sh"
+echo "   - Run: ./scripts/dev-verify-launcher.sh"
+echo "   - Run: ./scripts/dev-check-duplicates.sh"
 echo "   - Commit with: git commit -m 'sync: pull runtime changes from device'"

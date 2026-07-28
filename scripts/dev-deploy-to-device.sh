@@ -1,14 +1,14 @@
 #!/bin/bash -e
-# deploy-to-device.sh — Deploy the MIXXX bundle to a Denon Prime Go device
+# dev-deploy-to-device.sh — Deploy the MIXXX bundle to a Denon Prime Go device
 # via SCP, and install systemd service + switcher scripts.
 #
 # Prerequisites:
 #   1. Device is running TKGL stock firmware (SSH enabled)
-#   2. ./scripts/collect-mixxx-bundle.sh has been run (produces mixxx-bundle/)
+#   2. ./scripts/dev-collect-mixxx-bundle.sh has been run (produces mixxx-bundle/)
 #   3. Device is reachable via SSH at the configured host/IP
 #
 # Usage:
-#   DEVICE_IP=192.168.1.100 ./scripts/deploy-to-device.sh
+#   DEVICE_IP=192.168.1.100 ./scripts/dev-deploy-to-device.sh
 #   (or edit DEVICE_IP below)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -42,7 +42,7 @@ echo "Bundle:  $BUNDLE_DIR"
 echo "Target:  $DEVICE_MIXXX_DIR"
 
 if [ ! -f "$BUNDLE_DIR/bin/mixxx" ]; then
-  echo "ERROR: MIXXX bundle not found. Run scripts/collect-mixxx-bundle.sh first." >&2
+  echo "ERROR: MIXXX bundle not found. Run scripts/dev-collect-mixxx-bundle.sh first." >&2
   exit 1
 fi
 
@@ -88,7 +88,7 @@ echo "Bundle copied successfully."
 # ── Step 4: Install device services (systemd, udev, switchers, etc.) ────────
 echo ""
 echo "--- Installing device services ---"
-bash "$SCRIPT_DIR/install-device-services.sh" || {
+bash "$SCRIPT_DIR/dev-install-device-services.sh" || {
   echo "ERROR: Device service installation failed." >&2
   exit 1
 }

@@ -95,9 +95,9 @@ PRIME_GO_Control_Surface (JavaScript)
 
 ### ✅ DONE
 
-- [x] `scripts/deploy-to-device.sh` — full deploy + stale settings cleanup + config path fix
-- [x] `scripts/quick-fix-deploy.sh` — fast partial deploy for iteration
-- [x] `scripts/fix-device-libs.sh` — removes system-critical libs from bundle
+- [x] `scripts/dev-deploy-to-device.sh` — full deploy + stale settings cleanup + config path fix
+- [x] `scripts/dev-quick-fix-deploy.sh` — fast partial deploy for iteration
+- [x] `scripts/dev-fix-device-libs.sh` — removes system-critical libs from bundle
 
 ### 🔧 PENDING
 

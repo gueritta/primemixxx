@@ -16,7 +16,7 @@
 #
 # Prerequisites:
 #   - mixxx-bundle/ must exist with bin/mixxx, lib/, mixxx_launcher.sh, etc.
-#     (run scripts/collect-mixxx-bundle.sh first, or download a prebuilt bundle)
+#     (run scripts/dev-collect-mixxx-bundle.sh first, or download a prebuilt bundle)
 #   - tkgl-bootstrap/ must exist with doer_list, modules/, scripts/, etc.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -54,7 +54,7 @@ echo "Source:   $BUNDLE_DIR"
 # ── Pre-flight checks ────────────────────────────────────────────────────────
 if [ ! -f "$BUNDLE_DIR/bin/mixxx" ]; then
   echo "ERROR: MIXXX binary not found at $BUNDLE_DIR/bin/mixxx" >&2
-  echo "Run scripts/collect-mixxx-bundle.sh first, or download a prebuilt bundle." >&2
+  echo "Run scripts/dev-collect-mixxx-bundle.sh first, or download a prebuilt bundle." >&2
   exit 1
 fi
 

@@ -1,16 +1,16 @@
 #!/bin/bash -e
-# fix-device-libs.sh — Remove system-critical libs from the deployed MIXXX bundle.
+# dev-fix-device-libs.sh — Remove system-critical libs from the deployed MIXXX bundle.
 # These MUST come from the device's own /lib, not from Buildroot.
 #
 # Usage:
-#   ./fix-device-libs.sh                       # Run locally (test/preview mode)
-#   ./fix-device-libs.sh --remote DEVICE_IP    # Run on device via SSH
-#   BUNDLE_LIB=/path/to/lib ./fix-device-libs.sh  # Override bundle path
+#   ./dev-fix-device-libs.sh                       # Run locally (test/preview mode)
+#   ./dev-fix-device-libs.sh --remote DEVICE_IP    # Run on device via SSH
+#   BUNDLE_LIB=/path/to/lib ./dev-fix-device-libs.sh  # Override bundle path
 #
 # Examples:
-#   BUNDLE_LIB=./mixxx-bundle/lib ./fix-device-libs.sh   # Preview against local bundle
-#   ./fix-device-libs.sh --remote 10.109.235.244          # Run on connected device
-#   ./fix-device-libs.sh --remote primego.local           # Run on device via mDNS
+#   BUNDLE_LIB=./mixxx-bundle/lib ./dev-fix-device-libs.sh   # Preview against local bundle
+#   ./dev-fix-device-libs.sh --remote 10.109.235.244          # Run on connected device
+#   ./dev-fix-device-libs.sh --remote primego.local           # Run on device via mDNS
 #
 # Local mode (default) operates on the local filesystem — useful for testing
 # or previewing which libs would be removed before deploying.

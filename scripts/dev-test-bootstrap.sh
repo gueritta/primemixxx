@@ -1,7 +1,7 @@
 #!/bin/sh
-# test-bootstrap.sh — One-shot manual bootstrap for Phase 1 testing.
+# dev-test-bootstrap.sh — One-shot manual bootstrap for Phase 1 testing.
 # Run on the device after inserting the SD card.
-# Usage: ssh root@DEVICE 'sh /media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/test-bootstrap.sh'
+# Usage: ssh root@DEVICE 'sh /media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/dev-test-bootstrap.sh'
 
 set -e
 echo "=== Phase 1: Manual Bootstrap Test ==="

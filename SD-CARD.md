@@ -8,7 +8,7 @@
 
 ## Local Source Copy
 
-The `mixxx-bundle/` directory in this repo is the **local mirror** of what was SCP'd to the device. It was created by `scripts/collect-mixxx-bundle.sh` from Buildroot output, then deployed via `scripts/deploy-to-device.sh` using SCP.
+The `mixxx-bundle/` directory in this repo is the **local mirror** of what was SCP'd to the device. It was created by `scripts/dev-collect-mixxx-bundle.sh` from Buildroot output, then deployed via `scripts/dev-deploy-to-device.sh` using SCP.
 
 ## Directory Structure (Binary Layout)
 
@@ -310,7 +310,7 @@ These 9 libraries are provided by the device's `/lib` — bundling them causes s
 - `librt.so.1`, `libstdc++.so.6`, `libgcc_s.so.1`
 - `ld-linux-armhf.so.3`, `libatomic.so.1`
 
-The `fix-device-libs.sh` script removes these from the bundle after collection.
+The `dev-fix-device-libs.sh` script removes these from the bundle after collection.
 
 ## Known Issues (Current State)
 
@@ -323,7 +323,7 @@ The `fix-device-libs.sh` script removes these from the bundle after collection.
 
 ## Deployment Scripts
 
-- `scripts/collect-mixxx-bundle.sh` — Gathers MIXXX + deps from Buildroot output into `mixxx-bundle/`
-- `scripts/deploy-to-device.sh` — SCPs bundle to device, installs systemd service + switchers, backs up existing SD card
-- `scripts/fix-device-libs.sh` — Removes system-critical libs from deployed bundle on device
-- `scripts/quick-fix-deploy.sh` — Redeploys only changed files for fast iteration
+- `scripts/dev-collect-mixxx-bundle.sh` — Gathers MIXXX + deps from Buildroot output into `mixxx-bundle/`
+- `scripts/dev-deploy-to-device.sh` — SCPs bundle to device, installs systemd service + switchers, backs up existing SD card
+- `scripts/dev-fix-device-libs.sh` — Removes system-critical libs from deployed bundle on device
+- `scripts/dev-quick-fix-deploy.sh` — Redeploys only changed files for fast iteration

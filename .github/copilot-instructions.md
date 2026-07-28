@@ -36,7 +36,7 @@ Custom firmware + MIXXX deployment for **Denon DJ Prime Go** hardware (Rockchip 
 - ASSERTION: These 9 libraries MUST NOT exist in the bundle. They MUST come from device `/lib`:
   `libc.so.6` `libm.so.6` `libpthread.so.0` `libdl.so.2` `librt.so.1`
   `libstdc++.so.6` `libgcc_s.so.1` `ld-linux-armhf.so.3` `libatomic.so.1`
-- CHECK: `ls $BUNDLE/lib/libc.so.6 2>/dev/null` must return nothing. `scripts/fix-device-libs.sh` must be run after every `collect-mixxx-bundle.sh`.
+- CHECK: `ls $BUNDLE/lib/libc.so.6 2>/dev/null` must return nothing. `scripts/dev-fix-device-libs.sh` must be run after every `dev-collect-mixxx-bundle.sh`.
 - VIOLATION: Any of these libs present in bundle → segfault (kernel ABI mismatch)
 
 - RULE_ID: "MALI-DDK-R1P0"
@@ -90,22 +90,22 @@ Custom firmware + MIXXX deployment for **Denon DJ Prime Go** hardware (Rockchip 
 
 - RULE_ID: "EVAL-NO-REDIRECT"
 - ASSERTION: NEVER use `eval $SSH_CMD` (or any `eval` wrapper) for commands containing `>`, `>>`, `<`, `<<`, or `|`.
-- CHECK: `grep 'eval.*|.*ssh' scripts/deploy-to-device.sh` must return nothing if the eval'd string contains redirect/pipes.
+- CHECK: `grep 'eval.*|.*ssh' scripts/dev-deploy-to-device.sh` must return nothing if the eval'd string contains redirect/pipes.
 - VIOLATION: `eval` interprets `>` as LOCAL file redirection (writes to host filesystem, not device). `eval` interprets `|` as LOCAL pipe (pipes on host, not device). Both break silently with confusing "Permission denied" or "not found" errors.
 - CORRECT PATTERN: `cat localfile | sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$SSH_TARGET" "cat > /remote/path"`
 - ACCEPTABLE: Simple `eval $SSH_CMD "$SSH_TARGET" "command"` without `>`, `<`, `|`, or `<<` is OK.
 - REASON: `eval` strips one level of quoting and re-parses the string. Shell metacharacters (`>`, `|`, `<<`) that were quoted inside the eval'd argument become unquoted during re-parsing and get interpreted by the LOCAL shell.
 
 - RULE_ID: "HEREDOC-FORBIDDEN-DEPLOY"
-- ASSERTION: deploy-to-device.sh MUST NOT contain heredocs (`<<`). All device files must exist as local source-of-truth files in `scripts/device/`.
-- CHECK: `grep -c '<< ' scripts/deploy-to-device.sh` must return 0.
+- ASSERTION: dev-deploy-to-device.sh MUST NOT contain heredocs (`<<`). All device files must exist as local source-of-truth files in `scripts/device/`.
+- CHECK: `grep -c '<< ' scripts/dev-deploy-to-device.sh` must return 0.
 - VIOLATION: Heredocs in deploy scripts are fragile — they require `eval` (see EVAL-NO-REDIRECT) and duplicate content that should live in version-controlled files.
 - CORRECT: Create `scripts/device/<filename>` then deploy with `cat scripts/device/<filename> | sshpass ssh "cat > /dest/path"`.
 
 - RULE_ID: "MDNS-PRIMEGO"
 - ASSERTION: Avahi mDNS MUST advertise `primego.local`, NOT `buildroot.local`.
 - CHECK: `ssh root@$DEVICE_IP "ps | grep avahi-daemon | grep primego"` must find a match.
-- FIX: `DEVICE_IP=... bash scripts/install-device-services.sh` — this deploys `fix-mdns.sh` + `fix-mdns.service` which run at boot and are idempotent.
+- FIX: `DEVICE_IP=... bash scripts/dev-install-device-services.sh` — this deploys `fix-mdns.sh` + `fix-mdns.service` which run at boot and are idempotent.
 - VIOLATION: Avahi defaults to `buildroot.local` → mDNS doesn't resolve `primego.local`.
 
 ### Constraints
@@ -309,7 +309,7 @@ Boot chain:
 - NEVER hardcode the device IP or password in any generated script. Use the DEVICE_IP env var.
 - Device password is in DEPLOY.md (denonprime4). Never hardcode it.
 - After any SCP-based file change on the device, update the local repo to match. The repo is always the source of truth.
-- CRITICAL: After modifying engine.service or tkgl-bootstrap-stub.sh, you MUST deploy them to the device. These files live on internal eMMC and are NOT part of the SD card bundle — they won't be updated by deploy-to-device.sh. Run `DEVICE_IP=... ./scripts/install-device-services.sh` or manually scp them.
+- CRITICAL: After modifying engine.service or tkgl-bootstrap-stub.sh, you MUST deploy them to the device. These files live on internal eMMC and are NOT part of the SD card bundle — they won't be updated by dev-deploy-to-device.sh. Run `DEVICE_IP=... ./scripts/dev-install-device-services.sh` or manually scp them.
 ```
 
 ### Runtime modification workflow — CRITICAL
@@ -386,8 +386,8 @@ git status --short
 grep "settings/controllers" mixxx-bundle/settings/mixxx.cfg && echo "FAIL: wrong path!" || echo "OK"
 
 # Run pre-commit checks
-./scripts/verify-launcher.sh
-./scripts/check-duplicates.sh
+./scripts/dev-verify-launcher.sh
+./scripts/dev-check-duplicates.sh
 ```
 
 **Canonical skin is LateNightMini** (`mixxx-bundle/skins/LateNightMini/`). RoundCorners (`mixxx-bundle/skins/roundcorners/`) is a legacy reference kept locally for history but never deployed to device. All skin work goes into LateNightMini.
@@ -435,26 +435,48 @@ grep "settings/controllers" mixxx-bundle/settings/mixxx.cfg && echo "FAIL: wrong
 
 Or use Makefile targets: `make unpack`, `make clone-buildroot`, etc.
 
-### MIXXX bundle pipeline
+### MIXXX bundle pipeline (developer)
 
 ```bash
-./scripts/collect-mixxx-bundle.sh    # Gather MIXXX + deps from Buildroot output into mixxx-bundle/
-./scripts/fix-device-libs.sh         # Remove system-critical libs from bundle
-DEVICE_IP=primego.local ./scripts/deploy-to-device.sh  # SCP to device
-./scripts/quick-fix-deploy.sh        # Fast iteration: redeploy only changed files
+./scripts/dev-collect-mixxx-bundle.sh    # Gather MIXXX + deps from Buildroot output into mixxx-bundle/
+./scripts/dev-fix-device-libs.sh         # Remove system-critical libs from bundle
+DEVICE_IP=primego.local ./scripts/dev-deploy-to-device.sh  # SCP to device
+./scripts/dev-quick-fix-deploy.sh        # Fast iteration: redeploy only changed files
 ```
 
-### SD card distribution bundle
+### User-facing scripts
+
+These two scripts are for end users — no Buildroot or dev tooling needed:
 
 ```bash
-./dist.sh    # Assemble the full SD card tarball for GitHub Releases
+./scripts/create-sdcard-bundle.sh        # Assemble a complete SD card tarball (from prebuilt mixxx-bundle/)
+./scripts/fix-sdcard-paths.sh            # Patch paths after extracting tarball to SD card
 ```
 
-### Skin QSS build
+### Developer scripts (all prefixed `dev-`)
 
-```bash
-./scripts/build-style-qss.sh     # Concatenate style_qss/_*.qss modules → style.qss
-```
+All scripts under `scripts/` with the `dev-` prefix are developer-only. They require
+Buildroot output, SSH access to the device, or other dev tooling:
+
+| Script | Purpose |
+|---|---|
+| `dev-collect-mixxx-bundle.sh` | Gather MIXXX + Qt libs from Buildroot into `mixxx-bundle/` |
+| `dev-fix-device-libs.sh` | Remove 9 forbidden system libs from bundle |
+| `dev-deploy-to-device.sh` | Full deploy via SCP (calls dev-install-device-services.sh) |
+| `dev-install-device-services.sh` | Install engine.service, stub, switchers, udev rules, USB gadget, etc. |
+| `dev-quick-fix-deploy.sh` | Fast iteration: redeploy only changed files |
+| `dev-sync-all-back.sh` | Pull all runtime-edited files from device back to repo |
+| `dev-sync-profiler-back.sh` | Pull profiler scripts from device back to repo |
+| `dev-verify-launcher.sh` | Pre-commit: launcher integrity, single source, pidof guard |
+| `dev-check-duplicates.sh` | Pre-commit: no duplicate mapping files |
+| `dev-build-style-qss.sh` | Concatenate `style_qss/_*.qss` modules → `style.qss` |
+| `dev-test-bootstrap.sh` | One-shot manual TKGL bootstrap test on device |
+| `dev-patch-qt-to-5.15.2.sh` | Historical: downgrade Qt (NOT used — we need 5.15.8) |
+
+Device scripts (deployed to the device, not run locally) live in `scripts/device/`:
+`tkgl-bootstrap-stub.sh`, `switch-to-mixxx.sh`, `switch-to-engine.sh`,
+`usb-gadget-eth.sh`, `fix-mdns.sh`, `powerbutton-monitor`, plus profiling tools
+(`profiler.sh`, `cpu-latency.sh`, `xrun-monitor.sh`, `bench-harness.sh`).
 
 ### Go tools (cross-platform updater)
 
@@ -474,16 +496,16 @@ Cross-compile for Windows: `make -C go all-windows-amd64`
 ### Pre-commit verification
 
 ```bash
-./scripts/verify-launcher.sh     # Launcher integrity: single source, pidof guard, TKGL module size
-./scripts/check-duplicates.sh    # No duplicate mapping files outside canonical location
+./scripts/dev-verify-launcher.sh     # Launcher integrity: single source, pidof guard, TKGL module size
+./scripts/dev-check-duplicates.sh    # No duplicate mapping files outside canonical location
 ```
 
-Both scripts exit non-zero on failure — run before every commit. They also serve as standalone debugging tools: `verify-launcher.sh` checks launcher correctness, `check-duplicates.sh` finds duplicate mappings outside canonical locations.
+Both scripts exit non-zero on failure — run before every commit. They also serve as standalone debugging tools: `dev-verify-launcher.sh` checks launcher correctness, `dev-check-duplicates.sh` finds duplicate mappings outside canonical locations.
 
 ### Fast iteration (device)
 
 ```bash
-./scripts/quick-fix-deploy.sh    # Redeploy only changed files, skip full bundle collection
+./scripts/dev-quick-fix-deploy.sh    # Redeploy only changed files, skip full bundle collection
 ```
 
 ### Build DTS→DTB firmware images
@@ -553,7 +575,7 @@ MIXXX mappings live in `mixxx-bundle/mixxx-mapping/prime-go/` (canonical) and de
 - Skin lives in `mixxx-bundle/skins/LateNightMini/` (Tango-derived, heavily customized for 1280×800 touchscreen)
 - **CRITICAL**: WPushButton has a stale-read bug on Qt 5.15.8 EGLFS — use the `_trig` CO toggle pattern. Full documentation and conversion rules at `mixxx-bundle/skins/LateNightMini/copilot-instructions.md`
 - `style.qss` is split into 5 modules in `style_qss/`: `_base.qss`, `_library.qss`, `_controls.qss`, `_buttons.qss`, `_deck2.qss`
-- Build QSS from modules: `./scripts/build-style-qss.sh` — concatenates all `_*.qss` files in order into `style.qss`
+- Build QSS from modules: `./scripts/dev-build-style-qss.sh` — concatenates all `_*.qss` files in order into `style.qss`
 - Resolution architecture: Physical display 1280×800 landscape, GPU framebuffer 800×1280 portrait, Qt logical screen 1280×800 (EGLFS_ROTATION=90), display HW rotates output
 - **SizeAwareStack breakpoints MUST match 800px world** — any breakpoint ≥800 triggers wrong template at native resolution. The skin always runs at 1280px (≥801 breakpoint → lg template)
 - **44px minimum touch targets**, 4px grid spacing
@@ -561,10 +583,10 @@ MIXXX mappings live in `mixxx-bundle/mixxx-mapping/prime-go/` (canonical) and de
 
 ### Deployment workflow
 
-1. Collect bundle: `./scripts/collect-mixxx-bundle.sh`
-2. Fix system libs: `./scripts/fix-device-libs.sh`
-3. Deploy to device: `DEVICE_IP=... ./scripts/deploy-to-device.sh`
-4. For fast iteration (skin/mapping changes): `./scripts/quick-fix-deploy.sh`
+1. Collect bundle: `./scripts/dev-collect-mixxx-bundle.sh`
+2. Fix system libs: `./scripts/dev-fix-device-libs.sh`
+3. Deploy to device: `DEVICE_IP=... ./scripts/dev-deploy-to-device.sh`
+4. For fast iteration (skin/mapping changes): `./scripts/dev-quick-fix-deploy.sh`
 5. After deployment, restart MIXXX: `ssh root@$DEVICE_IP 'systemctl stop mixxx-app.service; systemctl restart engine.service'`
 6. **Always update the local repo after device-side changes** — the repo is the source of truth
 
@@ -587,7 +609,7 @@ ssh root@$DEVICE_IP switch-to-mixxx
 ssh root@$DEVICE_IP switch-to-engine
 ```
 
-These are scripts at `/usr/bin/switch-to-mixxx` and `/usr/bin/switch-to-engine` deployed by `deploy-to-device.sh`.
+These are scripts at `/usr/bin/switch-to-mixxx` and `/usr/bin/switch-to-engine` deployed by `dev-deploy-to-device.sh`.
 
 ### USB music library (sandbox bypass)
 

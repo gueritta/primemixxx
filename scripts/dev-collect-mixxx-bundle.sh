@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# collect-mixxx-bundle.sh — Gather MIXXX binary + all dependencies from Buildroot output
+# dev-collect-mixxx-bundle.sh — Gather MIXXX binary + all dependencies from Buildroot output
 # into a self-contained bundle directory ready for deployment to the device's SD card.
 #
 # Output: ./mixxx-bundle/ containing:
@@ -225,4 +225,4 @@ echo "Bundle size: $(du -sh "$BUNDLE_DIR" | cut -f1)"
 echo "Binary:      $(file "$BUNDLE_DIR/bin/mixxx" | cut -d: -f2-)"
 echo "Libraries:   $(ls "$BUNDLE_DIR/lib/" | wc -l) files"
 echo ""
-echo "Next: run scripts/deploy-to-device.sh to copy to device"
+echo "Next: run scripts/dev-deploy-to-device.sh to copy to device"

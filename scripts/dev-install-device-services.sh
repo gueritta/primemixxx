@@ -1,9 +1,9 @@
 #!/bin/sh
-# install-device-services.sh — Install all device system files to a Denon Prime Go
+# dev-install-device-services.sh — Install all device system files to a Denon Prime Go
 # via SSH. One-stop script for services, udev rules, switchers, and power button.
 #
 # Usage:
-#   DEVICE_IP=192.168.42.1 ./scripts/install-device-services.sh
+#   DEVICE_IP=192.168.42.1 ./scripts/dev-install-device-services.sh
 #   (defaults to primego.local)
 
 set -e

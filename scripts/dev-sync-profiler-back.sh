@@ -1,9 +1,9 @@
 #!/bin/sh
-# sync-profiler-back.sh — Pull profiler scripts from device back to local repo
+# dev-sync-profiler-back.sh — Pull profiler scripts from device back to local repo
 # Use after editing profiling tools on-device during a runtime session.
 #
-# Usage: DEVICE_IP=10.128.54.244 ./scripts/sync-profiler-back.sh
-#        DEV=root@192.168.42.1 ./scripts/sync-profiler-back.sh
+# Usage: DEVICE_IP=10.128.54.244 ./scripts/dev-sync-profiler-back.sh
+#        DEV=root@192.168.42.1 ./scripts/dev-sync-profiler-back.sh
 
 DEV="${1:-root@${DEVICE_IP:-primego.local}}"
 LOCAL_DIR="$(cd "$(dirname "$0")/device" && pwd)"

@@ -81,9 +81,9 @@ Prerequisites: u-boot tools, 7-zip, QEMU ARM emulation with binfmt, base develop
 ### Deploy MIXXX to Device
 
 ```bash
-./scripts/collect-mixxx-bundle.sh    # Gather MIXXX + deps from Buildroot output
-./scripts/fix-device-libs.sh         # Remove system libs from bundle
-DEVICE_IP=<ip> ./scripts/deploy-to-device.sh  # SCP to device
+./scripts/dev-collect-mixxx-bundle.sh    # Gather MIXXX + deps from Buildroot output
+./scripts/dev-fix-device-libs.sh         # Remove system libs from bundle
+DEVICE_IP=<ip> ./scripts/dev-deploy-to-device.sh  # SCP to device
 ```
 
 ### Create SD card bundle (for distribution)
@@ -95,7 +95,7 @@ DEVICE_IP=<ip> ./scripts/deploy-to-device.sh  # SCP to device
 ### Device Services (Install/Repair)
 
 ```bash
-DEVICE_IP=<ip> ./scripts/install-device-services.sh
+DEVICE_IP=<ip> ./scripts/dev-install-device-services.sh
 ```
 
 </details>

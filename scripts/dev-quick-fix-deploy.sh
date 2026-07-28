@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# quick-fix-deploy.sh — Redeploy only the changed files to device
+# dev-quick-fix-deploy.sh — Redeploy only the changed files to device
 # Run after the device reconnects. Assumes SSH_ASKPASS is set up.
 
 DEVICE_IP="${1:-10.109.235.244}"

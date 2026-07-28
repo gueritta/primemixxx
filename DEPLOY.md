@@ -32,7 +32,7 @@ See the [README Quick Start](README.md#quick-start-end-users) for detailed step-
    - Prime Go: USB Ethernet gadget at `192.168.42.1` or WiFi
    - Prime 4: WiFi (keepalive ping needed to prevent SSH drops)
 
-2. **Build machine**: MIXXX already compiled via Buildroot (`scripts/collect-mixxx-bundle.sh` needs the output)
+2. **Build machine**: MIXXX already compiled via Buildroot (`scripts/dev-collect-mixxx-bundle.sh` needs the output)
 
 ## Quick Start
 
@@ -43,10 +43,10 @@ See the [README Quick Start](README.md#quick-start-end-users) for detailed step-
 
 ```bash
 # 1. Collect MIXXX + dependencies from Buildroot output
-./scripts/collect-mixxx-bundle.sh
+./scripts/dev-collect-mixxx-bundle.sh
 
 # 2. Deploy to device (backs up SD card first, copies bundle, installs services)
-DEVICE_IP=primego.local ./scripts/deploy-to-device.sh
+DEVICE_IP=primego.local ./scripts/dev-deploy-to-device.sh
 
 # 3. Switch to MIXXX
 ssh root@primego.local switch-to-mixxx
@@ -57,11 +57,11 @@ ssh root@primego.local switch-to-engine
 
 ## Device Services
 
-`scripts/install-device-services.sh` installs all system-level services. Run it standalone
+`scripts/dev-install-device-services.sh` installs all system-level services. Run it standalone
 to fix/reinstall services without re-deploying the full MIXXX bundle:
 
 ```bash
-DEVICE_IP=<ip> ./scripts/install-device-services.sh
+DEVICE_IP=<ip> ./scripts/dev-install-device-services.sh
 ```
 
 | Service | Purpose | Auto-start |
@@ -107,7 +107,7 @@ ssh root@<ip> 'mount | grep TKGL_BOOTSTRAP'
 
 ## SD Card Backup
 
-`deploy-to-device.sh` automatically backs up `/media/az01-internal/` to `sdcard-backup-YYYYMMDD-HHMMSS/` before deploying. This captures the overlay filesystem state (connman WiFi configs, Engine library database, etc.).
+`dev-deploy-to-device.sh` automatically backs up `/media/az01-internal/` to `sdcard-backup-YYYYMMDD-HHMMSS/` before deploying. This captures the overlay filesystem state (connman WiFi configs, Engine library database, etc.).
 
 ## Flashing the Firmware
 

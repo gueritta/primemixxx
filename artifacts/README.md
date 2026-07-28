@@ -32,7 +32,7 @@ tar xzf primego-sdcard-mixxx-20260710.tar.gz -C /mountpoint/
 make mixxx-rebuild
 
 # 2. Collect bundle from Buildroot output
-./scripts/collect-mixxx-bundle.sh
+./scripts/dev-collect-mixxx-bundle.sh
 
 # 3. Create artifact tarball
 tar -czf artifacts/primego-sdcard-mixxx-$(date +%Y%m%d).tar.gz \
@@ -49,7 +49,7 @@ sudo mount /dev/sdX1 /mnt/sdcard
 sudo tar xzf artifacts/primego-sdcard-mixxx-20260710.tar.gz -C /mnt/sdcard/
 
 # Or deploy via SSH to device (recommended)
-DEVICE_IP=10.70.180.244 ./scripts/deploy-to-device.sh
+DEVICE_IP=10.70.180.244 ./scripts/dev-deploy-to-device.sh
 
 sudo umount /mnt/sdcard
 ```

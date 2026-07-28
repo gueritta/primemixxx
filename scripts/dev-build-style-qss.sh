@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# build-style-qss.sh — Concatenate modular QSS files into style.qss
+# dev-build-style-qss.sh — Concatenate modular QSS files into style.qss
 # Source: style_qss/_*.qss → Output: style.qss
 
 SKIN_DIR="$(cd "$(dirname "$0")/../mixxx-bundle/skins/roundcorners" && pwd)"

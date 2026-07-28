@@ -281,20 +281,20 @@ and [`docs/hardware-reference.md`](hardware-reference.md).
 
 ```bash
 # 1. Collect MIXXX + dependencies from Buildroot output
-./scripts/collect-mixxx-bundle.sh
+./scripts/dev-collect-mixxx-bundle.sh
 
 # 2. Remove system-critical libs from bundle (libc, libm, etc.)
-./scripts/fix-device-libs.sh
+./scripts/dev-fix-device-libs.sh
 
 # 3. Deploy to device via SCP
-DEVICE_IP=primego.local ./scripts/deploy-to-device.sh
+DEVICE_IP=primego.local ./scripts/dev-deploy-to-device.sh
 ```
 
 ### Fast Iteration
 
 ```bash
 # Redeploy only changed files (skips full bundle collection)
-./scripts/quick-fix-deploy.sh
+./scripts/dev-quick-fix-deploy.sh
 ```
 
 ### Updater Tools
