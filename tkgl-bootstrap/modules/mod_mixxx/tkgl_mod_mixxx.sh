@@ -16,7 +16,7 @@ tkgl_mod_mixxx() {
     fi
 
     # /data/mixxx/mixxx is a delegation script that calls the SD card launcher:
-    #   exec /media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/mixxx_launcher.sh "$@"
+    #   exec /media/az01-internal/mixxx/mixxx_launcher.sh "$@"
     # The SD launcher sets all env vars (Qt, Mali, USB, seed DB) and CPU shielding.
     MIXDIR=/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle
     ENTRYPOINT=$MIXDIR/mixxx_launcher.sh
@@ -52,7 +52,7 @@ tkgl_mod_mixxx() {
     systemctl start powerbutton-monitor.service 2>/dev/null || true
     log "powerbutton-monitor started"
 
-    systemd-run --unit=mixxx-app --collect --service-type=exec \
+    systemd-run --unit=mixxx-app --collect --service-type=exec --property=LimitMEMLOCK=infinity --property=LimitRTPRIO=99 \
         --property=RuntimeDirectory=mixxx \
         --property=RuntimeDirectoryMode=0700 \
         --working-directory="$MIXDIR" \

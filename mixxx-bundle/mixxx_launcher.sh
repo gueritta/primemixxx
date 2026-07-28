@@ -90,6 +90,33 @@ export XDG_RUNTIME_DIR=/tmp
 # starving the audio engine under load.
 echo -1 > /proc/sys/kernel/sched_rt_runtime_us
 
+# ── I/O & VM latency optimizations ──────────────────────────────────────────
+# Block scheduler: none (noop) for flash storage — BFQ's per-process I/O
+# accounting wastes CPU and adds latency variance on MMC/SD.
+for blk in mmcblk0 mmcblk1; do
+    echo none > "/sys/block/$blk/queue/scheduler" 2>/dev/null
+    echo 512 > "/sys/block/$blk/queue/read_ahead_kb" 2>/dev/null
+    echo 64 > "/sys/block/$blk/queue/nr_requests" 2>/dev/null
+done
+
+# Reduce dirty page thresholds to limit writeback latency spikes.
+# With 2 GB RAM, default dirty_ratio=20% means 400 MB of dirty pages
+# before forced writeback — that can stall the audio thread.
+echo 20480 > /proc/sys/vm/dirty_background_bytes 2>/dev/null
+
+# No swap exists — don't waste CPU reclaiming vfs caches.
+echo 1 > /proc/sys/vm/swappiness
+echo 200 > /proc/sys/vm/vfs_cache_pressure
+
+# Reduce VM stat collection frequency (1s → 10s = 10× less periodic work).
+echo 10 > /proc/sys/vm/stat_interval
+
+# ext4: noatime eliminates metadata writes on read; commit=60 batches journal
+# writes to reduce periodic I/O bursts (default is every 5 seconds).
+for mp in /data /media/az01-internal /media/TKGL_BOOTSTRAP; do
+    mountpoint -q "$mp" 2>/dev/null && mount -o remount,noatime,nodiratime,commit=60 "$mp" 2>/dev/null
+done
+
 # Launch MIXXX pinned to CPU cores 2-3 (audio-dedicated cores).
 # We do NOT set RT priority on the main process — that would cause ALL
 # 44+ child threads to inherit SCHED_FIFO and compete with audio.
