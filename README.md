@@ -1,17 +1,27 @@
 # primemixxx — MIXXX on Denon Prime DJ Hardware
 
 Run [MIXXX](https://mixxx.org) (open-source DJ software) on your Denon DJ
-Prime Go or Prime 4 alongside the stock Engine OS — switchable on demand.
-**No compiling required.**
+Prime Go or Prime 4 hardware alongside the stock Engine OS — **switchable
+on demand by inserting or removing an SD card.** No firmware flashing,
+no permanent modification. The stock Engine OS remains untouched.
 
 > Fork of [@ghuntley/denon-prime4](https://github.com/ghuntley/denon-prime4) —
 > original firmware research. This fork focuses on deploying a working MIXXX
-> environment via SD card with dual-boot support.
+> environment via SD card with dual-boot support, PREEMPT_RT kernel tuning,
+> CPU shielding, and sub-6ms audio latency.
 
 | Device | Status |
 |---|---|
-| **Prime Go** | ✅ Verified working (display, audio, touch, MIDI) |
-| **Prime 4** | ⚠️ Untested — boots MIXXX in offscreen mode, but native display (DSI) causes GPU crash |
+| **Prime Go** | ✅ Verified (display, audio, touch, MIDI, 5.8ms latency) |
+| **Prime 4** | ⚠️ Untested — boots in offscreen mode (DSI GPU crash) |
+
+### Audio Performance
+
+With CPU shielding, RT thread pinning, and I/O scheduler tuning, the
+Prime Go achieves **5.8ms (256/512) ALSA buffer** with SCHED_FIFO 98
+audio threads. Early testing shows stable playback at this latency, but
+**deeper stress testing is needed** — run with heavy FX chains, pitch
+bend, and USB library scanning to validate under load.
 
 ## Quick Start (End Users)
 
