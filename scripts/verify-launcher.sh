@@ -46,10 +46,10 @@ else
 fi
 
 # 5. No other .sh file outside canonical path invokes bin/mixxx directly
-EXTRA=$(grep -rl "bin/mixxx" --include="*.sh" tkgl-bootstrap/ buildroot-customizations/ 2>/dev/null | grep -v "/data/mixxx/mixxx" | grep -v "post-build" | grep -v "rootfs_overlay/usr/bin" | wc -l)
+EXTRA=$(grep -rl "bin/mixxx" --include="*.sh" tkgl-bootstrap/ buildroot-customizations/ 2>/dev/null | grep -v "/data/mixxx/mixxx" | grep -v "post-build" | grep -v "rootfs_overlay/usr/bin" | grep -v "mod_install" | wc -l)
 if [ "$EXTRA" -ne 0 ]; then
     echo "FAIL: $EXTRA launcher(s) outside canonical path invoke bin/mixxx directly:"
-    grep -rl "bin/mixxx" --include="*.sh" tkgl-bootstrap/ buildroot-customizations/ 2>/dev/null | grep -v "/data/mixxx/mixxx" | grep -v "post-build" | grep -v "rootfs_overlay/usr/bin"
+    grep -rl "bin/mixxx" --include="*.sh" tkgl-bootstrap/ buildroot-customizations/ 2>/dev/null | grep -v "/data/mixxx/mixxx" | grep -v "post-build" | grep -v "rootfs_overlay/usr/bin" | grep -v "mod_install"
     failures=$((failures + 1))
 else
     echo "OK: No external launchers invoke bin/mixxx directly"

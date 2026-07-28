@@ -31,6 +31,21 @@ detect_device
 BUNDLE=/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle
 MUSIC_DIR="$BUNDLE/music"
 
+# Internal eMMC storage for binaries and libraries (50MHz/8-bit bus vs 25MHz/4-bit SD).
+# Loading Qt 5.15.8, Mali integration, and MIXXX binary from fast internal storage
+# eliminates MMC bus contention on the external SD during audio playback.
+INTERNAL_BUNDLE="/media/az01-internal/mixxx"
+if [ -d "$INTERNAL_BUNDLE/lib" ] && [ -f "$INTERNAL_BUNDLE/lib/bin/mixxx" ]; then
+    BIN_PATH="$INTERNAL_BUNDLE/bin"
+    LIB_PATH="$INTERNAL_BUNDLE/lib"
+    PLUGIN_PATH="$INTERNAL_BUNDLE/qt-plugins"
+else
+    echo "[launcher] internal lib not found, falling back to SD bundle"
+    BIN_PATH="$BUNDLE/bin"
+    LIB_PATH="$BUNDLE/lib"
+    PLUGIN_PATH="$BUNDLE/qt-plugins"
+fi
+
 mount_usb_music() {
     [ -d "$MUSIC_DIR" ] || mkdir -p "$MUSIC_DIR"
     mountpoint -q "$MUSIC_DIR" && return 0
@@ -44,11 +59,11 @@ mount_usb_music() {
 mount_usb_music
 
 # Work around kernel 5.10 hidraw netlink bug — udev's hid_enumerate() hangs without NLMSG_DONE
-export LD_PRELOAD=$BUNDLE/lib/no_hid_poll.so
+export LD_PRELOAD=$LIB_PATH/no_hid_poll.so
 # Qt 5.15.8 plugins from SD card (NOT device's Qt 5.15.2 — eglfs_emu can't take over fbcon)
-export QT_PLUGIN_PATH="$BUNDLE/qt-plugins"
+export QT_PLUGIN_PATH="$PLUGIN_PATH"
 # SD Qt 5.15.8 first, device Qt 5.15.2 fallback, then system libs
-export LD_LIBRARY_PATH="$BUNDLE/lib:/usr/qt/lib:/usr/lib"
+export LD_LIBRARY_PATH="$LIB_PATH:/usr/qt/lib:/usr/lib"
 # EGLFS full-screen compositor (no X11/Wayland on embedded display)
 export QT_QPA_PLATFORM=eglfs
 # Mali GPU integration (r1p0 DDK via /usr/lib/libmali.so.14.0 symlinks)
@@ -79,7 +94,7 @@ echo -1 > /proc/sys/kernel/sched_rt_runtime_us
 # We do NOT set RT priority on the main process — that would cause ALL
 # 44+ child threads to inherit SCHED_FIFO and compete with audio.
 # Instead, we selectively boost only the critical audio threads.
-taskset -c 2,3 $BUNDLE/bin/mixxx -platform eglfs --settingsPath $BUNDLE/settings --resourcePath $BUNDLE "$@" &
+taskset -c 2,3 $BIN_PATH/mixxx -platform eglfs --settingsPath $BUNDLE/settings --resourcePath $BUNDLE "$@" &
 MIXPID=$!
 
 # Audio-critical threads that get SCHED_FIFO and stay on cores 2-3:
