@@ -70,7 +70,13 @@ ssh root@192.168.42.1 reboot
 ```
 
 After reboot, the device detects the SD card and **automatically launches MIXXX**
-— no SSH needed. To switch between MIXXX and Engine OS, SSH in and run
+— no SSH needed.
+
+**To boot into stock Engine OS instead**, simply remove the SD card before
+powering on. The device falls back to the original `engine.service` and loads
+Engine OS normally. Re-insert the SD card and reboot to return to MIXXX.
+
+To switch between MIXXX and Engine OS at runtime, SSH in and run
 `switch-to-mixxx` or `switch-to-engine`.
 
 ### USB music library

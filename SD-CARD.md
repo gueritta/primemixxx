@@ -211,6 +211,10 @@ wait $MIXPID
 - Device: `hw:JP11,0` (direct, no plughw conversion)
 - Format: S32_LE, 4 channels, 44100 Hz
 - latency=5: period_size=1024 (23.2ms), buffer_size=2048 (46.4ms total)
+- **WARNING:** `latency=4` (11.6ms) causes xruns on Mali GPU hardware.
+  If `soundconfig.xml` has `latency="4"`, ALSA shows `period_size=512` — double the
+  buffer. Also note MIXXX uses `--settingsPath` from the launcher, so ensure the
+  correct soundconfig is at the path the launcher points to.
 
 ### Kernel Limitations (unfixable without rebuild)
 - `CONFIG_NO_HZ_FULL` not set: 1ms timer tick fires on ALL cores including isolated 2-3
@@ -220,19 +224,32 @@ wait $MIXPID
 
 ## Systemd Service
 
-There are two service paths:
+### Boot chain (internal eMMC → SD card):
 
-### 1. Firmware overlay: `/usr/lib/systemd/system/mixxx.service`
-The canonical service definition in the Buildroot overlay. Sources `mixxx_launcher.sh`.
-
-### 2. TKGL Bootstrap: `/etc/systemd/system/tkgl-mixxx.service`
-The actual service used at boot (TKGL framework). Can be masked with
-`systemctl mask tkgl-mixxx` or overridden by the `mixxx` service.
-
-### Boot chain:
 ```
-tkgl-mixxx.service → /data/tkgl-bootstrap-launcher → tkgl_mod_mixxx.sh
-  → systemd-run --unit=mixxx-app → /data/mixxx/mixxx → SD card launcher → MIXXX
+engine.service → TKGL bootstrap → mod_mixxx → systemd-run --unit=mixxx-app
+  → /data/mixxx/mixxx (thin delegator) → /media/az01-internal/mixxx/mixxx_launcher.sh → MIXXX
+```
+
+### One-time install: `install-device.sh`
+
+Runs ONCE from the TKGL SD card. Backs up original `engine.service` → `engine.service.orig`,
+then installs the TKGL stub + `engine.service` to internal eMMC. Interactively offers
+optional services: USB Ethernet gadget, power button monitor, mDNS fix, WiFi powersave.
+
+```bash
+# From device — run once after SD card is set up:
+sh /media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/install-device.sh
+```
+
+### Uninstall: `uninstall-device.sh`
+
+Inverse of `install-device.sh`. Stops MIXXX, removes the stub, restores
+`engine.service.orig`, and interactively asks which optional services to keep.
+
+```bash
+# From device — removes TKGL boot hook, returns to stock Engine OS:
+sh /media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/uninstall-device.sh
 ```
 
 ### Important: `mixxx-app.service` and masking
@@ -243,8 +260,6 @@ won't start at boot. If masked, unmask with:
 ```bash
 systemctl unmask mixxx-app.service 2>/dev/null || true
 ```
-
-### To re-enable the simple service:
 
 ## USB MP3 Library: Sandbox Bypass & Seed DB
 
