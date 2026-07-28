@@ -3,6 +3,20 @@
 > Rules, assertions, invariants, paths, and version constraints.
 > For full architecture context and rationale, see `docs/ONBOARDING.md`.
 
+## QUICK NAVIGATION
+
+| If you need to… | Section |
+|---|---|
+| Fix a segfault or black screen | [CRITICAL RULES](#critical-rules--violating-any-of-these-breaks-the-device) |
+| Build firmware or bundle | [BUILD, TEST, AND LINT COMMANDS](#build-test-and-lint-commands) |
+| Deploy to the device | [Deployment workflow](#deployment-workflow) |
+| Understand the boot chain | [HIGH-LEVEL ARCHITECTURE](#high-level-architecture) |
+| Edit a controller mapping | [Controller mapping workflow](#controller-mapping-workflow) |
+| Edit the skin (QSS, layout, buttons) | [Skin development](#skin-development) + `mixxx-bundle/skins/LateNightMini/copilot-instructions.md` |
+| Pull changes back from device | [Runtime modification workflow](#runtime-modification-workflow--critical) |
+| Restart MIXXX on device | [Restarting MIXXX](#restarting-mixxx-on-device) |
+| Debug on device | [Debugging on device](#debugging-on-device) |
+
 ## WHAT THIS PROJECT IS
 
 Custom firmware + MIXXX deployment for **Denon DJ Prime Go** hardware (Rockchip RK3288 ARMv7, Mali-T76x GPU, PREEMPT_RT kernel). MIXXX (open-source DJ software) runs from an internal SD card alongside the stock Engine OS — the two are switchable on demand. Three layers: **Buildroot firmware customization**, **SD card runtime bundle**, and **TKGL boot-time framework** on a separate SD card.
@@ -429,6 +443,12 @@ DEVICE_IP=primego.local ./scripts/deploy-to-device.sh  # SCP to device
 ./scripts/quick-fix-deploy.sh        # Fast iteration: redeploy only changed files
 ```
 
+### SD card distribution bundle
+
+```bash
+./dist.sh    # Assemble the full SD card tarball for GitHub Releases
+```
+
 ### Skin QSS build
 
 ```bash
@@ -437,7 +457,7 @@ DEVICE_IP=primego.local ./scripts/deploy-to-device.sh  # SCP to device
 
 ### Go tools (cross-platform updater)
 
-Module: `github.com/icedream/denon-prime4/go` (Go 1.24). Key deps: FLTK (`go-fltk`) for GUI, `gousb` for USB flashing, `xz` for firmware decompression, `u-root` for fastboot.
+Module: `go/` (Go 1.24, `github.com/icedream/denon-prime4/go`). Key deps: `go-fltk` for GUI, `gousb` for USB flashing, `xz` for firmware decompression, `u-root` for fastboot. Dependency updates managed by Renovate (`renovate.json` at repo root).
 
 ```bash
 cd go
@@ -457,7 +477,7 @@ Cross-compile for Windows: `make -C go all-windows-amd64`
 ./scripts/check-duplicates.sh    # No duplicate mapping files outside canonical location
 ```
 
-Both scripts exit non-zero on failure — run before every commit.
+Both scripts exit non-zero on failure — run before every commit. They also serve as standalone debugging tools: `verify-launcher.sh` checks launcher correctness, `check-duplicates.sh` finds duplicate mappings outside canonical locations.
 
 ### Fast iteration (device)
 
@@ -530,6 +550,7 @@ MIXXX mappings live in `mixxx-bundle/mixxx-mapping/prime-go/` (canonical) and de
 ### Skin development
 
 - Skin lives in `mixxx-bundle/skins/LateNightMini/` (Tango-derived, heavily customized for 1280×800 touchscreen)
+- **CRITICAL**: WPushButton has a stale-read bug on Qt 5.15.8 EGLFS — use the `_trig` CO toggle pattern. Full documentation and conversion rules at `mixxx-bundle/skins/LateNightMini/copilot-instructions.md`
 - `style.qss` is split into 5 modules in `style_qss/`: `_base.qss`, `_library.qss`, `_controls.qss`, `_buttons.qss`, `_deck2.qss`
 - Build QSS from modules: `./scripts/build-style-qss.sh` — concatenates all `_*.qss` files in order into `style.qss`
 - Resolution architecture: Physical display 1280×800 landscape, GPU framebuffer 800×1280 portrait, Qt logical screen 1280×800 (EGLFS_ROTATION=90), display HW rotates output
