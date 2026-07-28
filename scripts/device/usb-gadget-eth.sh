@@ -31,5 +31,6 @@ fi
 for i in $(seq 1 30); do [ -d /sys/class/net/usb0 ] && break; sleep 1; done
 if [ -d /sys/class/net/usb0 ]; then
     ip link set usb0 up 2>/dev/null
-    ip addr add 192.168.42.1/24 dev usb0 2>/dev/null
+    ip addr add 192.168.42.1/24 dev usb0 2>/dev/null || true
 fi
+exit 0
