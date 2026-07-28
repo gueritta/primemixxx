@@ -126,7 +126,7 @@ MIXPID=$!
 
 # Audio-critical threads that get SCHED_FIFO and stay on cores 2-3:
 # Non-audio threads to banish to cores 0-1 at SCHED_OTHER:
-BANISH_PATTERNS="mali-|CachingReader|QEvdevTouch|StatsManager|QDBus|VinylControl|LibraryScanner|BrowseThread|AnalyzerThread|Controller$|VSync|gmain|gdbus|Thread \(pooled\)|QQuickPixmapRea|QQmlThread"
+BANISH_PATTERNS="mali-|CachingReader|QEvdevTouch|StatsManager|QDBus|VinylControl|LibraryScanner|BrowseThread|AnalyzerThread|Controller$|VSync|gmain|gdbus|Thread \(pooled\)|QQuickPixmapRea|QQmlThread|libusb_event"
 
 for i in $(seq 1 12); do
     sleep 1
@@ -144,7 +144,10 @@ for i in $(seq 1 12); do
         fi
     done
 done
-chrt -f -p 1 $MIXPID 2>/dev/null
-taskset -p 0x0C $MIXPID 2>/dev/null
+# Pin main process to non-audio cores 0-1 at SCHED_OTHER so newly-spawned
+# threads (e.g. Qt thread pool) inherit non-audio affinity by default.
+# Audio threads were already moved to 2-3 with explicit per-thread affinity.
+chrt -o -p 0 $MIXPID 2>/dev/null
+taskset -p 0x03 $MIXPID 2>/dev/null
 
 wait $MIXPID
