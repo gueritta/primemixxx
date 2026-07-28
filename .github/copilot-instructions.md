@@ -309,6 +309,7 @@ Boot chain:
 - NEVER hardcode the device IP or password in any generated script. Use the DEVICE_IP env var.
 - Device password is in DEPLOY.md (denonprime4). Never hardcode it.
 - After any SCP-based file change on the device, update the local repo to match. The repo is always the source of truth.
+- CRITICAL: After modifying engine.service or tkgl-bootstrap-stub.sh, you MUST deploy them to the device. These files live on internal eMMC and are NOT part of the SD card bundle — they won't be updated by deploy-to-device.sh. Run `DEVICE_IP=... ./scripts/install-device-services.sh` or manually scp them.
 ```
 
 ### Runtime modification workflow — CRITICAL

@@ -48,25 +48,39 @@ fi
 echo "--- Remounting / as rw ---"
 ssh_cmd "mount -o remount,rw /" || { echo "WARN: remount failed, continuing..."; }
 
-# ── 3. mixxx.service ───────────────────────────────────────────────────────
+# ── 3. engine.service — TKGL bootstrap host (internal eMMC) ────────────────
+echo ""
+echo "--- Installing engine.service (TKGL bootstrap host) ---"
+# engine.service lives in tkgl-bootstrap/, not scripts/device/
+cat "$REPO_ROOT/tkgl-bootstrap/engine.service" | ssh_cmd "cat > /etc/systemd/system/engine.service"
+ssh_cmd "systemctl enable engine.service"
+echo "  engine.service: installed and enabled"
+
+# ── 3b. TKGL bootstrap stub — mount TKGL SD, delegate to launcher ──────────
+echo ""
+echo "--- Installing TKGL bootstrap stub (/data/tkgl-bootstrap-launcher) ---"
+deploy_file "tkgl-bootstrap-stub.sh" "/data/tkgl-bootstrap-launcher" "+x"
+echo "  TKGL bootstrap stub: installed"
+
+# ── 4. mixxx.service ───────────────────────────────────────────────────────
 echo ""
 echo "--- Installing mixxx.service ---"
 deploy_file "mixxx.service" "/etc/systemd/system/mixxx.service"
 ssh_cmd "sed -i 's|ExecStart=.*|ExecStart=$DEVICE_MIXXX_DIR/mixxx_launcher.sh|' /etc/systemd/system/mixxx.service"
 
-# ── 4. USB automount udev rule ─────────────────────────────────────────────
+# ── 5. USB automount udev rule ─────────────────────────────────────────────
 echo ""
 echo "--- Installing USB automount udev rule ---"
 deploy_file "99-usb-automount.rules" "/etc/udev/rules.d/99-usb-automount.rules"
 ssh_cmd "udevadm control --reload-rules"
 
-# ── 5. Switcher scripts ────────────────────────────────────────────────────
+# ── 6. Switcher scripts ────────────────────────────────────────────────────
 echo ""
 echo "--- Installing switcher scripts ---"
 deploy_file "switch-to-mixxx.sh" "/usr/bin/switch-to-mixxx" "+x"
 deploy_file "switch-to-engine.sh" "/usr/bin/switch-to-engine" "+x"
 
-# ── 6. USB Ethernet gadget ─────────────────────────────────────────────────
+# ── 7. USB Ethernet gadget ─────────────────────────────────────────────────
 echo ""
 echo "--- Installing USB Ethernet gadget ---"
 deploy_file "usb-gadget-eth.sh" "/usr/sbin/usb-gadget-eth.sh" "+x"
@@ -75,13 +89,13 @@ ssh_cmd "systemctl daemon-reload"
 ssh_cmd "systemctl enable usb-gadget-eth.service && systemctl start usb-gadget-eth.service"
 echo "  USB Ethernet gadget: enabled and started"
 
-# ── 7. WiFi power save udev rule ───────────────────────────────────────────
+# ── 8. WiFi power save udev rule ───────────────────────────────────────────
 echo ""
 echo "--- Installing WiFi power save udev rule ---"
 deploy_file "99-wifi-power-save.rules" "/etc/udev/rules.d/99-wifi-power-save.rules"
 ssh_cmd "udevadm control --reload-rules"
 
-# ── 8. Power button shutdown service ───────────────────────────────────────
+# ── 9. Power button shutdown service ───────────────────────────────────────
 echo ""
 echo "--- Installing power button shutdown service ---"
 deploy_file "powerbutton-monitor" "/usr/sbin/powerbutton-monitor" "+x"
@@ -89,7 +103,7 @@ deploy_file "powerbutton-monitor.service" "/etc/systemd/system/powerbutton-monit
 # Do NOT enable by default — only active during MIXXX sessions (started by switch-to-mixxx)
 echo "  Power button monitor: installed (started only when MIXXX is active)"
 
-# ── 9. mDNS fix (primego.local) ─────────────────────────────────────────────
+# ── 10. mDNS fix (primego.local) ────────────────────────────────────────────
 echo ""
 echo "--- Installing mDNS fix (primego.local) ---"
 deploy_file "fix-mdns.sh" "/usr/sbin/fix-mdns.sh" "+x"
@@ -100,7 +114,7 @@ ssh_cmd "systemctl enable fix-mdns.service"
 ssh_cmd "/usr/sbin/fix-mdns.sh"
 echo "  mDNS fix: enabled (advertises primego.local)"
 
-# ── 9. Fix stale settings/controllers ──────────────────────────────────────
+# ── 11. Fix stale settings/controllers ─────────────────────────────────────
 echo ""
 echo "--- Cleaning stale paths ---"
 ssh_cmd "
@@ -113,6 +127,8 @@ sed -i 's|/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/setting
 echo ""
 echo "=== Device services installed successfully ==="
 echo ""
+echo "  engine.service:           installed (TKGL bootstrap host — internal eMMC)"
+echo "  tkgl-bootstrap-stub:      installed (/data/tkgl-bootstrap-launcher)"
 echo "  mixxx.service:            installed (disabled — use switch-to-mixxx)"
 echo "  usb-gadget-eth.service:   enabled (boots on USB connect)"
 echo "  powerbutton-monitor:      enabled (graceful shutdown on power button)"
