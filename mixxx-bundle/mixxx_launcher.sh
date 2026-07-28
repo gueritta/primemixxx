@@ -25,8 +25,8 @@ detect_device() {
         DEVICE="prime4"
         ROTATION=270
         SWAPINTERVAL=1
-        PHYSICAL_WIDTH=155
-        PHYSICAL_HEIGHT=98
+        PHYSICAL_WIDTH=216
+        PHYSICAL_HEIGHT=139
     fi
     echo "[launcher] detected device: $DEVICE (rotation=$ROTATION swapinterval=$SWAPINTERVAL phys=${PHYSICAL_WIDTH}x${PHYSICAL_HEIGHT}mm)"
 }
