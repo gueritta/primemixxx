@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# create-sdcard-bundle.sh — Assemble a complete, ready-to-use SD card bundle
+# dev-create-sdcard-bundle.sh — Assemble a complete, ready-to-use SD card bundle
 # for the Denon Prime Go. Users extract this tarball to the root of an SD
 # card, insert it, and get a working MIXXX setup without compiling anything.
 #
@@ -9,10 +9,10 @@
 # tarball: primego-sdcard-mixxx-<version>.tar.gz
 #
 # Usage:
-#   ./scripts/create-sdcard-bundle.sh                           # default output
-#   ./scripts/create-sdcard-bundle.sh --output ./my-bundle.tar.gz  # custom output
-#   ./scripts/create-sdcard-bundle.sh --version 2.6.0           # version tag
-#   SKIP_ASSERTIONS=1 ./scripts/create-sdcard-bundle.sh         # skip assertion checks
+#   ./scripts/dev-create-sdcard-bundle.sh                           # default output
+#   ./scripts/dev-create-sdcard-bundle.sh --output ./my-bundle.tar.gz  # custom output
+#   ./scripts/dev-create-sdcard-bundle.sh --version 2.6.0           # version tag
+#   SKIP_ASSERTIONS=1 ./scripts/dev-create-sdcard-bundle.sh         # skip assertion checks
 #
 # Prerequisites:
 #   - mixxx-bundle/ must exist with bin/mixxx, lib/, mixxx_launcher.sh, etc.
@@ -205,6 +205,14 @@ TKGL_SCRIPTS="$TKGL_ROOT/scripts"
 TKGL_MODULES="$TKGL_ROOT/modules"
 TKGL_LOG_FILE="$TKGL_LOG/bootstrap_$(date +%Y%m%d_%H%M%S).log"
 PATHEOF
+
+# ── Step 10b: Include boot hook files for one-time internal eMMC install ─────
+echo "--- Including boot hook files ---"
+cp "$REPO_ROOT/scripts/device/tkgl-bootstrap-stub.sh" "$TKGL_ROOT_STAGING/tkgl-bootstrap-stub.sh"
+cp "$REPO_ROOT/scripts/device/install-boot-hook.sh" "$TKGL_ROOT_STAGING/install-boot-hook.sh"
+cp "$REPO_ROOT/tkgl-bootstrap/engine.service" "$TKGL_ROOT_STAGING/engine.service"
+chmod +x "$TKGL_ROOT_STAGING/install-boot-hook.sh"
+echo "  Boot hook files included (run install-boot-hook.sh once on device)"
 
 # ── Step 11: Verify assertions ────────────────────────────────────────────────
 if [ "$SKIP_ASSERTIONS" != "1" ]; then

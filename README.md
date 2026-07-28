@@ -34,26 +34,30 @@ sudo tar xzf prime-series-sdcard-*.tar.gz -C /mnt/sdcard
 sudo umount /mnt/sdcard
 ```
 
-### 3. Insert & boot
+### 3. Install boot hook (one-time)
 
-Insert the SD card and power on. The device boots into Engine OS first.
-
-**To start MIXXX**, SSH in and run:
+SSH into the device and run the install script from the SD card:
 
 ```bash
-ssh root@<device-ip>   # password: denonprime4
+# Connect via USB (preferred): the device appears at 192.168.42.1
+ssh root@192.168.42.1   # password: denonprime4
 
-# Mount the SD card and start MIXXX
-mount -L TKGL_BOOTSTRAP /media/TKGL_BOOTSTRAP
-/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/scripts/tkgl_bootstrap
+# Or via WiFi — find the IP on your router, or try primego.local
+ssh root@<device-ip>
+
+# Run the one-time install (flashes stub + engine.service to internal eMMC)
+sh /media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/install-boot-hook.sh
 ```
 
-MIXXX takes over the display. Engine OS continues running underneath — to
-switch back, SSH in and restart Engine:
+### 4. Reboot & enjoy
 
 ```bash
-ssh root@<device-ip> 'systemctl stop mixxx-app.service; systemctl restart engine.service'
+ssh root@192.168.42.1 reboot
 ```
+
+After reboot, the device detects the SD card and **automatically launches MIXXX**
+— no SSH needed. To switch between MIXXX and Engine OS, SSH in and run
+`switch-to-mixxx` or `switch-to-engine`.
 
 ### USB music library
 
@@ -89,7 +93,7 @@ DEVICE_IP=<ip> ./scripts/dev-deploy-to-device.sh  # SCP to device
 ### Create SD card bundle (for distribution)
 
 ```bash
-./scripts/create-sdcard-bundle.sh    # Assemble complete SD card tarball
+./scripts/dev-create-sdcard-bundle.sh    # Assemble complete SD card tarball
 ```
 
 ### Device Services (Install/Repair)

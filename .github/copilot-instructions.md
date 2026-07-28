@@ -449,8 +449,8 @@ DEVICE_IP=primego.local ./scripts/dev-deploy-to-device.sh  # SCP to device
 These two scripts are for end users — no Buildroot or dev tooling needed:
 
 ```bash
-./scripts/create-sdcard-bundle.sh        # Assemble a complete SD card tarball (from prebuilt mixxx-bundle/)
-./scripts/fix-sdcard-paths.sh            # Patch paths after extracting tarball to SD card
+./scripts/dev-create-sdcard-bundle.sh        # Assemble a complete SD card tarball (from prebuilt mixxx-bundle/)
+./scripts/dev-fix-sdcard-paths.sh            # Patch paths after extracting tarball to SD card
 ```
 
 ### Developer scripts (all prefixed `dev-`)
