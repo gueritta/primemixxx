@@ -16,7 +16,7 @@
 #      - Use only with stripped rootfs <500MB uncompressed
 #
 #   2. Manufacturer's native updater (this script repackages it):
-#      - Extracted from icedream/denon-prime4 release .run file (Makeself 2.7.1)
+#      - Extracted from icedream/primemixxx release .run file (Makeself 2.7.1)
 #      - Sends xz-compressed data directly -> device decompresses on-flash
 #      - Stock 500MB rootfs (142MB xz) flashes successfully
 #      - 16MB native x86-64 ELF with bundled GTK3 libraries
@@ -83,7 +83,7 @@ MANUFACTURER_UPDATER_DIR="$(dirname "$(readlink -f "$0")")/extracted_run"
 
 if [ ! -f "$MANUFACTURER_UPDATER_DIR/updater" ]; then
     echo "ERROR: Manufacturer updater not found at $MANUFACTURER_UPDATER_DIR"
-    echo "Download from https://github.com/icedream/denon-prime4/releases and extract:"
+    echo "Download from https://github.com/icedream/primemixxx/releases and extract:"
     echo "  ./PRIMEGO-4.3.4-ssh-Update.run --noexec --target extracted_run"
     exit 1
 fi

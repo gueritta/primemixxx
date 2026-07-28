@@ -1,8 +1,12 @@
-# Denon Prime Series — MIXXX on SD Card
+# primemixxx — MIXXX on Denon Prime DJ Hardware
 
 Run [MIXXX](https://mixxx.org) (open-source DJ software) on your Denon DJ
 Prime Go or Prime 4 alongside the stock Engine OS — switchable on demand.
 **No compiling required.**
+
+> Fork of [@ghuntley/denon-prime4](https://github.com/ghuntley/denon-prime4) —
+> original firmware research. This fork focuses on deploying a working MIXXX
+> environment via SD card with dual-boot support.
 
 | Device | Status |
 |---|---|
@@ -16,7 +20,7 @@ You need: a Denon Prime Go or Prime 4, a microSD card (≥ 32 GB), and a compute
 ### 1. Download the SD card bundle
 
 Get the latest `prime-series-sdcard-*.tar.gz` from
-[GitHub Releases](https://github.com/gueritta/denon-prime4/releases/latest) (~25 MB).
+[GitHub Releases](https://github.com/gueritta/primemixxx/releases/latest) (~25 MB).
 
 ### 2. Prepare the SD card
 

@@ -1,4 +1,4 @@
-module github.com/icedream/denon-prime4/go
+module github.com/icedream/primemixxx/go
 
 go 1.24.0
 

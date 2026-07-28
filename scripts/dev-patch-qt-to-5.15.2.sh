@@ -1,7 +1,7 @@
 #!/bin/bash -e
 # Downgrades Buildroot Qt from 5.15.8 to 5.15.2
 # Uses KDE Qt patch collection commits matching v5.15.2 tag
-BR="/home/kevin/denon-prime4/buildroot/2023.02.11/package/qt5"
+BR="/home/kevin/primemixxx/buildroot/2023.02.11/package/qt5"
 
 # qt5.mk: change version
 sed -i 's/^QT5_VERSION = $(QT5_VERSION_MAJOR)\.8$/QT5_VERSION = $(QT5_VERSION_MAJOR).2/' "$BR/qt5.mk"

@@ -480,7 +480,7 @@ Device scripts (deployed to the device, not run locally) live in `scripts/device
 
 ### Go tools (cross-platform updater)
 
-Module: `go/` (Go 1.24, `github.com/icedream/denon-prime4/go`). Key deps: `go-fltk` for GUI, `gousb` for USB flashing, `xz` for firmware decompression, `u-root` for fastboot. Dependency updates managed by Renovate (`renovate.json` at repo root).
+Module: `go/` (Go 1.24, `github.com/icedream/primemixxx/go`). Key deps: `go-fltk` for GUI, `gousb` for USB flashing, `xz` for firmware decompression, `u-root` for fastboot. Dependency updates managed by Renovate (`renovate.json` at repo root).
 
 ```bash
 cd go

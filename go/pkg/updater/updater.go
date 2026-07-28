@@ -18,7 +18,7 @@ import (
 
 	"github.com/dustin/go-humanize"
 	"github.com/google/gousb"
-	"github.com/icedream/denon-prime4/go/pkg/fastboot"
+	"github.com/icedream/primemixxx/go/pkg/fastboot"
 	"github.com/sqweek/dialog"
 	"github.com/u-root/u-root/pkg/dt"
 )

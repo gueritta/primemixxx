@@ -4,7 +4,7 @@
 
 If you just want MIXXX on your Prime Go or Prime 4 without building anything:
 
-1. **Download the SD card bundle** from [GitHub Releases](https://github.com/gueritta/denon-prime4/releases/latest) — file `prime-series-sdcard-*.tar.gz`
+1. **Download the SD card bundle** from [GitHub Releases](https://github.com/gueritta/primemixxx/releases/latest) — file `prime-series-sdcard-*.tar.gz`
 2. **Extract the bundle** to a microSD card formatted as ext4 (label `TKGL_BOOTSTRAP`)
 3. **Insert the SD card** and power on
 4. **SSH in** and run the bootstrap:

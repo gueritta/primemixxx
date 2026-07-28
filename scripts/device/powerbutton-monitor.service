@@ -1,6 +1,6 @@
 [Unit]
 Description=Power button shutdown monitor
-Documentation=https://github.com/gueritta/denon-prime4
+Documentation=https://github.com/gueritta/primemixxx
 After=local-fs.target
 
 [Service]
