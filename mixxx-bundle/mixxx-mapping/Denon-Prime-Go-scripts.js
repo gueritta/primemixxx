@@ -1232,7 +1232,6 @@ PrimeGo.Deck = function(deckNumbers, midiChannel) {
     this.playButton = new components.PlayButton({
         midi: [0x90 + midiChannel, 0x0A],
         input: function(channel, control, value, status, group) {
-            print("DBG_PLAY: ch="+channel+" ctrl=0x"+control.toString(16)+" val="+value+" st=0x"+this.midi[0].toString(16));
             components.PlayButton.prototype.input.call(this, channel, control, value, status, group);
         },
         unshift: function() {
@@ -1298,7 +1297,6 @@ PrimeGo.Deck = function(deckNumbers, midiChannel) {
                 }
                 this.send(value / 2 + 0.5); // Hacky way to get LEDs to respond properly
             };
-            console.log("Sifted");
             this.outTrigger = false;
             this.outConnect = false;
         },
@@ -1322,7 +1320,6 @@ PrimeGo.Deck = function(deckNumbers, midiChannel) {
                 }
                 this.send(value / 2 + 0.5); // Hacky way to get LEDs to respond properly
             };
-            console.log("Shifted");
             this.outTrigger = false;
             this.outConnect = false;
         },
@@ -1393,37 +1390,65 @@ PrimeGo.Deck = function(deckNumbers, midiChannel) {
         type: components.Button.prototype.types.toggle,
     });
 
-    // Vinyl Mode Button (QML: holdAction=GridCueEdit, shiftAction=SlipMode)
-    // Vinyl mode is ALWAYS ON for proper jog wheel scratching.
+    // Vinyl/Keylock Button (Simple LED, hardware-fixed red)
+    // Press: toggle vinyl/scratch mode + arm long-press timer
+    // Long press (≥275ms): undo vinyl toggle + toggle keylock
+    // Shift+press: toggle slip_enabled (immediate)
     this.vinylButton = new components.Button({
         midi: [0x90 + midiChannel, 0x23],
         type: components.Button.prototype.types.toggle,
         outConnect: true,
         outTrigger: false,
         input: function(channel, control, value, status, _group) {
-            print("DBG_VINYL_IN: ch=0x"+channel.toString(16)+" ctrl=0x"+control.toString(16)+" val="+value+" shift="+PrimeGo.shift);
-            // QML actions: normal=GridCueEdit (hold), shift=SlipMode (toggle)
-            if (PrimeGo.shift) {
-                if (this.isPress(channel, control, value, status)) {
+            if (this.isPress(channel, control, value, status)) {
+                // PRESS: toggle vinylMode immediately, arm long-press timer
+                if (PrimeGo.shift) {
                     engine.setValue(theDeck.currentDeck, "slip_enabled",
                         engine.getValue(theDeck.currentDeck, "slip_enabled") > 0 ? 0 : 1);
+                    return;
                 }
+                var oldVinyl = theDeck.jogWheel.vinylMode;
+                theDeck.jogWheel.vinylMode = !theDeck.jogWheel.vinylMode;
+                this.output();
+                // Long press within timeout toggles keylock
+                this._vinylLongArmed = true;
+                this.longPressTimer = engine.beginTimer(
+                    this.longPressTimeout,
+                    function() {
+                        if (this._vinylLongArmed) {
+                            // Long press: undo vinyl toggle + toggle keylock
+                            theDeck.jogWheel.vinylMode = !theDeck.jogWheel.vinylMode;
+                            engine.setValue(theDeck.currentDeck, "keylock",
+                                engine.getValue(theDeck.currentDeck, "keylock") > 0 ? 0 : 1);
+                            this.output();
+                            this._vinylLongArmed = false;
+                        }
+                        this.longPressTimer = 0;
+                    }.bind(this),
+                    true  // one-shot
+                );
+            } else {
+                // RELEASE: cancel timer — this was a short press, keep vinyl toggle
+                if (this.longPressTimer !== 0) {
+                    engine.stopTimer(this.longPressTimer);
+                    this.longPressTimer = 0;
+                }
+                this._vinylLongArmed = false;
             }
         },
         output: function() {
-            print("DBG_VINYL_OUT: shift="+PrimeGo.shift);
+            var val;
             if (PrimeGo.shift) {
-                this.send(0x09);  // yellow = slip mode via shift
+                var slip = engine.getValue(theDeck.currentDeck, "slip_enabled");
+                val = slip > 0 ? 0x3F : 0x00;
             } else {
-                this.send(0x40);  // bright red = vinyl mode always on
+                val = theDeck.jogWheel.vinylMode ? 0x40 : 0x00;
             }
+            this.send(val);
         },
         connect: function() {
             components.Button.prototype.connect.call(this);
-            // outKey is undefined, so parent connect makes no connection.
-            // Explicitly light the LED on connect.
-            print("DBG_VINYL_CONNECT: midi=0x"+this.midi[0].toString(16)+" n=0x"+this.midi[1].toString(16));
-            this.send(0x03);
+            this.send(0x40);  // vinyl mode starts on
         },
     });
 
@@ -1489,24 +1514,23 @@ PrimeGo.Deck = function(deckNumbers, midiChannel) {
             }
         },
         connect: function() {
-            // Force deck from group BEFORE parent connect, since 
-            // script.channelRegEx can produce NaN on this MIXXX build.
-            if (this.group) {
-                var match = /\[Channel(\d+)\]/.exec(this.group);
-                if (match) {
-                    this.deck = parseInt(match[1], 10);
+            // Force deck from group — script.channelRegEx is broken on this
+            // MIXXX build. Extract the deck number from the group string
+            // without using regex (Qt JS engine has broken regex support).
+            if (this.group && typeof this.group === "string") {
+                // group is like "[Channel1]", extract the number
+                var start = this.group.indexOf("Channel");
+                if (start >= 0) {
+                    var numStart = start + 7; // "Channel".length
+                    var numEnd = this.group.indexOf("]", numStart);
+                    if (numEnd < 0) numEnd = this.group.length;
+                    var numStr = this.group.substring(numStart, numEnd);
+                    this.deck = parseInt(numStr, 10);
                 }
             }
-            var prevDeck = this.deck;
-            components.JogWheelBasic.prototype.connect.call(this);
-            // Re-force deck after parent may have overwritten with NaN
-            if (isNaN(this.deck) && this.group) {
-                var match2 = /\[Channel(\d+)\]/.exec(this.group);
-                if (match2) {
-                    this.deck = parseInt(match2[1], 10);
-                }
-            }
-            print("DBG_JOG_CONNECT: prevDeck="+prevDeck+" deck="+this.deck+" group="+this.group);
+            // Call parent to make CO connections, but skip JogWheelBasic's
+            // connect (which would crash on broken channelRegEx).
+            components.Component.prototype.connect.call(this);
         },
     });
 

@@ -9,7 +9,7 @@ Last updated: 2026-07-28
 - [ ] **USB gadget cold boot test** — verify `WantedBy=multi-user.target` works after reboot
 - [ ] **Cold boot verification** — confirm all 10 I/O & VM optimizations persist across reboot
 - [ ] **Process trimming** — audit and disable unnecessary systemd units (149 processes is high)
-- [ ] **Keylock MIDI mapping** — debug keylock behavior (possibly MIDI mapping bug)
+- [x] **Keylock MIDI mapping** — vinyl button now toggles keylock (press) and slip (shift+press)
 
 ## Deferred (requires kernel/DTS rebuild)
 

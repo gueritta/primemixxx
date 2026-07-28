@@ -1226,7 +1226,7 @@
               </options>
             </control>
             <control> <!-- Deck A - Jog Wheel Surface Touch -->
-              <group></group>
+              <group>[Channel1]</group>
               <key>PrimeGo.leftDeck.jogWheel.inputTouch</key>
               <description></description>
               <status>0x92</status>
@@ -1236,7 +1236,7 @@
               </options>
             </control>
             <control> <!-- Deck A - Jog Wheel Surface Touch -->
-              <group></group>
+              <group>[Channel1]</group>
               <key>PrimeGo.leftDeck.jogWheel.inputTouch</key>
               <description></description>
               <status>0x82</status>
@@ -1447,22 +1447,22 @@
                 <Script-Binding/>
               </options>
             </control>
-            <control> <!-- Deck A - Vinyl Button -->
+            <control> <!-- Deck A - Vinyl/Keylock Button -->
               <group>[Channel1]</group>
               <key>PrimeGo.leftDeck.vinylButton.input</key>
-              <description>Vinyl Mode</description>
+              <description>Vinyl/Scratch (press) / Keylock (long press) / Slip (shift+press)</description>
               <status>0x92</status>
               <midino>0x23</midino>
               <options>
                 <Script-Binding/>
               </options>
             </control>
-            <control> <!-- Deck A - Slip Button -->
+            <control> <!-- Deck A - Vinyl/Keylock Button (release) -->
               <group>[Channel1]</group>
-              <key>PrimeGo.leftDeck.slipButton.input</key>
-              <description>Slip Mode</description>
-              <status>0x92</status>
-              <midino>0x24</midino>
+              <key>PrimeGo.leftDeck.vinylButton.input</key>
+              <description>Vinyl/Scratch (press) / Keylock (long press) / Slip (shift+press)</description>
+              <status>0x82</status>
+              <midino>0x23</midino>
               <options>
                 <Script-Binding/>
               </options>
@@ -1969,7 +1969,7 @@
               </options>
             </control>
             <control> <!-- Deck B - Jog Wheel Surface Touch -->
-              <group></group>
+              <group>[Channel2]</group>
               <key>PrimeGo.rightDeck.jogWheel.inputTouch</key>
               <description></description>
               <status>0x93</status>
@@ -1979,7 +1979,7 @@
               </options>
             </control>
             <control> <!-- Deck B - Jog Wheel Surface Touch -->
-              <group></group>
+              <group>[Channel2]</group>
               <key>PrimeGo.rightDeck.jogWheel.inputTouch</key>
               <description></description>
               <status>0x83</status>
@@ -2190,11 +2190,21 @@
                 <Script-Binding/>
               </options>
             </control>
-            <control> <!-- Deck B - Vinyl Button -->
+            <control> <!-- Deck B - Vinyl/Keylock Button -->
               <group>[Channel2]</group>
               <key>PrimeGo.rightDeck.vinylButton.input</key>
-              <description>Vinyl Mode</description>
+              <description>Vinyl/Scratch (press) / Keylock (long press) / Slip (shift+press)</description>
               <status>0x93</status>
+              <midino>0x23</midino>
+              <options>
+                <Script-Binding/>
+              </options>
+            </control>
+            <control> <!-- Deck B - Vinyl/Keylock Button (release) -->
+              <group>[Channel2]</group>
+              <key>PrimeGo.rightDeck.vinylButton.input</key>
+              <description>Vinyl/Scratch (press) / Keylock (long press) / Slip (shift+press)</description>
+              <status>0x83</status>
               <midino>0x23</midino>
               <options>
                 <Script-Binding/>
