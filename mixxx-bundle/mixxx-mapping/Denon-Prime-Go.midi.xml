@@ -2580,7 +2580,7 @@
 
             <control> <!-- FX Activate (note 6) — Toggle effect unit -->
               <group></group>
-              <key>PrimeGo.fxActivate</key>
+              <key>PrimeGo.fxActivate.input</key>
               <description>FX Activate</description>
               <status>0x94</status>
               <midino>0x06</midino>
@@ -2590,7 +2590,7 @@
             </control>
             <control> <!-- FX Activate OFF -->
               <group></group>
-              <key>PrimeGo.fxActivate</key>
+              <key>PrimeGo.fxActivate.input</key>
               <description>FX Activate (off)</description>
               <status>0x84</status>
               <midino>0x06</midino>
@@ -2601,7 +2601,7 @@
 
             <control> <!-- FX Assign 1 (note 11) — Route to Channel 1 -->
               <group></group>
-              <key>PrimeGo.fxAssign1</key>
+              <key>PrimeGo.fxAssign1.input</key>
               <description>FX Assign Channel 1</description>
               <status>0x94</status>
               <midino>0x0B</midino>
@@ -2611,7 +2611,7 @@
             </control>
             <control> <!-- FX Assign 1 OFF -->
               <group></group>
-              <key>PrimeGo.fxAssign1</key>
+              <key>PrimeGo.fxAssign1.input</key>
               <description>FX Assign Channel 1 (off)</description>
               <status>0x84</status>
               <midino>0x0B</midino>
@@ -2622,7 +2622,7 @@
 
             <control> <!-- FX Assign 2 (note 12) — Route to Channel 2 -->
               <group></group>
-              <key>PrimeGo.fxAssign2</key>
+              <key>PrimeGo.fxAssign2.input</key>
               <description>FX Assign Channel 2</description>
               <status>0x94</status>
               <midino>0x0C</midino>
@@ -2632,7 +2632,7 @@
             </control>
             <control> <!-- FX Assign 2 OFF -->
               <group></group>
-              <key>PrimeGo.fxAssign2</key>
+              <key>PrimeGo.fxAssign2.input</key>
               <description>FX Assign Channel 2 (off)</description>
               <status>0x84</status>
               <midino>0x0C</midino>

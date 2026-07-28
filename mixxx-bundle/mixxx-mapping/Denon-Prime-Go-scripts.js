@@ -440,6 +440,11 @@ PrimeGo.init = function(_id, _debug) {
     // Turn off all LEDs
     midi.sendShortMsg(0x90, 0x75, 0x00);
 
+    // DEBUG: Test FX LEDs directly
+    midi.sendShortMsg(0x94, 0x06, 0x3F);   // FX ON LED
+    midi.sendShortMsg(0x94, 0x0B, 0x3F);   // Assign Ch1 LED
+    midi.sendShortMsg(0x94, 0x0C, 0x3F);   // Assign Ch2 LED
+
     // Clear OLED screens
     for (let i = 0; i < 8; i++) {
         fxSendMsg(fxClear(i));
@@ -666,11 +671,17 @@ PrimeGo.init = function(_id, _debug) {
     };
 
     // ON button (0x94 0x06): minimize/expand FX unit → toggles [EffectRack1_EffectUnit1],show_parameters
-    PrimeGo.fxActivate = function(channel, control, value, status) {
-        if (value !== 0x7F) return;
-        var group = "[EffectRack1_EffectUnit1]";
-        engine.setValue(group, "show_parameters",
-            engine.getValue(group, "show_parameters") > 0 ? 0 : 1);
+    // LED: bright when FX section is expanded, off when collapsed
+    PrimeGo.fxActivate = new components.Button({
+        midi: [0x94, 0x06],
+        group: "[EffectRack1_EffectUnit1]",
+        key: "show_parameters",
+        type: components.Button.prototype.types.toggle,
+        outTrigger: true,
+    });
+    PrimeGo.fxActivate.output = function() {
+        // outTrigger passes no args — must read CO directly
+        this.send(engine.getValue("[EffectRack1_EffectUnit1]", "show_parameters") > 0 ? 0x3F : 0x00);
     };
 
     PrimeGo.fxWetDry = function(channel, control, value, status) {
@@ -679,18 +690,28 @@ PrimeGo.init = function(_id, _debug) {
         }
     };
 
-    PrimeGo.fxAssign1 = function(channel, control, value, status) {
-        if (value !== 0x7F) return;
-        var key = "group_[Channel1]_enable";
-        engine.setValue("[EffectRack1_EffectUnit1]", key,
-            engine.getValue("[EffectRack1_EffectUnit1]", key) > 0 ? 0 : 1);
+    PrimeGo.fxAssign1 = new components.Button({
+        midi: [0x94, 0x0B],
+        group: "[EffectRack1_EffectUnit1]",
+        key: "group_[Channel1]_enable",
+        type: components.Button.prototype.types.toggle,
+        outTrigger: true,
+    });
+    PrimeGo.fxAssign1.output = function() {
+        // outTrigger passes no args — must read CO directly
+        this.send(engine.getValue("[EffectRack1_EffectUnit1]", "group_[Channel1]_enable") > 0 ? 0x3F : 0x00);
     };
 
-    PrimeGo.fxAssign2 = function(channel, control, value, status) {
-        if (value !== 0x7F) return;
-        var key = "group_[Channel2]_enable";
-        engine.setValue("[EffectRack1_EffectUnit1]", key,
-            engine.getValue("[EffectRack1_EffectUnit1]", key) > 0 ? 0 : 1);
+    PrimeGo.fxAssign2 = new components.Button({
+        midi: [0x94, 0x0C],
+        group: "[EffectRack1_EffectUnit1]",
+        key: "group_[Channel2]_enable",
+        type: components.Button.prototype.types.toggle,
+        outTrigger: true,
+    });
+    PrimeGo.fxAssign2.output = function() {
+        // outTrigger passes no args — must read CO directly
+        this.send(engine.getValue("[EffectRack1_EffectUnit1]", "group_[Channel2]_enable") > 0 ? 0x3F : 0x00);
     };
 
     // Browse encoder push — loads selected track
@@ -1405,6 +1426,7 @@ PrimeGo.Deck = function(deckNumbers, midiChannel) {
                 if (PrimeGo.shift) {
                     engine.setValue(theDeck.currentDeck, "slip_enabled",
                         engine.getValue(theDeck.currentDeck, "slip_enabled") > 0 ? 0 : 1);
+                    this.output();
                     return;
                 }
                 var oldVinyl = theDeck.jogWheel.vinylMode;
