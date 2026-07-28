@@ -1,1 +1,1 @@
-../mixxx-mapping/Denon-Prime-Go-jog-wheel-scripts.js
+../mixxx-mapping/prime-go/Denon-Prime-Go-jog-wheel-scripts.js
