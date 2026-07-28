@@ -1,11 +1,28 @@
 #!/bin/sh
 # TKGL Bootstrap - Main script
 # Reads doer_list and executes modules in order
-# Source: adapted from MPC-LiveXplore-bootstrap
+# Self-describing: derives all paths from its own location on the SD card.
+# Does NOT depend on internal eMMC launcher injecting paths via tkgl_path.
 
-# Source tkgl_path first (needed when run as child process)
-TKGL_ROOT_DIR="$(dirname "$(readlink -f "$0")")/.."
-. "$TKGL_ROOT_DIR/scripts/tkgl_path"
+# Derive root from script location (e.g. /media/TKGL_BOOTSTRAP/.../scripts/tkgl_bootstrap)
+SELF="$(readlink -f "$0")"                   # resolve symlinks
+SCRIPTS_DIR="$(dirname "$SELF")"             # .../scripts
+TKGL_ROOT="$(dirname "$SCRIPTS_DIR")"        # .../
+MOUNT_POINT="$(dirname "$TKGL_ROOT")"        # /media/TKGL_BOOTSTRAP
+
+# Set standard TKGL paths
+TKGL_BIN="$TKGL_ROOT/bin"
+TKGL_LIB="$TKGL_ROOT/lib"
+TKGL_CONF="$TKGL_ROOT/conf"
+TKGL_LOG="$TKGL_ROOT/logs"
+TKGL_SCRIPTS="$TKGL_ROOT/scripts"
+TKGL_MODULES="$TKGL_ROOT/modules"
+TKGL_LOG_FILE="$TKGL_LOG/bootstrap_$(date +%Y%m%d_%H%M%S).log"
+
+# Optionally source tkgl_path for any overrides (e.g. module-specific paths)
+if [ -f "$TKGL_SCRIPTS/tkgl_path" ]; then
+    . "$TKGL_SCRIPTS/tkgl_path"
+fi
 
 BOOTSTRAP_LOG="$TKGL_LOG_FILE"
 

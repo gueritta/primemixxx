@@ -39,17 +39,8 @@ if [ ! -d "$TKGL_ROOT" ]; then
     exit 0
 fi
 
-cat > "$TKGL_ROOT/scripts/tkgl_path" <<EOF
-MOUNT_POINT="$BOOTSTRAP_MOUNT"
-TKGL_ROOT="$TKGL_ROOT"
-TKGL_BIN="\$TKGL_ROOT/bin"
-TKGL_LIB="\$TKGL_ROOT/lib"
-TKGL_CONF="\$TKGL_ROOT/conf"
-TKGL_LOG="\$TKGL_ROOT/logs"
-TKGL_SCRIPTS="\$TKGL_ROOT/scripts"
-TKGL_MODULES="\$TKGL_ROOT/modules"
-TKGL_LOG_FILE="\$TKGL_LOG/bootstrap_\$(date +%Y%m%d_%H%M%S).log"
-EOF
+# Bootstrap derives its own paths from script location.
+# No path injection needed — SD card is self-describing.
 
 echo "TKGL: running bootstrap" >> "$BOOT_LOG"
 "$TKGL_ROOT/scripts/tkgl_bootstrap" 2>&1 | tee -a "$BOOT_LOG"
