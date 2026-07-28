@@ -3,12 +3,11 @@
 Run [MIXXX](https://mixxx.org) (open-source DJ software) on your Denon DJ
 Prime Go or Prime 4 hardware alongside the stock Engine OS — **switchable
 on demand by inserting or removing an SD card.** No firmware flashing,
-no permanent modification. The stock Engine OS remains untouched.
+no permanent modification. **Stable at 5ms audio buffer.**
 
 > Fork of [@ghuntley/denon-prime4](https://github.com/ghuntley/denon-prime4) —
-> original firmware research. This fork focuses on deploying a working MIXXX
-> environment via SD card with dual-boot support, PREEMPT_RT kernel tuning,
-> CPU shielding, and sub-6ms audio latency.
+> original firmware research. This fork runs a tuned PREEMPT_RT environment
+> with CPU shielding, RT thread pinning, and I/O scheduler optimization.
 
 | Device | Status |
 |---|---|
