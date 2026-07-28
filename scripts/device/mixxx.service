@@ -6,7 +6,7 @@ Before=engine.service
 
 [Service]
 Type=simple
-ExecStart=/media/az01-internal/mixxx/mixxx_launcher.sh
+ExecStart=/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/mixxx_launcher.sh
 Restart=on-failure
 RestartSec=2
 Environment=HOME=/root

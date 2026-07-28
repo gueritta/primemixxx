@@ -14,7 +14,7 @@ systemctl stop engine.service 2>/dev/null || true
 sleep 1
 
 # Ensure MIXXX launcher is executable
-chmod +x /media/az01-internal/mixxx/mixxx_launcher.sh
+chmod +x /media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/mixxx_launcher.sh
 
 # Start MIXXX
 echo "Starting mixxx.service..."

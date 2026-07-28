@@ -19,7 +19,7 @@ BUNDLE_DIR="$REPO_ROOT/mixxx-bundle"
 DEVICE_IP="${DEVICE_IP:-primego.local}"
 SSH_USER="${SSH_USER:-root}"
 SSH_PASS="${SSH_PASS:-denonprime4}"
-DEVICE_MIXXX_DIR="/media/az01-internal/mixxx"
+DEVICE_MIXXX_DIR="/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle"
 BACKUP_DIR="$REPO_ROOT/sdcard-backup-$(date +%Y%m%d-%H%M%S)"
 
 # ── SSH helper using sshpass ─────────────────────────────────────────────────
@@ -63,12 +63,12 @@ eval $SSH_CMD "$SSH_TARGET" "mount -o remount,rw /" || {
 
 # ── Step 2: Back up SD card contents ─────────────────────────────────────────
 echo ""
-echo "--- Backing up /media/az01-internal/mixxx from device (excluding music/, lib/, bin/) ---"
+echo "--- Backing up /media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle from device (excluding music/, lib/, bin/) ---"
 mkdir -p "$BACKUP_DIR"
-eval $SCP_CMD "$SSH_TARGET:/media/az01-internal/mixxx/controllers" "$BACKUP_DIR/" 2>/dev/null
-eval $SCP_CMD "$SSH_TARGET:/media/az01-internal/mixxx/skins" "$BACKUP_DIR/" 2>/dev/null
-eval $SCP_CMD "$SSH_TARGET:/media/az01-internal/mixxx/settings" "$BACKUP_DIR/" 2>/dev/null
-eval $SCP_CMD "$SSH_TARGET:/media/az01-internal/mixxx/mixxx_launcher.sh" "$BACKUP_DIR/" 2>/dev/null && \
+eval $SCP_CMD "$SSH_TARGET:/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/controllers" "$BACKUP_DIR/" 2>/dev/null
+eval $SCP_CMD "$SSH_TARGET:/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/skins" "$BACKUP_DIR/" 2>/dev/null
+eval $SCP_CMD "$SSH_TARGET:/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/settings" "$BACKUP_DIR/" 2>/dev/null
+eval $SCP_CMD "$SSH_TARGET:/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/mixxx_launcher.sh" "$BACKUP_DIR/" 2>/dev/null && \
   echo "SD card backup saved to: $BACKUP_DIR" || \
   echo "WARNING: SD card backup may be incomplete (directory may be empty or inaccessible)."
 echo "Backup size: $(du -sh "$BACKUP_DIR" 2>/dev/null | cut -f1)"

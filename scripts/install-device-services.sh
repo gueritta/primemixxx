@@ -16,7 +16,7 @@ DEVICE_IP="${DEVICE_IP:-primego.local}"
 SSH_USER="${SSH_USER:-root}"
 SSH_PASS="${SSH_PASS:-denonprime4}"
 SSH_TARGET="${SSH_USER}@${DEVICE_IP}"
-DEVICE_MIXXX_DIR="/media/az01-internal/mixxx"
+DEVICE_MIXXX_DIR="/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle"
 
 ssh_cmd() {
     sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$SSH_TARGET" "$@"
@@ -104,10 +104,10 @@ echo "  mDNS fix: enabled (advertises primego.local)"
 echo ""
 echo "--- Cleaning stale paths ---"
 ssh_cmd "
-rm -f /media/az01-internal/mixxx/settings/controllers/*.js \
-      /media/az01-internal/mixxx/settings/controllers/*.xml
-sed -i 's|/media/az01-internal/mixxx/settings/controllers/Denon-Prime-Go.midi.xml|/media/az01-internal/mixxx/controllers/Denon-Prime-Go.midi.xml|' \
-  /media/az01-internal/mixxx/settings/mixxx.cfg 2>/dev/null || true
+rm -f /media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/settings/controllers/*.js \
+      /media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/settings/controllers/*.xml
+sed -i 's|/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/settings/controllers/Denon-Prime-Go.midi.xml|/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/controllers/Denon-Prime-Go.midi.xml|' \
+  /media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/settings/mixxx.cfg 2>/dev/null || true
 "
 
 echo ""

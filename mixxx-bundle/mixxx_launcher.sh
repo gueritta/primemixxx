@@ -28,7 +28,7 @@ detect_device() {
 }
 detect_device
 
-BUNDLE=/media/az01-internal/mixxx
+BUNDLE=/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle
 MUSIC_DIR="$BUNDLE/music"
 
 mount_usb_music() {

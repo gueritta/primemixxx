@@ -17,7 +17,10 @@ sed -i 's|^BUNDLE=/media/az01-internal/mixxx|BUNDLE=/media/TKGL_BOOTSTRAP/tkgl_b
 
 echo "Patching TKGL module..."
 sed -i 's|MIXDIR=/data/mixxx|MIXDIR=/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle|' "$MOD_MIXXX"
-sed -i 's|ENTRYPOINT=$MIXDIR/mixxx|ENTRYPOINT=$MIXDIR/mixxx_launcher.sh|' "$MOD_MIXXX"
+# Only add _launcher.sh if not already present (avoid doubling)
+if ! grep -q 'ENTRYPOINT=.*mixxx_launcher\.sh' "$MOD_MIXXX"; then
+    sed -i 's|ENTRYPOINT=$MIXDIR/mixxx\b|ENTRYPOINT=$MIXDIR/mixxx_launcher.sh|' "$MOD_MIXXX"
+fi
 
 echo "=== Verify ==="
 grep "^BUNDLE=" "$LAUNCHER"

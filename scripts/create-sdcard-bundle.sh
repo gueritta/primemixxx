@@ -99,7 +99,7 @@ else
   cat > "$STAGING/mixxx" <<'ENTRYEOF'
 #!/bin/sh
 # TKGL entry point - delegates to SD card launcher
-exec /media/az01-internal/mixxx/mixxx_launcher.sh "$@"
+exec /media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/mixxx_launcher.sh "$@"
 ENTRYEOF
   chmod +x "$STAGING/mixxx"
 fi
@@ -165,7 +165,7 @@ CREATE TABLE IF NOT EXISTS directories (
     directory TEXT NOT NULL,
     volume TEXT NOT NULL
 );
-INSERT OR IGNORE INTO directories (id, directory, volume) VALUES (1, '/media/az01-internal/mixxx/music', '1');
+INSERT OR IGNORE INTO directories (id, directory, volume) VALUES (1, '/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/music', '1');
 
 CREATE TABLE IF NOT EXISTS information (
     id INTEGER PRIMARY KEY,

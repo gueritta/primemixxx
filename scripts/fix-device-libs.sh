@@ -48,7 +48,7 @@ SYSTEM_LIBS=(
 )
 
 # ── Bundle lib path (overrideable via env) ─────────────────────────────────────
-: "${BUNDLE_LIB:=/media/az01-internal/mixxx/lib}"
+: "${BUNDLE_LIB:=/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/lib}"
 
 # ── The core fix logic (shared between local and remote modes) ─────────────────
 FIX_COMMANDS='

@@ -4,7 +4,7 @@
 
 DEVICE_IP="${1:-10.109.235.244}"
 BUNDLE_DIR="$(cd "$(dirname "$0")/../mixxx-bundle" && pwd)"
-TARGET_DIR="/media/az01-internal/mixxx"
+TARGET_DIR="/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle"
 
 echo "=== Quick-fix deploy to $DEVICE_IP ==="
 echo "This will:"
@@ -18,7 +18,7 @@ SCP_CMD="setsid scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null 
 # Step 1: Remove system libs on device
 echo "--- Removing system libs from device bundle ---"
 $SSH_CMD '
-BUNDLE_LIB="/media/az01-internal/mixxx/lib"
+BUNDLE_LIB="/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/lib"
 SYSTEM_LIBS="libc.so.6 libm.so.6 libpthread.so.0 libdl.so.2 librt.so.1 libstdc++.so.6 libgcc_s.so.1 ld-linux-armhf.so.3 libatomic.so.1 libresolv.so.2 libnss_dns.so.2 libnss_files.so.2 libutil.so.1 libcrypt.so.1 libnsl.so.1 libanl.so.1"
 for lib in $SYSTEM_LIBS; do
   [ -f "$BUNDLE_LIB/$lib" ] && rm -f "$BUNDLE_LIB/$lib" && echo "  removed $lib"
@@ -44,19 +44,19 @@ cat "$BUNDLE_DIR/mixxx_launcher.sh" | $SSH_CMD "cat > $TARGET_DIR/mixxx_launcher
 #        Our custom Prime Go mapping must NOT be mixed into settings/controllers/.
 echo "--- Cleaning stale settings/controllers/ copies and fixing config ---"
 $SSH_CMD '
-CTRL_DIR="/media/az01-internal/mixxx/controllers"
-SETTINGS_DIR="/media/az01-internal/mixxx/settings/controllers"
+CTRL_DIR="/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/controllers"
+SETTINGS_DIR="/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/settings/controllers"
 # Remove any stray Denon Prime Go files from the built-in controller directory
 rm -f "$SETTINGS_DIR"/Denon-Prime-Go-scripts.js "$SETTINGS_DIR"/Denon-Prime-Go.midi.xml "$SETTINGS_DIR"/Denon-Prime-Go-jog-wheel-scripts.js "$SETTINGS_DIR"/Denon-Prime-Go-Jog-Wheels.midi.xml "$SETTINGS_DIR"/midi-components-0.0.js
 # Fix MIXXX config to point to controllers/ (not settings/controllers/)
-sed -i "s|/media/az01-internal/mixxx/settings/controllers/Denon-Prime-Go.midi.xml|/media/az01-internal/mixxx/controllers/Denon-Prime-Go.midi.xml|" /media/az01-internal/mixxx/settings/mixxx.cfg
+sed -i "s|/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/settings/controllers/Denon-Prime-Go.midi.xml|/media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/controllers/Denon-Prime-Go.midi.xml|" /media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle/settings/mixxx.cfg
 echo "  Stale copies removed, config fixed"
 # Verify no duplication
 [ -f "$SETTINGS_DIR/Denon-Prime-Go.midi.xml" ] && echo "  WARNING: still in settings/controllers!" || echo "  Verified: no duplicate in settings/controllers/"
 '
 
 echo ""
-echo "Run on device: cd /media/az01-internal/mixxx && ./mixxx_launcher.sh"
+echo "Run on device: cd /media/TKGL_BOOTSTRAP/tkgl_bootstrap_DenonPrimeGO/mixxx-bundle && ./mixxx_launcher.sh"
 
 # Step 5: Deploy profiling/measurement tools
 echo ""
